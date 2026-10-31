@@ -926,7 +926,22 @@ function examsFor(cid){
 /* রুটিনের দিনে এক বা একাধিক অংশ (পুরোনো রুটিনে শুধু chapter/ex থাকে) */
 function unitsOf(r){
   if(r&&Array.isArray(r.units)&&r.units.length) return r.units.filter(u=>u&&+u.ch).map(u=>({ch:+u.ch,ex:u.ex?String(u.ex):null}));
-  return r&&r.chapter?[{ch:+r.chapter,ex:r.ex?String(r.ex):null}]:[];
+  if(r&&r.chapter) return [{ch:+r.chapter,ex:r.ex?String(r.ex):null}];
+  return r&&r.course&&r.syllabus?parseUnits(r.course,r.syllabus):[];   // অংশ বেছে না দিলে সিলেবাসের লেখা থেকে চিনে নেওয়া
+}
+/* সিলেবাসের লেখা থেকে অধ্যায়/অনুশীলনী চেনা: "অনুশীলনী ৮.২, ৮.৩", "অনুশীলনী২, ৮.৩", "অধ্যায় ৫" */
+function parseUnits(cid,text){
+  const c=COURSES[cid]; if(!c) return [];
+  let t=en(String(text||'')); const out=[];
+  const add=u=>{ if(!out.some(x=>x.ch===u.ch&&x.ex===u.ex)) out.push(u); };
+  const valid=ex=>exList(cid,exCh(ex)).includes(ex);
+  const DOT=/(\d{1,2})\s*[.।]\s*(\d{1,2})/g;
+  [...t.matchAll(DOT)].forEach(m=>{ const ex=`${+m[1]}.${+m[2]}`; if(valid(ex)) add({ch:+m[1],ex}); });
+  t=t.replace(DOT,' ');
+  t=t.replace(/অধ্যায়\s*[:\-]?\s*(\d{1,2})/g,(_,n)=>{ n=+n; if(n>=1&&n<=c.chapters.length) add({ch:n,ex:null}); return ' '; });
+  const chs=[...new Set(out.filter(u=>u.ex).map(u=>u.ch))];
+  if(chs.length===1) [...t.matchAll(/(\d{1,2})/g)].forEach(m=>{ const ex=`${chs[0]}.${+m[1]}`; if(valid(ex)) add({ch:chs[0],ex}); });
+  return out.sort((a,b)=>a.ch-b.ch||String(a.ex||'').localeCompare(String(b.ex||''),undefined,{numeric:true}));
 }
 const unitVal=u=>u.ex?String(u.ex):String(u.ch);
 const valUnit=v=>({ch:exCh(v),ex:String(v).indexOf('.')>0?String(v):null});
@@ -1109,7 +1124,7 @@ function xaCard(e,showCourse){
   else if(e.pending){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>প্রকাশ হবে ${fmtDT(e.publishAt)}</button>`; }
   else if(e.date>today){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>শুরু হবে ${bn(d.getDate())} ${MONN[d.getMonth()]}</button>`; }
   else if(!units.length||!pool){ right=`<button class="btn" disabled>${!units.length?'অনলাইন পরীক্ষা নেই':'প্রশ্ন যোগ হয়নি'}</button>`; }
-  else { right=`<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দিন':'পরীক্ষা দিন (দেরিতে)'}</button>`; }
+  else { right=`<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'}</button>`; }
   const del=CAN_EDIT&&DB&&e.kind!=='friday'?`<button class="link del" ${e.kind==='special'?`data-xdel="${esc(e.id)}"`:`data-del="${esc(e.id)}"`} style="align-self:flex-end">মুছুন</button>`:'';
   return `<article class="xa-card">
     <div class="xa-top"><span class="xa-date">${bnD(d)}</span><span class="xa-chips"><span class="xa-pill st-${sk}">${sl}</span>
@@ -1490,9 +1505,11 @@ async function publishRoutine(){
   S.publishing=true; render();
   try{
     for(let i=0;i<6;i++){
-      const k=isoD(addD(s,i)), id=`${rf.course}_${k}`, units=((rf.chs&&rf.chs[k])||[]).map(valUnit).filter(u=>u.ch), ch=units.length?units[0].ch:null, ex=units.length?units[0].ex:null;
+      const k=isoD(addD(s,i)), id=`${rf.course}_${k}`, units=((rf.chs&&rf.chs[k])||[]).map(valUnit).filter(u=>u.ch);
       let txt=String(rf.vals[k]||'').trim();
       const files=((rf.files&&rf.files[k])||[]).slice(0,10);
+      if(!units.length&&String(rf.vals[k]||'').trim()){ parseUnits(rf.course,rf.vals[k]).forEach(u=>units.push(u)); }
+      const ch=units.length?units[0].ch:null, ex=units.length?units[0].ex:null;
       const had=ROUT.find(x=>x.id===id), same=had&&JSON.stringify(unitsOf(had))===JSON.stringify(units)&&JSON.stringify(filesOf(had))===JSON.stringify(files);
       if(had&&!same&&txt&&txt===autoSyl(rf.course,unitsOf(had))) txt='';
       if(!txt&&units.length) txt=autoSyl(rf.course,units);
