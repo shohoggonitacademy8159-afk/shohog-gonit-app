@@ -361,6 +361,13 @@ select.input{appearance:auto}
 .price-tag{display:block;width:fit-content;margin:5px auto 0;font-size:12px;font-weight:700;color:#fff;background:var(--pink-a);border-radius:999px;padding:2px 9px}
 .offer{background:var(--surface);border:2px solid var(--accent);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px}
 .offer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.pk-block{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.perks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;width:100%}
+.perks li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.45}
+.pk-ic{width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex-shrink:0}
+.pk-ic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pk-fee{display:flex;justify-content:space-between;align-items:center;gap:12px;border-radius:16px;padding:12px 14px;background:var(--accent-soft)}
+.pk-btn{font-size:17px;min-height:54px}
 .offer-tag{font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 10px}
 .price{text-align:right;flex-shrink:0}
 .price b{display:block;font-size:30px;line-height:1;color:var(--pink-a);font-variant-numeric:tabular-nums}
@@ -649,25 +656,39 @@ function vHome(){
   </div>`;
 }
 function offerCard(id,o){
-  const days=[['শনি',6],['রবি',0],['সোম',1],['মঙ্গল',2],['বুধ',3],['বৃহঃ',4],['শুক্র',5]];
-  const today=new Date().getDay();
-  const enrolled=!!(S.enrolled&&S.enrolled[id]);
+  const c=COURSES[id], enrolled=!!(S.enrolled&&S.enrolled[id]);
+  const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0);
+  const nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
+  const perks=[
+    ['calendar',`শনি – বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা (${bn(o.daily.mins)} মিনিট)`],
+    ['calendar',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের সাপ্তাহিক পরীক্ষা (${bn(o.friday.mins)} মিনিট), সিলেবাস আগের ৬ দিনের`],
+    ['exam','মাসিক পরীক্ষা ও মডেল টেস্ট (বিশেষ পরীক্ষা)'],
+    ['book',`${bn(c.chapters.length)}টি অধ্যায়${nex?`, ${bn(nex)}টি অনুশীলনী`:''} — অধ্যায়ভিত্তিক নোট ও পিডিএফ`],
+    ['pencil',`${nq?bn(nq)+'+':'হাজারো'} MCQ — সহজ, মধ্যম ও কঠিন স্তরে অনুশীলন`],
+    ['check','পরীক্ষার পরপরই নম্বর, সঠিক উত্তর ও ব্যাখ্যা'],
+    ['chart','মেধাতালিকায় নিজের অবস্থান ও লার্নিং রিপোর্টে অগ্রগতি'],
+  ];
   return `<section class="offer" aria-label="মাসিক কোর্স">
-    <div class="offer-top">
-      <div><span class="offer-tag">মাসিক কোর্স</span><h2 class="display" style="font-size:22px;margin-top:6px">দশম শ্রেণি সাধারণ গণিত</h2></div>
+    <div class="pk-block">
+      <span class="offer-tag">কোর্স</span>
+      <h2 class="display" style="font-size:22px;margin:6px 0 2px">${c.name} ${c.subj} — মাসিক লাইভ পরীক্ষা কোর্স</h2>
+      <p class="muted" style="margin:0;font-size:14px">${c.sub?`${c.sub} পরীক্ষার্থীদের জন্য। `:''}প্রতিদিনের রুটিন মেনে পরীক্ষা দিয়ে পুরো সিলেবাস নিয়মিত অনুশীলন।</p>
+    </div>
+    <div class="pk-block">
+      <span class="offer-tag">কোর্সের সুবিধা</span>
+      <ul class="perks">${perks.map(([ic,t])=>`<li><span class="pk-ic">${svg(ic)}</span><span>${t}</span></li>`).join('')}</ul>
+    </div>
+    <div class="pk-fee">
+      <div><span class="offer-tag">মাসিক ফি</span><p class="muted" style="margin:6px 0 0;font-size:13.5px">সব সুবিধা এক প্যাকেজে</p></div>
       <div class="price"><b>৳${bn(o.price)}</b><span>প্রতি মাস</span></div>
     </div>
-    <div class="exam-rules">
-      <div class="rule-box"><span class="muted">শনিবার – বৃহস্পতিবার</span><b>${bn(o.daily.marks)} নম্বরের পরীক্ষা</b><span>সময় ${bn(o.daily.mins)} মিনিট</span></div>
-      <div class="rule-box fri"><span class="muted">শুক্রবার</span><b>${bn(o.friday.marks)} নম্বরের পরীক্ষা</b><span>সময় ${bn(o.friday.mins)} মিনিট</span><span style="font-size:12.5px">সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</span></div>
-    </div>
+    ${enrolled
+      ?`<div class="enrolled">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ নেওয়া হয়েছে। পেমেন্ট ব্যবস্থা চালু হলে এখান থেকেই মাসিক ফি দেওয়া যাবে।</div>`
+      :`<button class="btn pk-btn" data-enroll="${id}" style="width:100%">প্যাকেজ নাও · ৳${bn(o.price)}/মাস</button>`}
     <div style="display:flex;flex-direction:column;gap:8px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:16px">এই সপ্তাহের রুটিন</b><button class="link" data-go="routine">পুরো রুটিন</button></div>
       ${weekPreview(id)}
     </div>
-    ${enrolled
-      ?`<div class="enrolled">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}কোর্সে ভর্তি হয়েছ। পেমেন্ট ব্যবস্থা চালু হলে এখান থেকেই মাসিক ফি দেওয়া যাবে।</div>`
-      :`<button class="btn" data-enroll="${id}" style="width:100%">মাসিক ৳${bn(o.price)}-এ ভর্তি হও</button>`}
   </section>`;
 }
 function vCourse(){
@@ -681,8 +702,8 @@ function vCourse(){
       <span class="muted" style="font-size:14px">${bn(c.chapters.length)}টি অধ্যায় · ${bn(doneCount)}টি পড়া শেষ</span></div>
     </div>
     <div class="progress" aria-hidden="true"><i style="width:${Math.round(doneCount/c.chapters.length*100)}%"></i></div>
-    ${sylCard(id)}
     ${c.offer?offerCard(id,c.offer):''}
+    ${sylCard(id)}
     <div class="list" role="list">
       ${c.chapters.map((ch,i)=>{const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
         <span class="num">${bn(i+1)}</span>
@@ -1831,7 +1852,7 @@ app.addEventListener('click',e=>{
     else{ t.dataset.armed='1'; t.textContent='নিশ্চিত? আবার চাপুন'; }
     return;
   }
-  if(t.dataset.enroll){ S.enrolled[t.dataset.enroll]=true; persist(); render(); toast('কোর্সে ভর্তি হয়েছ'); return; }
+  if(t.dataset.enroll){ S.enrolled[t.dataset.enroll]=true; persist(); render(); toast('প্যাকেজ নেওয়া হয়েছে'); return; }
   if(t.hasAttribute('data-primary')){
     if(!S.joined){ S.joined=true; persist(); toast('পঞ্চম শ্রেণিতে ফ্রীতে যুক্ত হয়েছ'); }
     return go('course',{course:'p5'});
