@@ -33,13 +33,15 @@ class Bank:
         return True
     def count(s, lv): return sum(1 for x in s.items if x['lv'] == lv)
     def fill(s, lv, need, gens, cap=7):
-        tries, used = 0, {}
+        tries, used, miss = 0, {}, {}
         while s.count(lv) < need:
             tries += 1
             assert tries < 60000, (s.ex, lv, s.count(lv))
-            live = [g for g in gens if used.get(g.__name__, 0) < cap] or gens
+            alive = [g for g in gens if miss.get(g.__name__, 0) < 300] or gens   # নতুন প্রশ্ন আর দিতে না পারা টেমপ্লেট বাদ
+            live = [g for g in alive if used.get(g.__name__, 0) < cap] or alive
             g = s.R.choice(live); before = s.count(lv); g()
-            if s.count(lv) > before: used[g.__name__] = used.get(g.__name__, 0) + 1
+            if s.count(lv) > before: used[g.__name__] = used.get(g.__name__, 0) + 1; miss[g.__name__] = 0
+            else: miss[g.__name__] = miss.get(g.__name__, 0) + 1
     def final(s):
         out = []
         for lv, n in ((E, 30), (M, 50), (H, 20)):

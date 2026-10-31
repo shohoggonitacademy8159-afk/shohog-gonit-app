@@ -220,33 +220,32 @@ def h2_diff_back():
 b.fill(H, 20, [h2_x6, h2_surd, h2_ab_back, h2_ratio, h2_diff_back], cap=6)
 B32 = b.final()
 
-# ================ 3.3 উৎপাদকে বিশ্লেষণ ও ভাগশেষ উপপাদ্য ================
-b = Bank('3.3', R)
+# ================ 3.3/3.4/3.5 টেমপ্লেট (ব্যাংক নিচে সাজানো) ================
 def fac(r):  # (x − r)
     return f"(x {sgn(-r)} {abs(r)})" if r else "x"
-for q, c, w, e in [
+FIX33 = [
  ("P(x)-কে (x − a) দ্বারা ভাগ করলে ভাগশেষ কত হয়?", "P(a)", ["P(−a)", "P(0)", "a"], "ভাগশেষ উপপাদ্য।"),
  ("P(a) = 0 হলে নিচের কোনটি P(x)-এর একটি উৎপাদক?", "x − a", ["x + a", "a", "x"], "উৎপাদক উপপাদ্য।"),
  ("P(x)-কে (x + a) দ্বারা ভাগ করলে ভাগশেষ কত?", "P(−a)", ["P(a)", "P(0)", "−a"], "x + a = x − (−a)।"),
  ("P(x)-কে (ax − b) দ্বারা ভাগ করলে ভাগশেষ কত?", "P(b/a)", ["P(a/b)", "P(−b/a)", "P(b)"], "ax − b = 0 ⇒ x = b/a।"),
  ("x⁴ + x² + 1 এর উৎপাদক কোনটি?", "(x² + x + 1)(x² − x + 1)", ["(x² + 1)²", "(x² + x − 1)(x² − x − 1)", "(x² + 1)(x² − 1)"], "(x² + 1)² − x² আকারে লিখে।"),
  ("a⁴ + 4 এর উৎপাদক কোনটি?", "(a² + 2a + 2)(a² − 2a + 2)", ["(a² + 2)²", "(a² + 2)(a² − 2)", "(a + 2)(a³ + 2)"], "(a² + 2)² − (2a)² আকারে লিখে।"),
-]: b.add(q, c, w, e, E)
+]
 def e3_diffsq():
     k = R.randint(1, 12)
     b.add(f"x² − {k*k} এর উৎপাদক কোনটি?", f"(x + {k})(x − {k})", [f"(x − {k})²", f"(x + {k})²", f"(x − {k*k})(x + 1)"], "a² − b² = (a + b)(a − b)।", E)
 def e3_monic():
     r1, r2 = R.sample([v for v in range(-7, 8) if v], 2)
+    if r1 == -r2: return
     p = pmul(lin([1], -r1), lin([1], -r2))
     b.add(f"{pfmt(p, ('x',))} এর উৎপাদক কোনটি?", f"{fac(r1)}{fac(r2)}", [f"{fac(-r1)}{fac(-r2)}", f"{fac(r1)}{fac(-r2)}" if r1 != -r2 else f"{fac(r1 + 1)}{fac(r2)}", f"{fac(r1 * r2)}(x − 1)" if r1 * r2 != 1 else f"{fac(r1 + 2)}{fac(r2)}"], f"গুণফল {r1 * r2} ও যোগফল {r1 + r2} এমন দুটি সংখ্যা {r1}, {r2}।", E)
 def e3_common():
     a_, k = R.randint(2, 6), R.randint(2, 9)
     b.add(f"{a_}x² + {a_*k}x এর উৎপাদক কোনটি?", f"{a_}x(x + {k})", [f"{a_}(x² + {k})", f"x({a_}x + {k})", f"{a_}x(x + {a_*k})"], f"সাধারণ উৎপাদক {a_}x বের করে।", E)
 def e3_rem_simple():
-    a_, c_ = R.randint(-4, 5), R.randint(-6, 6)
+    a_, c_ = R.choice([-4, -3, -2, -1, 1, 2, 3, 4, 5]), R.choice([v for v in range(-8, 9) if v])
     v = a_ * a_ + c_
     b.add(f"x² {sgn(c_)} {abs(c_)} কে (x {sgn(-a_)} {abs(a_)}) দ্বারা ভাগ করলে ভাগশেষ কত?", v, near(v), f"ভাগশেষ = P({a_}) = {a_*a_} {sgn(c_)} {abs(c_)} = {v}।", E)
-b.fill(E, 30, [e3_diffsq, e3_monic, e3_common, e3_rem_simple])
 def m3_split():
     p_, q_, r_, s_ = R.choice([2, 3, 4, 5]), R.choice([v for v in range(-5, 6) if v]), 1, R.choice([v for v in range(-5, 6) if v])
     if math.gcd(p_, abs(q_)) != 1: return
@@ -270,13 +269,14 @@ def m3_rem_cubic():
     v = P(a_)
     b.add(f"{poly} কে (x {sgn(-a_)} {abs(a_)}) দ্বারা ভাগ করলে ভাগশেষ কত?", v, [P(-a_) if P(-a_) != v else v + 2, v + 1, v - 1], f"ভাগশেষ = P({a_}) = {v}।", M)
 def m3_find_k():
-    a_, c_ = R.choice([-3, -2, -1, 1, 2, 3]), R.randint(-8, 8)
+    a_, c_ = R.choice([-3, -2, -1, 1, 2, 3]), R.choice([v for v in range(-8, 9) if v])
     # x² + kx + c ; P(a)=0 ⇒ k = −(a² + c)/a
     k = F(-(a_ * a_ + c_), a_)
     if k.denominator != 1: return
     b.add(f"(x {sgn(-a_)} {abs(a_)}) রাশিটি x² + kx {sgn(c_)} {abs(c_)} এর উৎপাদক হলে k = কত?", fr(k), [fr(-k) if k else '1', fr(k + 1), fr(k - 2)], f"P({a_}) = 0 ⇒ {a_*a_} + ({a_})k {sgn(c_)} {abs(c_)} = 0 ⇒ k = {fr(k)}।", M)
 def m3_group():
-    a_, b_ = R.randint(1, 6), R.randint(1, 6)
+    a_, b_ = R.randint(2, 7), R.randint(2, 7)
+    if a_ == b_: return
     b.add(f"x² + {a_}x + {b_}x + {a_*b_} এর উৎপাদক কোনটি?", f"(x + {a_})(x + {b_})", [f"(x + {a_})(x − {b_})", f"(x − {a_})(x − {b_})", f"(x + {a_*b_})(x + 1)"], "জোড়ায় জোড়ায় সাজিয়ে সাধারণ উৎপাদক বের করে।", M)
 def m3_sq_trinom():
     k = R.randint(2, 9); s_ = R.choice([1, -1])
@@ -290,7 +290,6 @@ def m3_is_factor():
     p = pmul(lin([1], -r1), lin([1], -r2))
     wrong = [f"x {sgn(r1)} {abs(r1)}" if r1 != -r2 else f"x {sgn(-r1-1)} {abs(r1+1)}", f"x {sgn(-r1*r2)} {abs(r1*r2)}" if r1 * r2 not in (r1, r2) else "x + 10", f"x {sgn(-(r1+r2))} {abs(r1+r2)}" if r1 + r2 not in (r1, r2, 0) else "x − 11"]
     b.add(f"নিচের কোনটি {pfmt(p, ('x',))} এর একটি উৎপাদক?", f"x {sgn(-r1)} {abs(r1)}", wrong, f"P({r1}) = 0, তাই (x {sgn(-r1)} {abs(r1)}) উৎপাদক।", M)
-b.fill(M, 50, [m3_split, m3_cubes, m3_rem_cubic, m3_find_k, m3_group, m3_sq_trinom, m3_four, m3_is_factor])
 def h3_cubic():
     rs = R.sample([v for v in range(-4, 5) if v], 3)
     p = pmul(pmul(lin([1], -rs[0]), lin([1], -rs[1])), lin([1], -rs[2]))
@@ -315,19 +314,16 @@ def h3_complex():
 def h3_sum_cubes_poly():
     k = R.randint(2, 4)
     b.add(f"8x³ + {k**3} এর উৎপাদক কোনটি?", f"(2x + {k})(4x² − {2*k}x + {k*k})", [f"(2x + {k})(4x² + {2*k}x + {k*k})", f"(2x − {k})(4x² + {2*k}x + {k*k})", f"(8x + {k})(x² − {k}x + {k*k})"], f"(2x)³ + {k}³ = (2x + {k})((2x)² − 2x·{k} + {k}²)।", H)
-b.fill(H, 20, [h3_cubic, h3_cubic_k, h3_rem_linear, h3_complex, h3_sum_cubes_poly], cap=6)
-B33 = b.final()
 
-# ================ 3.4 বাস্তব সমস্যায় সূত্রের প্রয়োগ ================
-b = Bank('3.4', R)
-for q, c, w, e in [
+# ---- বাস্তব সমস্যা ----
+FIX34 = [
  ("কেউ একটি কাজ n দিনে করলে 1 দিনে কাজের কত অংশ করে?", "1/n", ["n", "n − 1", "1 − n"], "সম্পূর্ণ কাজকে 1 ধরে।"),
  ("দূরত্ব, বেগ ও সময়ের সম্পর্ক কোনটি?", "দূরত্ব = বেগ × সময়", ["বেগ = দূরত্ব × সময়", "সময় = বেগ × দূরত্ব", "দূরত্ব = বেগ ÷ সময়"], "d = vt।"),
  ("স্রোতের অনুকূলে নৌকার কার্যকর বেগ কত?", "নৌকার বেগ + স্রোতের বেগ", ["নৌকার বেগ − স্রোতের বেগ", "স্রোতের বেগ", "নৌকার বেগ × স্রোতের বেগ"], "স্রোত নৌকাকে সাহায্য করে।"),
  ("স্রোতের প্রতিকূলে নৌকার কার্যকর বেগ কত?", "নৌকার বেগ − স্রোতের বেগ", ["নৌকার বেগ + স্রোতের বেগ", "স্রোতের বেগ − নৌকার বেগ", "নৌকার বেগ"], "স্রোত নৌকাকে বাধা দেয়।"),
  ("লাভ = কত?", "বিক্রয়মূল্য − ক্রয়মূল্য", ["ক্রয়মূল্য − বিক্রয়মূল্য", "বিক্রয়মূল্য + ক্রয়মূল্য", "বিক্রয়মূল্য × ক্রয়মূল্য"], "বিক্রয়মূল্য বেশি হলে লাভ।"),
  ("লাভের হার সাধারণত কিসের উপর হিসাব করা হয়?", "ক্রয়মূল্যের উপর", ["বিক্রয়মূল্যের উপর", "লাভের উপর", "মোট টাকার উপর"], "লাভ% = লাভ/ক্রয়মূল্য × 100।"),
-]: b.add(q, c, w, e, E)
+]
 def e4_dist():
     v, t = R.randint(20, 80), R.randint(2, 6)
     b.add(f"ঘণ্টায় {v} কিমি বেগে {t} ঘণ্টায় কত কিমি পথ যাওয়া যাবে?", v * t, [v + t, v * t + v, v * (t - 1)], f"দূরত্ব = {v} × {t} = {v*t} কিমি।", E)
@@ -345,7 +341,6 @@ def e4_profit():
 def e4_oneday():
     n = R.randint(4, 20)
     b.add(f"রহিম একটি কাজ {n} দিনে করতে পারে। {n//2 if n%2==0 else 2} দিনে সে কাজের কত অংশ করবে?", dec(F(n // 2 if n % 2 == 0 else 2, n)), [dec(F(1, n)), dec(F(n // 2 if n % 2 == 0 else 2, n) + F(1, n)), dec(1 - F(n // 2 if n % 2 == 0 else 2, n)) if 1 - F(n // 2 if n % 2 == 0 else 2, n) != F(n // 2 if n % 2 == 0 else 2, n) else dec(F(1, 3))], "প্রতিদিন 1/n অংশ।", E)
-b.fill(E, 30, [e4_dist, e4_time, e4_pct, e4_profit, e4_oneday])
 WORK = [(12, 24, 8), (10, 15, 6), (20, 30, 12), (6, 12, 4), (12, 36, 9), (18, 36, 12), (15, 30, 10), (4, 12, 3), (30, 60, 20), (10, 40, 8), (6, 3, 2), (20, 5, 4), (24, 8, 6)]
 def m4_together():
     a_, b_, t = R.choice(WORK)
@@ -386,7 +381,6 @@ def m4_speed_avg():
     v1, v2 = R.choice([(30, 60), (40, 60), (20, 30), (60, 90), (12, 24)])
     avg = F(2 * v1 * v2, v1 + v2)
     b.add(f"একজন লোক একটি পথ ঘণ্টায় {v1} কিমি বেগে যায় এবং ঘণ্টায় {v2} কিমি বেগে ফিরে আসে। গড় বেগ কত কিমি/ঘণ্টা?", dec(avg), [dec(F(v1 + v2, 2)), dec(avg + 2), dec(F(v1 * v2, v1 + v2))], f"গড় বেগ = 2×{v1}×{v2}/({v1}+{v2}) = {dec(avg)}।", M)
-b.fill(M, 50, [m4_together, m4_pipe, m4_boat, m4_train, m4_cost, m4_loss, m4_finish, m4_pctchange, m4_speed_avg], cap=6)
 def h4_three():
     a_, b_, c_ = R.choice([(10, 15, 30), (12, 24, 8), (6, 12, 12), (20, 30, 60), (4, 6, 12), (12, 18, 36)])
     t = 1 / (F(1, a_) + F(1, b_) + F(1, c_))
@@ -408,18 +402,15 @@ def h4_upstream():
     v, s = R.randint(6, 15), R.randint(1, 4)
     down, up = v + s, v - s; t = R.randint(2, 4); d = down * up * t
     b.add(f"একটি নৌকা স্রোতের অনুকূলে {d} কিমি {d // down} ঘণ্টায় এবং প্রতিকূলে একই পথ {d // up} ঘণ্টায় যায়। স্রোতের বেগ কত কিমি/ঘণ্টা?", s, [v, down, up if up != s else s + 1], f"অনুকূলে বেগ {down}, প্রতিকূলে {up}; স্রোতের বেগ = ({down} − {up})/2 = {s}।", H)
-b.fill(H, 20, [h4_three, h4_trains, h4_eff, h4_profit_two, h4_upstream], cap=5)
-B34 = b.final()
 
-# ================ 3.5 সরল ও চক্রবৃদ্ধি মুনাফা ================
-b = Bank('3.5', R)
-for q, c, w, e in [
+# ---- মুনাফা ----
+FIX35 = [
  ("সরল মুনাফা নির্ণয়ের সূত্র কোনটি? (P = আসল, r = শতকরা হার, n = বছর)", "I = Pnr/100", ["I = P(1 + r)ⁿ", "I = P + nr", "I = Pn/r"], "সরল মুনাফা = আসল × সময় × হার / 100।"),
  ("মুনাফা-আসল (সবৃদ্ধি মূলধন) = কত?", "আসল + মুনাফা", ["আসল − মুনাফা", "আসল × মুনাফা", "মুনাফা − আসল"], "A = P + I।"),
  ("চক্রবৃদ্ধি মূলধনের সূত্র কোনটি?", "C = P(1 + r/100)ⁿ", ["C = P(1 + nr/100)", "C = Pnr/100", "C = P(1 − r/100)ⁿ"], "প্রতি বছরের মুনাফা আসলের সাথে যোগ হয়।"),
  ("চক্রবৃদ্ধি মুনাফা = কত?", "চক্রবৃদ্ধি মূলধন − আসল", ["আসল − চক্রবৃদ্ধি মূলধন", "চক্রবৃদ্ধি মূলধন + আসল", "আসল × হার"], "C − P।"),
  ("প্রথম বছর শেষে সরল ও চক্রবৃদ্ধি মুনাফার মধ্যে সম্পর্ক কী?", "উভয়ই সমান", ["সরল মুনাফা বেশি", "চক্রবৃদ্ধি মুনাফা বেশি", "চক্রবৃদ্ধি মুনাফা দ্বিগুণ"], "প্রথম বছরে মুনাফার উপর মুনাফা হয় না।"),
-]: b.add(q, c, w, e, E)
+]
 def e5_si():
     P, r, n = R.choice([1000, 2000, 5000, 1500, 3000, 4000]), R.choice([5, 6, 8, 10, 12]), R.randint(1, 5)
     I = P * r * n // 100
@@ -436,7 +427,6 @@ def e5_ci1():
     P, r = R.choice([1000, 2000, 5000, 10000]), R.choice([5, 10, 20])
     C = P * (100 + r) // 100
     b.add(f"{P} টাকার {r}% হারে 1 বছরের চক্রবৃদ্ধি মূলধন কত টাকা?", C, [P * r // 100, C + P * r // 100, P + r], f"{P} × (1 + {r}/100) = {C}।", E)
-b.fill(E, 30, [e5_si, e5_amount, e5_rate, e5_ci1])
 def m5_ci2():
     P, r = R.choice([1000, 2000, 5000, 10000, 8000]), R.choice([5, 10, 20])
     C = F(P) * F(100 + r, 100) ** 2
@@ -469,7 +459,6 @@ def m5_double():
     r = R.choice([4, 5, 8, 10, 12.5, 20])
     n = F(100) / F(r)
     b.add(f"সরল মুনাফার হার বার্ষিক {r}% হলে কত বছরে আসল দ্বিগুণ হবে?", dec(n), [dec(n * 2), dec(n / 2), dec(n + 2)], f"দ্বিগুণ হলে মুনাফা = আসল; n = 100/{r} = {dec(n)} বছর।", M)
-b.fill(M, 50, [m5_ci2, m5_ciint, m5_diff, m5_time, m5_principal, m5_pop, m5_depr, m5_double])
 def h5_ci3():
     P, r = R.choice([1000, 8000, 10000, 2000]), R.choice([5, 10, 20])
     C = F(P) * F(100 + r, 100) ** 3
@@ -491,7 +480,92 @@ def h5_two_rates():
     P = R.choice([10000, 20000, 5000]); r1, r2 = R.choice([(5, 10), (10, 20), (10, 5), (20, 10)])
     v = F(P) * F(100 + r1, 100) * F(100 + r2, 100)
     b.add(f"{P} টাকা প্রথম বছর {r1}% এবং দ্বিতীয় বছর {r2}% চক্রবৃদ্ধি হারে রাখলে 2 বছর পর কত টাকা হবে?", dec(v), [dec(P + P * (r1 + r2) // 100), dec(F(P) * F(100 + max(r1, r2), 100) ** 2), dec(v + 100)], f"{P} × {dec(F(100 + r1, 100))} × {dec(F(100 + r2, 100))} = {dec(v)}।", H)
-b.fill(H, 20, [h5_ci3, h5_rate_back, h5_principal_diff, h5_si_ci_rate, h5_two_rates], cap=5)
+
+
+# ---- 3.3 উৎপাদক: নতুন টেমপ্লেট ----
+def e3_diffsq2():
+    a_, k = R.randint(2, 7), R.randint(1, 9)
+    if math.gcd(a_, k) != 1: return
+    b.add(f"{a_*a_}x² − {k*k} এর উৎপাদক কোনটি?", f"({a_}x + {k})({a_}x − {k})", [f"({a_}x − {k})²", f"({a_*a_}x + {k})({a_*a_}x − {k})" if a_ > 1 else f"({a_}x + {k})²", f"({a_}x + {k})²"], f"({a_}x)² − {k}² = ({a_}x + {k})({a_}x − {k})।", E)
+def e3_common_bin():
+    p_, k = R.randint(2, 9), R.randint(1, 9)
+    b.add(f"{p_}(x + {k}) + y(x + {k}) এর উৎপাদক কোনটি?", f"(x + {k})({p_} + y)", [f"(x + {k})({p_}y)", f"({p_}x + {k})(1 + y)", f"(x + {k} + y)({p_} + 1)"], f"সাধারণ উৎপাদক (x + {k}) বের করে।", E)
+def e3_sq_easy():
+    k = R.randint(2, 9)
+    p_ = ppow(lin([1], k), 2)
+    b.add(f"{pfmt(p_, ('x',))} এর উৎপাদক কোনটি?", f"(x + {k})²", [f"(x − {k})²", f"(x + {k})(x − {k})", f"(x + {k*k})(x + 1)"], f"a² + 2ab + b² = (a + b)²; এখানে b = {k}।", E)
+def m3_x4():
+    k = R.randint(1, 4)
+    b.add(f"x⁴ − {k**4} এর উৎপাদক কোনটি?", f"(x² + {k*k})(x + {k})(x − {k})", [f"(x² − {k*k})²", f"(x² + {k*k})²", f"(x + {k})²(x − {k})²"], f"(x²)² − ({k*k})² = (x² + {k*k})(x² − {k*k})।", M)
+def h3_split2():
+    p_, r_ = R.choice([2, 3]), R.choice([2, 3, 4])
+    q_, s_ = R.choice([v for v in range(-5, 6) if v]), R.choice([v for v in range(-5, 6) if v])
+    if math.gcd(p_, abs(q_)) != 1 or math.gcd(r_, abs(s_)) != 1 or F(-q_, p_) == F(-s_, r_) or p_ == r_: return
+    poly = pmul(lin([p_], q_), lin([r_], s_)); X = ('x',)
+    f1, f2 = pfmt(lin([p_], q_), X), pfmt(lin([r_], s_), X)
+    b.add(f"{pfmt(poly, X)} এর উৎপাদক কোনটি?", f"({f1})({f2})", [f"({pfmt(lin([p_], -q_), X)})({pfmt(lin([r_], -s_), X)})", f"({pfmt(lin([p_], s_), X)})({pfmt(lin([r_], q_), X)})", f"({pfmt(lin([p_], -q_), X)})({f2})"], "মধ্যপদ বিভাজন: ac এর দুটি উৎপাদক যাদের যোগফল b।", H)
+def h3_x4k():
+    k = R.randint(2, 4)
+    b.add(f"x⁴ + {k*k}x² + {k**4} এর উৎপাদক কোনটি?", f"(x² + {'' if k == 1 else k}x + {k*k})(x² − {'' if k == 1 else k}x + {k*k})", [f"(x² + {k*k})²", f"(x² + {k*k})(x² − {k*k})", f"(x² + {2*k}x + {k*k})(x² − {2*k}x + {k*k})"], f"(x² + {k*k})² − ({'' if k == 1 else k}x)² আকারে লিখে।", H)
+def h3_x4_4():
+    k = R.randint(1, 3); k2, k4 = 2 * k * k, 4 * k ** 4
+    kx = 'x' if 2 * k == 1 else f'{2*k}x'
+    b.add(f"x⁴ + {k4} এর উৎপাদক কোনটি?", f"(x² + {kx} + {k2})(x² − {kx} + {k2})", [f"(x² + {k2})²", f"(x² + {k2})(x² − {k2})", f"(x² + {k2}x + {2*k})(x² − {k2}x + {2*k})"], f"(x² + {k2})² − ({kx})² আকারে লিখে।", H)
+def h3_cube_diff2():
+    k = R.randint(2, 4)
+    b.add(f"27x³ − {k**3} এর উৎপাদক কোনটি?", f"(3x − {k})(9x² + {3*k}x + {k*k})", [f"(3x − {k})(9x² − {3*k}x + {k*k})", f"(3x + {k})(9x² − {3*k}x + {k*k})", f"(27x − {k})(x² + {k}x + {k*k})"], f"(3x)³ − {k}³ = (3x − {k})((3x)² + 3x·{k} + {k}²)।", H)
+# ---- 3.4 ভাগশেষ উপপাদ্য: নতুন টেমপ্লেট ----
+def e4r_lin():
+    a_, c_, r_ = R.randint(2, 7), R.choice([v for v in range(-8, 9) if v]), R.choice([v for v in range(-4, 5) if v])
+    v = a_ * r_ + c_
+    b.add(f"{a_}x {sgn(c_)} {abs(c_)} কে (x {sgn(-r_)} {abs(r_)}) দ্বারা ভাগ করলে ভাগশেষ কত?", v, [a_ * -r_ + c_ if a_ * -r_ + c_ != v else v + 2, v + 1, c_ if c_ != v else v - 1], f"ভাগশেষ = P({r_}) = {a_}×({r_}) {sgn(c_)} {abs(c_)} = {v}।", E)
+def e4r_const():
+    co = [R.randint(-5, 5) for _ in range(3)]; c_ = R.choice([v for v in range(-9, 10) if v])
+    poly = pfmt({k: v for k, v in {(3,): 1, (2,): co[0], (1,): co[1], (0,): c_}.items() if v}, ('x',))
+    b.add(f"{poly} কে x দ্বারা ভাগ করলে ভাগশেষ কত?", c_, [-c_, 1 + co[0] + co[1] + c_ if 1 + co[0] + co[1] + c_ not in (c_, -c_) else c_ + 3, 0 if c_ else 1], f"ভাগশেষ = P(0) = ধ্রুবপদ = {c_}।", E)
+def e4r_val():
+    a_ = R.choice([-2, -1, 1, 2, 3]); co = [R.randint(-5, 5), R.randint(-6, 6)]
+    v = a_ * a_ + co[0] * a_ + co[1]
+    poly = pfmt({k: vv for k, vv in {(2,): 1, (1,): co[0], (0,): co[1]}.items() if vv}, ('x',))
+    b.add(f"P(x) = {poly} হলে P({a_}) = কত?", v, near(v), f"x = {a_} বসিয়ে {v}।", E)
+def m4r_xn():
+    n, k = R.choice([3, 5, 7]), R.randint(1, 4)
+    b.add(f"x{'³⁵⁷'[[3,5,7].index(n)]} − {k**n} এর একটি উৎপাদক কোনটি?", f"x − {k}", [f"x + {k}", f"x − {k**n}", f"x + {k**n}"], f"P({k}) = {k}^{n} − {k**n} = 0।", M)
+def m4r_k_rem():
+    a_, c_, r_ = R.choice([-2, -1, 1, 2, 3]), R.choice([v for v in range(-8, 9) if v]), R.randint(-5, 9)
+    k = F(r_ - a_ * a_ - c_, a_)
+    if k.denominator != 1: return
+    b.add(f"x² + kx {sgn(c_)} {abs(c_)} কে (x {sgn(-a_)} {abs(a_)}) দ্বারা ভাগ করলে ভাগশেষ {r_} হলে k = কত?", fr(k), [fr(-k) if k else '2', fr(k + 1), fr(k - 1)], f"P({a_}) = {r_} ⇒ {a_*a_} + ({a_})k {sgn(c_)} {abs(c_)} = {r_} ⇒ k = {fr(k)}।", M)
+def h4r_two_k():
+    # x³ + px² + qx + 6 এর উৎপাদক (x − 1) ও (x − 2) হলে p, q
+    r1, r2 = R.sample([-3, -2, -1, 1, 2, 3], 2); r3 = R.choice([v for v in [-3, -2, -1, 1, 2, 3] if v not in (r1, r2)])
+    poly = pmul(pmul(lin([1], -r1), lin([1], -r2)), lin([1], -r3))
+    pq, qq = poly.get((2,), 0), poly.get((1,), 0); c_ = poly.get((0,), 0)
+    if not c_: return
+    b.add(f"(x {sgn(-r1)} {abs(r1)}) ও (x {sgn(-r2)} {abs(r2)}) উভয়ই x³ + px² + qx {sgn(c_)} {abs(c_)} এর উৎপাদক হলে p + q = কত?", pq + qq, near(pq + qq), f"P({r1}) = 0 ও P({r2}) = 0 থেকে p = {pq}, q = {qq}; p + q = {pq + qq}।", H)
+
+# ======================= ব্যাংক সাজানো =======================
+# 3.3 উৎপাদকে বিশ্লেষণ
+b = Bank('3.3', R)
+for q, c, w, e in FIX33[4:]: b.add(q, c, w, e, H)
+b.fill(E, 30, [e3_diffsq, e3_monic, e3_common, e3_diffsq2, e3_common_bin, e3_sq_easy])
+b.fill(M, 50, [m3_split, m3_cubes, m3_group, m3_sq_trinom, m3_four, m3_x4])
+b.fill(H, 20, [h3_complex, h3_sum_cubes_poly, h3_split2, h3_x4k, h3_x4_4, h3_cube_diff2], cap=4)
+B33 = b.final()
+# 3.4 ভাগশেষ উপপাদ্য, k-এর মান, ত্রিঘাত রাশির উৎপাদক
+b = Bank('3.4', R)
+for q, c, w, e in FIX33[:4]: b.add(q, c, w, e, E)
+b.fill(E, 30, [e3_rem_simple, e4r_lin, e4r_const, e4r_val])
+b.fill(M, 50, [m3_rem_cubic, m3_find_k, m3_is_factor, m4r_xn, m4r_k_rem], cap=10)
+b.fill(H, 20, [h3_cubic, h3_cubic_k, h3_rem_linear, h4r_two_k], cap=5)
+B34 = b.final()
+# 3.5 বাস্তব সমস্যা ও মুনাফা
+b = Bank('3.5', R)
+for q, c, w, e in FIX34[:3] + FIX35[:3]: b.add(q, c, w, e, E)
+b.fill(E, 30, [e4_dist, e4_time, e4_pct, e4_profit, e4_oneday, e5_si, e5_amount, e5_rate, e5_ci1], cap=3)
+b.fill(M, 50, [m4_together, m4_pipe, m4_boat, m4_train, m4_cost, m4_loss, m4_finish, m4_pctchange, m4_speed_avg,
+               m5_ci2, m5_ciint, m5_diff, m5_time, m5_principal, m5_pop, m5_depr, m5_double], cap=3)
+b.fill(H, 20, [h4_three, h4_trains, h4_eff, h4_profit_two, h4_upstream, h5_ci3, h5_rate_back, h5_principal_diff, h5_si_ci_rate, h5_two_rates], cap=2)
 B35 = b.final()
 
 items = B31 + B32 + B33 + B34 + B35
