@@ -356,6 +356,14 @@ select.input{appearance:auto}
 .xa-pager select{width:auto;min-height:44px;padding:0 10px}
 .xa-pager .iconbtn{font-size:26px}
 .xa-pager .iconbtn[disabled]{opacity:.35}
+.xa-pdfs{display:flex;flex-direction:column;gap:6px}
+.pdf-row,.pdf-item{display:flex;align-items:center;gap:10px;min-height:46px;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--fg);text-decoration:none}
+.pdf-t{flex:1;min-width:0;font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
+.pdf-ed{display:flex;flex-direction:column;gap:8px}
+.pdf-add{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.pdf-box{border:1px dashed var(--line);border-radius:12px;padding:6px 10px}
+.pdf-box summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
+.pdf-box[open] summary{margin-bottom:6px}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -742,7 +750,7 @@ function vCourse(){
     <div class="progress" aria-hidden="true"><i style="width:${Math.round(doneCount/c.chapters.length*100)}%"></i></div>
     ${c.offer?offerCard(id,c.offer):''}
     ${sylCard(id)}
-    <div class="list" role="list">
+    ${c.offer?'':`<div class="list" role="list">
       ${c.chapters.map((ch,i)=>{const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
         <span class="num">${bn(i+1)}</span>
         <span class="t">${esc(chTitle(id,i))}<br><span class="s">${chDoc(id,i)?'নোট আছে · চাপ দিয়ে পড়ুন':'নোট শিগগিরই আসবে'}</span></span>`:`<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
@@ -750,7 +758,7 @@ function vCourse(){
         <span class="t">${ch}<br><span class="s">${done?'পড়া শেষ · আবার চাপলে বাতিল':'চাপ দিয়ে পড়া শেষ চিহ্নিত করুন'}</span></span>
         <span class="pill ${done?'done':'todo'}">${done?'সম্পন্ন':'বাকি'}</span></button>`}).join('')}
     </div>
-    <p class="muted" style="margin:0;font-size:13px">অধ্যায়ের তালিকা নমুনা হিসেবে দেওয়া; আপনার সিলেবাস অনুযায়ী বদলে নিতে পারবেন।</p>
+    <p class="muted" style="margin:0;font-size:13px">অধ্যায়ের তালিকা নমুনা হিসেবে দেওয়া; আপনার সিলেবাস অনুযায়ী বদলে নিতে পারবেন।</p>`}
   </div>`;
 }
 function vPlay(){
@@ -889,11 +897,11 @@ function examsFor(cid){
   const daily=ROUT.filter(r=>r.course===cid&&typeof r.date==='string'&&canSee(r));
   const byDate={}; daily.forEach(r=>byDate[r.date]=r);
   const weeks=new Set(daily.map(r=>isoD(weekStartOf(parseD(r.date)))));
-  const out=daily.map(r=>({pending:!isLive(r),publishAt:r.publishAt,id:r.id,course:cid,date:r.date,kind:'daily',chapter:r.chapter||null,ex:r.ex||null,units:unitsOf(r),syllabus:String(r.syllabus||''),marks:o.daily.marks,mins:o.daily.mins}));
+  const out=daily.map(r=>({pending:!isLive(r),publishAt:r.publishAt,id:r.id,course:cid,date:r.date,kind:'daily',chapter:r.chapter||null,ex:r.ex||null,units:unitsOf(r),files:filesOf(r),syllabus:String(r.syllabus||''),marks:o.daily.marks,mins:o.daily.mins}));
   weeks.forEach(ws=>{
-    const s=parseD(ws), items=[], chs=[];
-    for(let i=0;i<6;i++){ const d=addD(s,i), r=byDate[isoD(d)]; if(r&&r.syllabus) items.push({day:DAYN[d.getDay()],text:String(r.syllabus)}); if(r) unitsOf(r).forEach(v=>{ if(!chs.some(u=>u.ch===v.ch&&u.ex===v.ex)) chs.push(v); }); }
-    out.push({course:cid,date:isoD(addD(s,6)),kind:'friday',items,chapters:chs,marks:o.friday.marks,mins:o.friday.mins});
+    const s=parseD(ws), items=[], chs=[], files=[];
+    for(let i=0;i<6;i++){ const d=addD(s,i), r=byDate[isoD(d)]; if(r&&r.syllabus) items.push({day:DAYN[d.getDay()],text:String(r.syllabus)}); if(r&&canSee(r)){ unitsOf(r).forEach(v=>{ if(!chs.some(u=>u.ch===v.ch&&u.ex===v.ex)) chs.push(v); }); filesOf(r).forEach(f=>{ if(!files.some(x=>x.u===f.u)) files.push(f); }); } }
+    out.push({course:cid,date:isoD(addD(s,6)),kind:'friday',items,chapters:chs,files,marks:o.friday.marks,mins:o.friday.mins});
   });
   out.push(...specialExams(cid));
   return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
@@ -906,10 +914,27 @@ function unitsOf(r){
 const unitVal=u=>u.ex?String(u.ex):String(u.ch);
 const valUnit=v=>({ch:exCh(v),ex:String(v).indexOf('.')>0?String(v):null});
 /* অ্যাডমিনের যোগ করা বিশেষ পরীক্ষা (syllabus সংগ্রহে type:'exam', তাই নতুন রুলস লাগে না) */
+/* পরীক্ষার সাথে যুক্ত PDF/লিংক: [{t:নাম, u:https লিংক}] */
+function filesOf(r){ return Array.isArray(r&&r.files)?r.files.filter(f=>f&&safeLink(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:safeLink(f.u)})).slice(0,10):[]; }
+function pdfList(files){
+  if(!files||!files.length) return '';
+  return `<div class="xa-pdfs">${files.map(f=>`<a class="pdf-row" href="${esc(f.u)}" target="_blank" rel="noopener"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}</span><span class="file-go">খুলুন</span></a>`).join('')}</div>`;
+}
+/* অ্যাডমিন: PDF যোগের ছোট ফর্ম (key = 'rf|তারিখ' বা 'xf') */
+function pdfEditor(key,files){
+  const d=(S.pdfDraft||{})[key]||{t:'',u:''};
+  return `<div class="pdf-ed">
+    ${(files||[]).map((f,i)=>`<div class="pdf-item"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}</span><button type="button" class="link del" data-pdfrm="${key}|${i}" aria-label="${esc(f.t)} বাদ দিন">বাদ</button></div>`).join('')}
+    <div class="pdf-add"><input class="input" data-pdft="${key}" maxlength="80" placeholder="PDF-এর নাম, যেমন: অনুশীলনী 3.1 শিট" value="${esc(d.t)}">
+      <input class="input" data-pdfu="${key}" inputmode="url" placeholder="লিংক (https://… Google Drive ইত্যাদি)" value="${esc(d.u)}">
+      <button type="button" class="btn ghost" data-pdfadd="${key}">+ PDF যোগ</button></div>
+  </div>`;
+}
+function pdfTarget(key){ if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
 function specialExams(cid){
   return Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid&&typeof r.date==='string'&&canSee(r)).map(r=>({
     xid:String(r.id).split('_').pop(), id:r.id, pending:!isLive(r), publishAt:r.publishAt, course:cid, date:r.date, kind:'special',
-    title:String(r.title||'বিশেষ পরীক্ষা'), syllabus:String(r.syllabus||''), units:unitsOf(r),
+    title:String(r.title||'বিশেষ পরীক্ষা'), syllabus:String(r.syllabus||''), units:unitsOf(r), files:filesOf(r),
     marks:Math.min(100,Math.max(1,Math.round(+r.marks)||20)), mins:Math.min(300,Math.max(1,Math.round(+r.mins)||15))}));
 }
 const kindName=e=>e.kind==='friday'?'সাপ্তাহিক লাইভ পরীক্ষা':e.kind==='special'?(e.title||'বিশেষ পরীক্ষা'):'দৈনিক লাইভ পরীক্ষা';
@@ -921,6 +946,7 @@ function examCard(e,showCourse){
     ? (e.items.length?`<span class="syl-label">সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</span><ul class="syl-list">${e.items.map(it=>`<li><b>${it.day}:</b> ${esc(it.text)}</li>`).join('')}</ul>`
                      :`<span class="syl-label">সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</span>`)
     : e.syllabus?`<p class="syl">${esc(e.syllabus)}</p>`:'';
+  const pdfs=pdfList(e.files);
   const del = (sp&&CAN_EDIT&&DB)?`<button class="link del" data-xdel="${esc(e.id)}">মুছুন</button>`:(!fri&&CAN_EDIT&&DB)?`<button class="link del" data-del="${esc(e.id)}">মুছুন</button>`:'';
   return `<article class="exam ${fri?'fri':''} ${sp?'sp':''} ${isToday?'today':''}">
     <div class="exam-date"><b>${d.getDate()}</b><span>${MONN[d.getMonth()]}</span></div>
@@ -932,6 +958,7 @@ function examCard(e,showCourse){
       <div class="exam-marks"><span>${e.marks} নম্বর</span><span>সময় ${e.mins} মিনিট</span></div>
       ${!fri&&(e.units||[]).length&&e.syllabus!==autoSyl(e.course,e.units)?`<span class="muted" style="font-size:13.5px">প্রশ্ন আসবে: ${esc(e.units.map(u=>unitLabel(e.course,u)).join(', '))}</span>`:''}
       ${syl}
+      ${pdfs}
       ${e.pending?'':`<div class="ex-act">${examAction(e)}</div>`}
       ${del}
     </div>
@@ -1070,6 +1097,7 @@ function xaCard(e,showCourse){
     <h3 class="xa-title">${esc(kindName(e))}</h3>
     <div class="xa-meta"><span>মোট নম্বর: ${e.marks}</span><span>সময়: ${e.mins} মিনিট</span></div>
     <p class="xa-desc">${esc(short?full.slice(0,70).replace(/\s+\S*$/,'')+' …':full)}${full.length>70?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</p>
+    ${pdfList(e.files)}
     ${mats.length?`<button class="xa-mat" data-xmat="${k}" aria-expanded="${matOpen}">${svg('openbook')}পড়ার উপকরণ (${bn(mats.length)}) <span aria-hidden="true">${matOpen?'▾':'▸'}</span></button>
       ${matOpen?`<div class="xa-mats">${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}`:''}
     <div class="xa-act ${done&&!running?'three':left?'':'one'}">${left}${right}</div>
@@ -1363,7 +1391,7 @@ function rfInit(){
   if(!S.rf.vals){
     const s=parseD(S.rf.week); S.rf.vals={};
     S.rf.chs={};
-    for(let i=0;i<6;i++){ const k=isoD(addD(s,i)); const r=ROUT.find(x=>x.course===S.rf.course&&x.date===k); S.rf.vals[k]=r?String(r.syllabus||''):''; S.rf.chs[k]=r?unitsOf(r).map(unitVal):[]; }
+    for(let i=0;i<6;i++){ const k=isoD(addD(s,i)); const r=ROUT.find(x=>x.course===S.rf.course&&x.date===k); S.rf.vals[k]=r?String(r.syllabus||''):''; S.rf.chs[k]=r?unitsOf(r).map(unitVal):[]; S.rf.files=S.rf.files||{}; S.rf.files[k]=r?filesOf(r):[]; }
   }
   return S.rf;
 }
@@ -1392,7 +1420,9 @@ function adminPanel(){
     ${[0,1,2,3,4,5].map(i=>{const d=addD(s,i),k=isoD(d);return `<div class="field"><label for="rf_${k}">${DAYN[d.getDay()]}, ${fmtD(d)} <span class="muted" style="font-weight:400">· 20 নম্বর · 15 মিনিট</span></label>
       <div class="rf-row"><select class="input rf-ch" id="rfc_${k}" data-rfadd="${k}" aria-label="${DAYN[d.getDay()]}-এর পরীক্ষায় অধ্যায় বা অনুশীলনী যোগ করুন"><option value="">+ অধ্যায়/অনুশীলনী যোগ</option>${unitOptions(rf.course,'')}</select>
       <input class="input" id="rf_${k}" data-rfday="${k}" maxlength="200" placeholder="সিলেবাস, যেমন: অনুশীলনী 1.1" value="${esc(rf.vals[k]||'')}"></div>
-      ${unitChips(rf.course,rf.chs[k],'rfrm',k)}</div>`}).join('')}
+      ${unitChips(rf.course,rf.chs[k],'rfrm',k)}
+      <details class="pdf-box" ${(rf.files&&rf.files[k]&&rf.files[k].length)||(S.pdfOpen&&S.pdfOpen['rf|'+k])||(S.pdfDraft&&S.pdfDraft['rf|'+k]&&(S.pdfDraft['rf|'+k].t||S.pdfDraft['rf|'+k].u))?'open':''} data-pdfbox="rf|${k}"><summary>সিলেবাসের নিচে PDF${rf.files&&rf.files[k]&&rf.files[k].length?` (${rf.files[k].length})`:''}</summary>${pdfEditor('rf|'+k,(rf.files||{})[k])}</details></div>`}).join('')}
+    <p class="muted" style="margin:0;font-size:13px">PDF দিতে: ফাইলটি Google Drive-এ রেখে Share → "Anyone with the link" করে লিংক কপি করুন, তারপর নাম ও লিংক বসিয়ে "+ PDF যোগ" চাপুন। শিক্ষার্থীরা পরীক্ষার সিলেবাসের নিচে দেখবে।</p>
     <p class="muted" style="margin:0;font-size:13px">প্রতিদিন এক বা একাধিক অধ্যায়/অনুশীলনী যোগ করা যায় (যেমন 3.1 ও 3.2)। শিক্ষার্থীরা সেদিন ঐ অংশগুলোর প্রশ্ন থেকে লাইভ পরীক্ষা দেবে। সিলেবাস ফাঁকা রাখলে বেছে নেওয়া অংশের নাম নিজে থেকে বসবে।</p>
     <div class="fri-auto"><b>শুক্রবার, ${fmtD(fri)} · 50 নম্বর · 40 মিনিট</b><br>সিলেবাস ও প্রশ্ন: উপরের 6 দিনের অধ্যায়গুলো একসাথে</div>
     ${whenUI('rf',rf)}
@@ -1434,10 +1464,11 @@ async function publishRoutine(){
     for(let i=0;i<6;i++){
       const k=isoD(addD(s,i)), id=`${rf.course}_${k}`, units=((rf.chs&&rf.chs[k])||[]).map(valUnit).filter(u=>u.ch), ch=units.length?units[0].ch:null, ex=units.length?units[0].ex:null;
       let txt=String(rf.vals[k]||'').trim();
-      const had=ROUT.find(x=>x.id===id), same=had&&JSON.stringify(unitsOf(had))===JSON.stringify(units);
+      const files=((rf.files&&rf.files[k])||[]).slice(0,10);
+      const had=ROUT.find(x=>x.id===id), same=had&&JSON.stringify(unitsOf(had))===JSON.stringify(units)&&JSON.stringify(filesOf(had))===JSON.stringify(files);
       if(had&&!same&&txt&&txt===autoSyl(rf.course,unitsOf(had))) txt='';
       if(!txt&&units.length) txt=autoSyl(rf.course,units);
-      if(txt){ if(!had||had.syllabus!==txt||!same||rf.when==='later'||!isLive(had)) await DB.collection('routines').doc(id).set({course:rf.course,date:k,kind:'daily',syllabus:txt,chapter:ch,ex,units,publishAt:(had&&had.syllabus===txt&&isLive(had)&&rf.when!=='later')?(had.publishAt||w.iso):w.iso,updatedAt:new Date().toISOString()}); }
+      if(txt){ if(!had||had.syllabus!==txt||!same||rf.when==='later'||!isLive(had)) await DB.collection('routines').doc(id).set({course:rf.course,date:k,kind:'daily',syllabus:txt,chapter:ch,ex,units,files,publishAt:(had&&had.syllabus===txt&&isLive(had)&&rf.when!=='later')?(had.publishAt||w.iso):w.iso,updatedAt:new Date().toISOString()}); }
       else if(had){ await DB.collection('routines').doc(id).delete(); }
     }
     S.publishing=false; rf.vals=null; const later=rf.when==='later'; rf.when='now'; rf.at=''; render(); toast(later?'রুটিন নির্ধারিত সময়ে প্রকাশ হবে':'রুটিন প্রকাশ হয়েছে');
@@ -1793,12 +1824,13 @@ function examPanel(){
       ${unitChips(cid,xf.units,'xfrm','x')}
       <span class="muted" style="font-size:13px">${xf.units.length?`প্রশ্নব্যাংকে মোট ${pool}টি প্রশ্ন আছে${mk>pool?`; নম্বর ${pool} এর বেশি দিলে ${pool}টি প্রশ্ন আসবে`:''}।`:'এক বা একাধিক অংশ যোগ করুন।'}</span></div>
     <div class="field"><label for="xfSyl">সিলেবাস (ঐচ্ছিক)</label><input class="input" id="xfSyl" data-xf="syllabus" maxlength="200" placeholder="ফাঁকা রাখলে অংশগুলোর নাম বসবে" value="${esc(xf.syllabus)}"></div>
+    <div class="field"><label>সিলেবাসের নিচে PDF (ঐচ্ছিক)</label>${pdfEditor('xf',xf.files)}</div>
     ${whenUI('xf',xf)}
     <div class="error" id="xfErr" role="alert">${esc(xf.err||'')}</div>
     <button class="btn" data-xpublish style="width:100%" ${S.xpublishing?'disabled':''}>${S.xpublishing?'প্রকাশ হচ্ছে…':'পরীক্ষা প্রকাশ কর'}</button>
   </section>
   <section class="section"><h2>যোগ করা পরীক্ষা</h2>
-    ${list.length?`<div class="xlist">${list.map(r=>`<div class="xitem"><div><b>${esc(r.title||'বিশেষ পরীক্ষা')}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':` · প্রকাশ ${fmtDT(r.publishAt)}`}</span><span class="muted">${esc(unitsOf(r).map(u=>unitLabel(cid,u)).join(', '))}</span></div>
+    ${list.length?`<div class="xlist">${list.map(r=>`<div class="xitem"><div><b>${esc(r.title||'বিশেষ পরীক্ষা')}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':` · প্রকাশ ${fmtDT(r.publishAt)}`}</span><span class="muted">${esc(unitsOf(r).map(u=>unitLabel(cid,u)).join(', '))}${filesOf(r).length?` · ${filesOf(r).length}টি PDF`:''}</span></div>
       <button class="link del" data-xdel="${esc(r.id)}">${xf.armed===r.id?'নিশ্চিত?':'মুছুন'}</button></div>`).join('')}</div>`:`<div class="empty">এখনো কোনো আলাদা পরীক্ষা যোগ করা হয়নি।</div>`}
   </section>`;
 }
@@ -1818,7 +1850,7 @@ async function publishSpecial(){
   const id=`exam_${cid}_${Date.now().toString(36)}`;
   S.xpublishing=true; xf.err=''; render();
   try{
-    await DB.collection('syllabus').doc(id).set({type:'exam',course:cid,title,date:xf.date,marks,mins,units,syllabus:syl,publishAt:w.iso,createdAt:new Date().toISOString()});
+    await DB.collection('syllabus').doc(id).set({type:'exam',course:cid,title,date:xf.date,marks,mins,units,files:(xf.files||[]).slice(0,10),syllabus:syl,publishAt:w.iso,createdAt:new Date().toISOString()});
     const later=xf.when==='later';
     S.xpublishing=false; S.xf=null; xfInit().course=cid; render(); toast(later?'পরীক্ষা নির্ধারিত সময়ে প্রকাশ হবে':'পরীক্ষা প্রকাশ হয়েছে');
   }catch(e){
@@ -1975,6 +2007,11 @@ app.addEventListener('click',e=>{
     if(S.resArmed===id){ S.resArmed=''; DB.collection('results').doc(id).delete().then(()=>toast('ফলাফল মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
     else{ S.resArmed=id; render(); }
     return; }
+  if(t.dataset.pdfadd){ const key=t.dataset.pdfadd, d=(S.pdfDraft||{})[key]||{t:'',u:''}, u=safeLink(d.u), tt=String(d.t||'').trim();
+    if(!u){ toast('সঠিক লিংক দিন (https:// দিয়ে শুরু)'); return; }
+    const arr=pdfTarget(key); if(arr.length>=10){ toast('সর্বোচ্চ ১০টি PDF দেওয়া যায়'); return; }
+    arr.push({t:tt||'PDF',u}); S.pdfDraft[key]={t:'',u:''}; S.pdfOpen=S.pdfOpen||{}; S.pdfOpen[key]=true; render(); toast('PDF যোগ হয়েছে · প্রকাশ চাপলে সংরক্ষণ হবে'); return; }
+  if(t.dataset.pdfrm){ const parts=t.dataset.pdfrm.split('|'), i=+parts.pop(), key=parts.join('|'); pdfTarget(key).splice(i,1); render(); return; }
   if(t.dataset.hub){ S.hubCourse=t.dataset.hubc||hubCourse(); S.hubFrom=S.view==='course'?'course':S.view==='routine'?'routine':'exams'; if(t.dataset.hub==='routine') return go('routine'); S.wlim=20; return go(t.dataset.hub); }
   if(t.dataset.hubcourse){ S.hubCourse=t.dataset.hubcourse; render(); return; }
   if(t.dataset.hubch){ const [c,i]=t.dataset.hubch.split('|'); S.course=c; S.chFrom='play'; return go('chapter',{chIdx:+i}); }
@@ -2074,6 +2111,7 @@ app.addEventListener('input',e=>{
   if(t.dataset.sfv){ const sf=sfInit(); sf.vals[t.dataset.sfv]=t.value; sf.dirty=true; }
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
   if(t.dataset.xf&&t.dataset.xf!=='course'){ xfInit()[t.dataset.xf]=t.value; }
+  if(t.dataset.pdft!==undefined||t.dataset.pdfu!==undefined){ const key=t.dataset.pdft||t.dataset.pdfu; S.pdfDraft=S.pdfDraft||{}; const d=S.pdfDraft[key]=S.pdfDraft[key]||{t:'',u:''}; if(t.dataset.pdft!==undefined) d.t=t.value; else d.u=t.value; }
   if(t.dataset.xq){ S.xq=t.value; S.xpage=1; const el=document.getElementById('xaList'); if(el&&!routineStateMsg()) el.innerHTML=xaListHTML(); }
 });
 app.addEventListener('change',e=>{
