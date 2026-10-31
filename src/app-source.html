@@ -179,6 +179,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
+.mcq-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
 .ex-box{background:var(--surface);border:1.5px solid var(--violet);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
 .ex-tile{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 6px;border-radius:14px;border:1.5px solid var(--violet-soft);background:var(--violet-soft);cursor:pointer;min-height:80px;justify-content:center;color:var(--fg)}
@@ -1242,13 +1243,13 @@ async function qSaveBulk(){
 const MCQ_N=20;
 if(window.SOHOG_MCQ&&window.SOHOG_MCQ.c10&&!window.SOHOG_MCQ.c9) window.SOHOG_MCQ.c9=window.SOHOG_MCQ.c10;
 const mcqBank=(cid,i)=>{ const b=bankFor(cid,i+1); return b.length?b:null; };
-const MCQ_LV={easy:'সহজ',mid:'মধ্যম',mix:'মিশ্র'};
+const MCQ_LV={easy:'সহজ',mid:'মধ্যম',hard:'কঠিন',mix:'মিশ্র'};
 (function(){ Object.keys(COURSES).filter(k=>COURSES[k].content).forEach(cid=>COURSES[cid].chapters.forEach((_,j)=>Object.keys(MCQ_LV).forEach(lv=>{
   QUIZZES[`mcq_${cid}_${j+1}_${lv}`]={title:`অধ্যায় ${j+1} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:(((window.SOHOG_MCQ||{})[cid]||{})[String(j+1)]||[]).slice(0,MCQ_N)};
   (((COURSES[cid].exs)||{})[j+1]||[]).forEach(ex=>{ QUIZZES[`mcq_${cid}_${ex.replace('.','-')}_${lv}`]={title:`অনুশীলনী ${ex} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:[]}; });
 })));})();
 function fillMcq(id){
-  const m=id.match(/^mcq_(\w+?)_(\d+)(?:-(\d+))?_(easy|mid|mix)$/); if(!m) return;
+  const m=id.match(/^mcq_(\w+?)_(\d+)(?:-(\d+))?_(easy|mid|hard|mix)$/); if(!m) return;
   const ex=m[3]?`${m[2]}.${m[3]}`:null, lv=m[4];
   const all=ex?exBank(m[1],ex):bankFor(m[1],m[2]);
   if(!QUIZZES[id]) QUIZZES[id]={title:`${ex?'অনুশীলনী '+ex:'অধ্যায় '+m[2]} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:[]};
@@ -1256,17 +1257,7 @@ function fillMcq(id){
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   QUIZZES[id].qs=pool.slice(0,MCQ_N);
 }
-function mcqSection(cid,i){
-  const b=mcqBank(cid,i); if(!b) return '';
-  const ne=b.filter(x=>x.lv==='সহজ').length, nm=b.filter(x=>x.lv==='মধ্যম').length;
-  const card=(lv,desc)=>{const id=`mcq_${cid}_${i+1}_${lv}`, r=S.results[id];
-    return `<button class="mcq-btn" data-quiz="${id}"><b>${MCQ_LV[lv]}</b><span>${desc}</span><span class="mcq-best">${r?`সেরা: ${r.best}/${r.total}`:'এখনো দেওয়া হয়নি'}</span></button>`;};
-  return `<section class="mcq-box" aria-label="MCQ অনুশীলন">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h2 style="margin:0;font-size:18px">MCQ অনুশীলন</h2><span class="muted" style="font-size:13px">মোট ${b.length}টি প্রশ্ন</span></div>
-    <p class="muted" style="margin:0;font-size:13.5px">প্রতিবার ${MCQ_N}টি প্রশ্ন এলোমেলোভাবে আসবে। উত্তর দিলেই সঠিক উত্তর ও ব্যাখ্যা দেখাবে।</p>
-    <div class="mcq-grid">${card('easy',`${ne}টি থেকে`)}${card('mid',`${nm}টি থেকে`)}${card('mix','সহজ + মধ্যম')}</div>
-  </section>`;
-}
+function mcqSection(cid,i){ return mcqBox(cid,String(i+1),mcqBank(cid,i)); }
 /* ---------- অনুশীলনী (যেমন 2.1, 3.4) ---------- */
 const exList=(cid,no)=>((COURSES[cid]&&COURSES[cid].exs)||{})[no]||[];
 const exCh=ex=>+String(ex).split('.')[0];
@@ -1283,13 +1274,13 @@ function exercisesSection(cid,i){
 }
 function mcqBox(cid,part,b,label){
   if(!b||!b.length) return '';
-  const ne=b.filter(x=>x.lv==='সহজ').length, nm=b.filter(x=>x.lv==='মধ্যম').length;
+  const ne=b.filter(x=>x.lv==='সহজ').length, nm=b.filter(x=>x.lv==='মধ্যম').length, nh=b.filter(x=>x.lv==='কঠিন').length;
   const card=(lv,desc)=>{const id=`mcq_${cid}_${part}_${lv}`, r=S.results[id];
     return `<button class="mcq-btn" data-quiz="${id}"><b>${MCQ_LV[lv]}</b><span>${desc}</span><span class="mcq-best">${r?`সেরা: ${r.best}/${r.total}`:'এখনো দেওয়া হয়নি'}</span></button>`;};
   return `<section class="mcq-box" aria-label="MCQ অনুশীলন">
     <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h2 style="margin:0;font-size:18px">${label||'MCQ অনুশীলন'}</h2><span class="muted" style="font-size:13px">মোট ${b.length}টি প্রশ্ন</span></div>
     <p class="muted" style="margin:0;font-size:13.5px">প্রতিবার সর্বোচ্চ ${MCQ_N}টি প্রশ্ন এলোমেলোভাবে আসবে। উত্তর দিলেই সঠিক উত্তর ও ব্যাখ্যা দেখাবে।</p>
-    <div class="mcq-grid">${card('easy',`${ne}টি থেকে`)}${card('mid',`${nm}টি থেকে`)}${card('mix','সব প্রশ্ন')}</div>
+    <div class="mcq-grid ${nh?'four':''}">${card('easy',`${ne}টি থেকে`)}${card('mid',`${nm}টি থেকে`)}${nh?card('hard',`${nh}টি থেকে`):''}${card('mix','সব প্রশ্ন')}</div>
   </section>`;
 }
 function vExercise(){

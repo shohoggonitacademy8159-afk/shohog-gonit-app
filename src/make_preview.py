@@ -15,10 +15,6 @@ MOCK = r"""
   const ago=new Date(Date.now()-3600e3).toISOString();
   const store={routines:{}, syllabus:{}, results:{}};
   store.routines['c10_'+today]={course:'c10',date:today,kind:'daily',syllabus:'অনুশীলনী 2.1 (সেট)',chapter:2,ex:'2.1',publishAt:ago};
-  const Q=(id,q,o,a,e,lv)=>{ store.syllabus[id]={type:'mcq',course:'c10',ch:2,ex:'2.1',q,o,a,e,lv,createdAt:ago}; };
-  Q('q_demo1','A = {1, 2, 3} হলে A-এর উপসেট কয়টি? (নমুনা)',['3','6','8','9'],2,'n উপাদানের সেটের উপসেট 2ⁿ টি; 2³ = 8।','সহজ');
-  Q('q_demo2','A = {2, 4}, B = {4, 6} হলে A ∪ B = ? (নমুনা)',['{4}','{2, 4, 6}','{2, 6}','{2, 4, 4, 6}'],1,'সংযোগ সেটে দুই সেটের সব উপাদান একবার করে থাকে।','সহজ');
-  Q('q_demo3','A = {2, 4}, B = {4, 6} হলে A ∩ B = ? (নমুনা)',['{4}','{2, 6}','{2, 4, 6}','∅'],0,'ছেদ সেটে শুধু দুই সেটের সাধারণ উপাদান থাকে।','মধ্যম');
   store.syllabus['ex_c10_2_1']={type:'exnote',course:'c10',no:2,ex:'2.1',title:'অনুশীলনী 2.1: সেট (নমুনা নোট)',note:'এটি প্রিভিউয়ের নমুনা নোট।\nঅ্যাডমিন প্যানেল → অধ্যায় ট্যাব থেকে প্রতিটি অনুশীলনীর আলাদা নোট দেওয়া যায়।',link:'',publishAt:ago};
   const subs={routines:[],syllabus:[],results:[]}; let authCb=null;
   const emit=n=>{ const docs=Object.entries(store[n]).map(([id,v])=>({id,data:()=>v})); subs[n].forEach(f=>f({docs})); };
