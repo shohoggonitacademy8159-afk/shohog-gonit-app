@@ -380,6 +380,15 @@ select.input{appearance:auto}
 @media (prefers-reduced-motion:reduce){.live-badge i{animation:none}}
 .tab-ic{position:relative;display:inline-grid}
 .tab-dot{position:absolute;top:-2px;right:-4px;width:10px;height:10px;border-radius:50%;background:#e53935;border:2px solid var(--surface)}
+.btn.locked{opacity:.6;cursor:not-allowed}
+.xa-opens{font-size:13px;text-align:right}
+.xc-back{position:fixed;inset:0;z-index:40;background:rgba(10,15,30,.55)}
+.xc{position:fixed;z-index:41;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,400px);background:var(--surface);color:var(--fg);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.xc h2{margin:0;font-size:20px;text-align:center}
+.xc p{margin:0;text-align:center;font-size:15.5px;line-height:1.6}
+.xc ul{margin:0;padding-left:20px;font-size:14px;color:var(--muted);line-height:1.6}
+.xc-act{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:4px}
+.xc-act .btn{min-height:50px;width:100%}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -1122,7 +1131,7 @@ function xaCard(e,showCourse){
   if(running){ right=`<button class="btn" data-exgo="1">চলমান পরীক্ষায় ফিরে যাও · ${fmtLeft(examLeft(S.examRun))}</button>`; }
   else if(done){ three=true; left=`<button class="btn outline" data-exview="${k}">প্রশ্ন দেখুন</button><button class="btn outline" data-exagain="${k}">আবার দিন</button>`; right=`<button class="btn" data-leader="${k}">মেধাতালিকা</button>`; }
   else if(e.pending){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>প্রকাশ হবে ${fmtDT(e.publishAt)}</button>`; }
-  else if(e.date>today){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>শুরু হবে ${bn(d.getDate())} ${MONN[d.getMonth()]}</button>`; }
+  else if(e.date>today){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn locked" aria-disabled="true" data-xlocked="${bn(d.getDate())} ${MONN[d.getMonth()]}">🔒 পরীক্ষা দাও</button>`; }
   else if(!units.length||!pool){ right=`<button class="btn" disabled>${!units.length?'অনলাইন পরীক্ষা নেই':'প্রশ্ন যোগ হয়নি'}</button>`; }
   else { right=`<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'}</button>`; }
   const del=CAN_EDIT&&DB&&e.kind!=='friday'?`<button class="link del" ${e.kind==='special'?`data-xdel="${esc(e.id)}"`:`data-del="${esc(e.id)}"`} style="align-self:flex-end">মুছুন</button>`:'';
@@ -1136,6 +1145,7 @@ function xaCard(e,showCourse){
     ${nMat?`<button class="xa-mat" data-xmat="${k}" aria-expanded="${matOpen}"><span aria-hidden="true">📚</span> স্টাডি ম্যাটেরিয়াল (${bn(nMat)}) ${matOpen?'▾':'›'}</button>
       ${matOpen?`<div class="xa-mats">${pdfList(files)}${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}`:''}
     <div class="xa-act ${three?'three':left?'':'one'}">${left}${right}</div>
+    ${e.date>today&&!e.pending&&!done?`<span class="muted xa-opens">পরীক্ষার দিন (${bnD(d)}) খুলবে, সারাদিন খোলা থাকবে</span>`:''}
     ${done&&!running&&S.retakes[k]?`<span class="muted" style="font-size:13px">আবার দিয়েছ ${bn(S.retakes[k].count)} বার · সেরা ${S.retakes[k].best}/${S.retakes[k].total} (মেধাতালিকায় প্রথমবারের নম্বর)</span>`:''}
     ${del}
   </article>`;
@@ -1275,6 +1285,18 @@ function vXNotes(){
   });
   return `<div class="screen">${hubTop('নোট ও PDF')}
     ${rows.length?`<div class="list">${rows.join('')}</div>`:`<div class="empty">এখনো কোনো নোট প্রকাশ হয়নি। প্রকাশ হলে এখানে দেখা যাবে।</div>`}
+  </div>`;
+}
+function confirmModal(){
+  const c=S.xconfirm; if(!c) return '';
+  const e=findExam(c.k); if(!e){ S.xconfirm=null; return ''; }
+  const n=Math.min(e.marks,examPool(e).length);
+  return `<div class="xc-back" data-xno role="presentation"></div>
+  <div class="xc" role="dialog" aria-modal="true" aria-labelledby="xcT">
+    <h2 id="xcT">তুমি কি ${c.again?'আবার ':''}পরীক্ষা শুরু করতে চাও?</h2>
+    <p><b>${esc(kindName(e))}</b><br>${bn(n)}টি প্রশ্ন · ${bn(e.mins)} মিনিট</p>
+    <ul><li>শুরু করলেই সময় গণনা শুরু হবে।</li><li>উত্তর একবার দিলে আর বদলানো যাবে না।</li>${c.again?'<li>আবার দেওয়া নম্বর মেধাতালিকায় যাবে না।</li>':'<li>প্রথমবারের নম্বরই মেধাতালিকায় যাবে।</li>'}</ul>
+    <div class="xc-act"><button class="btn outline" data-xno>না</button><button class="btn" data-xyes>হ্যাঁ, শুরু করো</button></div>
   </div>`;
 }
 function todayExamBanner(){
@@ -1990,7 +2012,8 @@ function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
   const V={exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
-  app.innerHTML=V();
+  app.innerHTML=V()+confirmModal();
+  const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
   if(authed) renderTabs();
   const f=app.querySelector('#loginId,#otp'); if(f) f.focus({preventScroll:true});
 }
@@ -2073,9 +2096,12 @@ app.addEventListener('click',e=>{
   if(t.hasAttribute('data-xgoclr')){ S.xgo=''; S.xpage=1; render(); return; }
   if(t.dataset.goadmin){ S.atab=t.dataset.goadmin; return go('admin'); }
   if(t.dataset.exview||t.dataset.exstart||t.dataset.exagain){ if(S.view!=='examResult') S.resFrom=HUBV.includes(S.view)&&S.view!=='course'?S.view:'routine'; }
-  if(t.dataset.exagain){ return startExam(t.dataset.exagain,true); }
+  if(t.dataset.xlocked){ toast(`এই পরীক্ষা ${t.dataset.xlocked} খুলবে`); return; }
+  if(t.hasAttribute('data-xno')){ S.xconfirm=null; render(); return; }
+  if(t.hasAttribute('data-xyes')){ const c=S.xconfirm; S.xconfirm=null; if(c) return startExam(c.k,c.again); render(); return; }
+  if(t.dataset.exagain){ S.xconfirm={k:t.dataset.exagain,again:true}; render(); return; }
   if(t.dataset.leader){ S.leaderFrom=S.view==='examResult'?(S.resFrom||'routine'):(HUBV.includes(S.view)&&S.view!=='course')||S.view==='home'?S.view:'routine'; return go('leader',{leaderKey:t.dataset.leader}); }
-  if(t.dataset.exstart){ return startExam(t.dataset.exstart); }
+  if(t.dataset.exstart){ S.xconfirm={k:t.dataset.exstart,again:false}; render(); return; }
   if(t.dataset.exgo){ return go('exam'); }
   if(t.dataset.exview){ S.examView=t.dataset.exview; S.examViewAgain=false; return go('examResult'); }
   if(t.hasAttribute('data-exsubmit')){
@@ -2188,6 +2214,7 @@ app.addEventListener('change',e=>{
   if(t.dataset.rf==='course'){ const rf=rfInit(); rf.course=t.value; rf.vals=null; pendingRender=false; render(); }
 });
 app.addEventListener('focusout',()=>{ setTimeout(()=>{ const a=document.activeElement; if(pendingRender&&!(a&&app.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))){ pendingRender=false; render(); } },0); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.xconfirm){ S.xconfirm=null; render(); } });
 tabs.addEventListener('click',e=>{
   const t=e.target.closest('[data-tab]'); if(!t) return;
   if(t.dataset.tab==='quiz') startQuiz('daily'); else go(t.dataset.tab);
