@@ -35,7 +35,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -54,7 +54,12 @@ jobs:
           APP_VERSION_NAME: 1.0.${{ github.run_number }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          set -o pipefail
+          if ! ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log; then
+            msg=$( (grep -A25 "What went wrong" build.log || tail -60 build.log) | head -60 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+            echo "::error title=APK build failed::$msg"
+            exit 1
+          fi
           cp app/build/outputs/apk/release/app-release.apk ../sohog-ganit-academy.apk
 
       - name: APK সংরক্ষণ
