@@ -364,6 +364,22 @@ select.input{appearance:auto}
 .pdf-box{border:1px dashed var(--line);border-radius:12px;padding:6px 10px}
 .pdf-box summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
 .pdf-box[open] summary{margin-bottom:6px}
+.xa-h{margin:4px 0 0;font-size:20px}
+.xa-pill{font-size:13px;font-weight:600;border-radius:999px;padding:3px 12px;border:1.5px solid currentColor;background:none}
+.xa-pill.st-soon,.xa-pill.st-sched{color:var(--muted);background:none}
+.heart{width:36px;height:36px;border:0;background:none;padding:0;cursor:pointer;display:grid;place-items:center;color:#c9ced6}
+.heart svg{width:26px;height:26px;fill:#eef0f3;stroke:#c9ced6;stroke-width:1.5}
+.heart.on svg{fill:#e53950;stroke:#e53950}
+.xa-line{font-size:15.5px;line-height:1.9;color:var(--fg)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:13.5px;line-height:1.7;background:var(--surface);vertical-align:middle;margin:1px 0}
+.xa-note{margin:0;font-size:15.5px;line-height:1.5}
+.xa-mat{background:var(--surface)!important;color:var(--fg)!important;border:1px solid var(--line)!important;font-weight:700!important}
+.live-badge{position:absolute;top:-8px;right:-6px;z-index:1;display:inline-flex;align-items:center;gap:4px;background:#e53935;color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 8px 2px 6px;box-shadow:0 2px 6px rgba(229,57,53,.4)}
+.live-badge i{width:7px;height:7px;border-radius:50%;background:#fff;animation:lvp 1.2s infinite}
+@keyframes lvp{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.live-badge i{animation:none}}
+.tab-ic{position:relative;display:inline-grid}
+.tab-dot{position:absolute;top:-2px;right:-4px;width:10px;height:10px;border-radius:50%;background:#e53935;border:2px solid var(--surface)}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -600,13 +616,14 @@ const S = {
   exams: saved.exams||{},
   retakes: saved.retakes||{},
   fav: saved.fav||{},
+  favx: saved.favx||{},
   examRun: saved.examRun||null,
   student: saved.student||null,
   dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -678,7 +695,7 @@ function joinCard(){
 function vHome(){
   const chev='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
   const tile=(id,kind)=>{const c=COURSES[id];
-    return `<button class="ctile ${kind} t-${c.t}" data-course="${id}">${art(c.art)}
+    return `<button class="ctile ${kind} t-${c.t}" data-course="${id}">${liveToday(id)?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${art(c.art)}
       <span style="flex:1;min-width:0"><b>${c.name}</b>${c.sub?`<small>(${c.sub})</small>`:''}${c.subj?`<span class="subj">${c.subj}</span>`:''}${c.offer?`<span class="price-tag">মাসিক ৳${bn(c.offer.price)}</span>`:''}</span>
       <span class="arrow">${chev}</span></button>`;};
   return `<div class="screen home">
@@ -1077,33 +1094,41 @@ function xaFiltered(){
     return true;
   }).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(a.kind==='special'?1:0)-(b.kind==='special'?1:0));
 }
+const bnD=d=>`${bn(d.getDate())} ${MONN[d.getMonth()]} ${bn(d.getFullYear())}, ${DAYN[d.getDay()]}`;
+const unitChipLabel=(cid,u)=>u.ex?`অনুশীলনী ${u.ex}`:`অধ্যায় ${u.ch} · ${COURSES[cid].chapters[u.ch-1]||''}`;
 function xaCard(e,showCourse){
-  const k=examKey(e), d=parseD(e.date), [sk,sl]=xaStatus(e), done=S.exams[k], today=todayISO();
-  const desc=e.kind==='friday'?(e.items.length?'সিলেবাস: '+e.items.map(it=>`${it.day}: ${it.text}`).join(' · '):'সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস'):(e.syllabus||examChapters(e).map(u=>unitLabel(e.course,u)).join(', '));
-  const full=`${showCourse?COURSES[e.course].name+' '+(COURSES[e.course].subj||'')+'\n':''}${desc}`;
-  const open=S.xmore===k, short=full.length>70&&!open;
-  const mats=xaMaterials(e), matOpen=S.xmat===k;
-  const running=S.examRun&&!S.examRun.done&&S.examRun.key===k, pool=examPool(e).length, nRes=leaderRows(k).length;
-  let left='', right='';
+  const k=examKey(e), d=parseD(e.date), [sk,sl]=xaStatus(e), done=S.exams[k], today=todayISO(), c=COURSES[e.course];
+  const units=examChapters(e), open=S.xmore===k, shown=open?units:units.slice(0,2);
+  const note=e.kind==='friday'?(e.items.length?(open?e.items.map(it=>`${it.day}: ${it.text}`).join(' · '):'আগের ৬ দিনের পরীক্ষার সিলেবাস'):'আগের ৬ দিনের পরীক্ষার সিলেবাস'):(e.syllabus&&e.syllabus!==autoSyl(e.course,units)?e.syllabus:'');
+  const mats=xaMaterials(e), files=e.files||[], nMat=mats.length+files.length, matOpen=S.xmat===k;
+  const fav=!!(S.favx&&S.favx[k]);
+  const running=S.examRun&&!S.examRun.done&&S.examRun.key===k, pool=examPool(e).length;
+  let left='', right='', three=false;
   if(running){ right=`<button class="btn" data-exgo="1">চলমান পরীক্ষায় ফিরে যাও · ${fmtLeft(examLeft(S.examRun))}</button>`; }
-  else if(done){ left=`<button class="btn outline" data-exview="${k}">প্রশ্ন দেখুন</button><button class="btn outline" data-exagain="${k}">আবার দিন</button>`; right=`<button class="btn" data-leader="${k}">মেধাতালিকা</button>`; }
-  else if(e.pending){ right=`<button class="btn" disabled>প্রকাশ হবে ${fmtDT(e.publishAt)}</button>`; }
-  else if(e.date>today){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>খুলবে ${fmtD(d)}</button>`; }
-  else if(!examChapters(e).length||!pool){ right=`<button class="btn" disabled>${!examChapters(e).length?'অনলাইন পরীক্ষা নেই':'প্রশ্ন যোগ হয়নি'}</button>`; }
+  else if(done){ three=true; left=`<button class="btn outline" data-exview="${k}">প্রশ্ন দেখুন</button><button class="btn outline" data-exagain="${k}">আবার দিন</button>`; right=`<button class="btn" data-leader="${k}">মেধাতালিকা</button>`; }
+  else if(e.pending){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>প্রকাশ হবে ${fmtDT(e.publishAt)}</button>`; }
+  else if(e.date>today){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>শুরু হবে ${bn(d.getDate())} ${MONN[d.getMonth()]}</button>`; }
+  else if(!units.length||!pool){ right=`<button class="btn" disabled>${!units.length?'অনলাইন পরীক্ষা নেই':'প্রশ্ন যোগ হয়নি'}</button>`; }
   else { right=`<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দিন':'পরীক্ষা দিন (দেরিতে)'}</button>`; }
   const del=CAN_EDIT&&DB&&e.kind!=='friday'?`<button class="link del" ${e.kind==='special'?`data-xdel="${esc(e.id)}"`:`data-del="${esc(e.id)}"`} style="align-self:flex-end">মুছুন</button>`:'';
   return `<article class="xa-card">
-    <div class="xa-top"><span class="xa-date">${longD(d)}</span><span class="xa-chips"><span class="xa-st st-${sk}">${sk==='done'?svg('check'):svg('exam')}${sl}</span><span class="xa-tag">${esc(kindShort(e))}</span></span></div>
+    <div class="xa-top"><span class="xa-date">${bnD(d)}</span><span class="xa-chips"><span class="xa-pill st-${sk}">${sl}</span>
+      <button class="heart ${fav?'on':''}" data-favx="${k}" aria-pressed="${fav}" aria-label="${fav?'প্রিয় থেকে সরাও':'প্রিয় পরীক্ষায় রাখো'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></div>
     <h3 class="xa-title">${esc(kindName(e))}</h3>
-    <div class="xa-meta"><span>মোট নম্বর: ${e.marks}</span><span>সময়: ${e.mins} মিনিট</span></div>
-    <p class="xa-desc">${esc(short?full.slice(0,70).replace(/\s+\S*$/,'')+' …':full)}${full.length>70?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</p>
-    ${pdfList(e.files)}
-    ${mats.length?`<button class="xa-mat" data-xmat="${k}" aria-expanded="${matOpen}">${svg('openbook')}পড়ার উপকরণ (${bn(mats.length)}) <span aria-hidden="true">${matOpen?'▾':'▸'}</span></button>
-      ${matOpen?`<div class="xa-mats">${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}`:''}
-    <div class="xa-act ${done&&!running?'three':left?'':'one'}">${left}${right}</div>
+    <div class="xa-line"><span class="chip">${esc(c.name)}${showCourse?' '+esc(c.subj||''):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
+    ${units.length?`<div class="xa-line">বিষয়: ${shown.map(u=>`<span class="chip">${esc(unitChipLabel(e.course,u))}</span>`).join(' ')}${units.length>2||(e.kind==='friday'&&e.items.length)?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</div>`:''}
+    ${note?`<p class="xa-note"><span aria-hidden="true">📝</span> ${esc(note)}</p>`:''}
+    ${nMat?`<button class="xa-mat" data-xmat="${k}" aria-expanded="${matOpen}"><span aria-hidden="true">📚</span> স্টাডি ম্যাটেরিয়াল (${bn(nMat)}) ${matOpen?'▾':'›'}</button>
+      ${matOpen?`<div class="xa-mats">${pdfList(files)}${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}`:''}
+    <div class="xa-act ${three?'three':left?'':'one'}">${left}${right}</div>
     ${done&&!running&&S.retakes[k]?`<span class="muted" style="font-size:13px">আবার দিয়েছ ${bn(S.retakes[k].count)} বার · সেরা ${S.retakes[k].best}/${S.retakes[k].total} (মেধাতালিকায় প্রথমবারের নম্বর)</span>`:''}
     ${del}
   </article>`;
+}
+/* আজ লাইভ পরীক্ষা আছে কি না (হোমের শ্রেণির টাইল ও নিচের মেনুতে লাল চিহ্ন) */
+function liveToday(cid){
+  if(RSTATE!=='ready'||!COURSES[cid]||!COURSES[cid].offer) return false;
+  const t=todayISO(); return examsFor(cid).some(e=>e.date===t&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
 }
 function xaListHTML(){
   const ids=[hubCourse()], all=xaFiltered(), pages=Math.max(1,Math.ceil(all.length/XA_PER));
@@ -1140,7 +1165,7 @@ function examTiles(cid){
   const t=(v,ic,l,n)=>`<button class="hub-tile" data-hub="${v}" data-hubc="${cid}">${svg(ic)}<span>${l}${n?` <small>${bn(n)}</small>`:''}</span></button>`;
   return `<div class="hub-grid">
     ${t('routine','calendar','রুটিন')}${t('xresults','check','ফলাফল',nRes)}
-    ${t('xarchive','archive','আর্কাইভ')}${t('xfav','star','প্রিয় প্রশ্ন',nF)}
+    ${t('xarchive','archive','আর্কাইভ')}${t('xfav','star','প্রিয়',nF+Object.keys(S.favx||{}).filter(k=>keyParts(k).course===cid).length)}
     ${t('xsyl','syl','সিলেবাস')}${t('xmerit','medal','মেধাতালিকা')}
     ${t('xwrong','xcircle','ভুল ও উত্তরহীন',nW)}${t('xnotes','files','নোট ও PDF')}
   </div>`;
@@ -1156,7 +1181,8 @@ function vExams(){
     ${ids.length>1?`<div class="seg" style="grid-template-columns:repeat(${ids.length},minmax(0,1fr))">${ids.map(k=>`<button class="seg-btn" aria-selected="${k===cid}" data-hubcourse="${k}">${COURSES[k].name}</button>`).join('')}</div>`:''}
     ${CAN_EDIT?`<div class="hub-admin"><button class="adminbar" data-goadmin="exam">${svg('pencil')}<span>নতুন পরীক্ষা যোগ কর</span></button><button class="adminbar" data-goadmin="routine">${svg('calendar')}<span>রুটিন প্রকাশ কর</span></button></div>`:''}
     ${msg||banner}
-    ${msg?'':(tod.length?tod.map(e=>xaCard(e,false)).join(''):next?xaCard(next,false):'')}
+    ${msg?'':(()=>{ const upc=all.filter(e=>e.date>=today&&(!e.pending||CAN_EDIT)).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).slice(0,5);
+      return upc.length?`<h2 class="xa-h">পরবর্তী পরীক্ষা ও সিলেবাস</h2>${upc.map(e=>xaCard(e,false)).join('')}`:''; })()}
     ${examTiles(cid)}
   </div>`;
 }
@@ -1211,7 +1237,9 @@ function vXWrong(){
 }
 function vXFav(){
   const cid=hubCourse(), keys=Object.keys(S.fav||{}).filter(k=>k.split('|')[0]===cid).sort((a,b)=>(S.fav[b].at||0)-(S.fav[a].at||0));
-  return `<div class="screen">${hubTop('প্রিয় প্রশ্ন')}
+  const fx=examsFor(cid).filter(e=>S.favx&&S.favx[examKey(e)]);
+  return `<div class="screen">${hubTop('প্রিয়')}
+    ${fx.length?`<h2 class="xa-h">প্রিয় পরীক্ষা</h2>${fx.map(e=>xaCard(e,false)).join('')}<h2 class="xa-h">প্রিয় প্রশ্ন</h2>`:''}
     <p class="muted" style="margin:0;font-size:13.5px">উত্তরপত্র বা "ভুল ও উত্তরহীন" থেকে ☆ চাপলে প্রশ্ন এখানে জমা হয়। আবার চাপলে সরে যায়।</p>
     ${keys.length?keys.map(k=>{ const [,ch,n]=k.split('|'), ref={ch:+ch,n:+n}, q=bankQ(cid,ref); return q?qReview(cid,ref,q,q.a):''; }).join('')
       :`<div class="empty">এখনো কোনো প্রিয় প্রশ্ন নেই।</div>`}
@@ -1438,8 +1466,8 @@ function vRoutine(){
     const up=all.filter(e=>e.date>=today), past=all.filter(e=>e.date<today).reverse();
     list = all.length===0
       ? `<div class="empty">এখনো কোনো পরীক্ষার রুটিন প্রকাশ হয়নি।<br>প্রকাশ হলে এখানেই তারিখ ও সিলেবাসসহ দেখা যাবে।</div>`
-      : `${up.length?up.map(e=>examCard(e,ids.length>1)).join(''):`<div class="empty">সামনের কোনো পরীক্ষা এখনো প্রকাশ হয়নি।</div>`}
-         ${past.length?`<button class="link" data-past style="align-self:center">${S.showPast?'আগের পরীক্ষা লুকাও':`আগের পরীক্ষা দেখাও (${bn(past.length)}টি)`}</button>${S.showPast?past.map(e=>examCard(e,ids.length>1)).join(''):''}`:''}`;
+      : `${up.length?up.map(e=>xaCard(e,ids.length>1)).join(''):`<div class="empty">সামনের কোনো পরীক্ষা এখনো প্রকাশ হয়নি।</div>`}
+         ${past.length?`<button class="link" data-past style="align-self:center">${S.showPast?'আগের পরীক্ষা লুকাও':`আগের পরীক্ষা দেখাও (${bn(past.length)}টি)`}</button>${S.showPast?past.map(e=>xaCard(e,ids.length>1)).join(''):''}`:''}`;
   }
   return `<div class="screen">
     <div class="topbar"><span style="width:44px"></span><h1>পরীক্ষার রুটিন</h1><span style="width:44px"></span></div>
@@ -1938,7 +1966,8 @@ setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','লার্নিং রিপোর্ট','report'],['profile','আরো','grid']];
 function renderTabs(){
   const active = S.view==='course'?'home':S.view;
-  tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}>${svg(ic)}${l}</button>`).join('');
+  const live=OFFER_IDS().some(liveToday);
+  tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}</span>${l}</button>`).join('');
 }
 function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
@@ -2017,6 +2046,7 @@ app.addEventListener('click',e=>{
   if(t.dataset.hubch){ const [c,i]=t.dataset.hubch.split('|'); S.course=c; S.chFrom='play'; return go('chapter',{chIdx:+i}); }
   if(t.dataset.wmode){ S.wmode=t.dataset.wmode; S.wlim=20; render(); return; }
   if(t.hasAttribute('data-wmore')){ S.wlim=(S.wlim||20)+20; render(); return; }
+  if(t.dataset.favx){ const k=t.dataset.favx; S.favx=S.favx||{}; if(S.favx[k]) delete S.favx[k]; else S.favx[k]={at:Date.now()}; persist(); render(); toast(S.favx[k]?'প্রিয় পরীক্ষায় রাখা হয়েছে':'প্রিয় থেকে সরানো হয়েছে'); return; }
   if(t.dataset.fav){ const k=t.dataset.fav; S.fav=S.fav||{}; if(S.fav[k]) delete S.fav[k]; else S.fav[k]={at:Date.now()}; persist(); render(); toast(S.fav[k]?'প্রিয় প্রশ্নে রাখা হয়েছে':'প্রিয় থেকে সরানো হয়েছে'); return; }
   if(t.dataset.xmore){ S.xmore=S.xmore===t.dataset.xmore?'':t.dataset.xmore; render(); return; }
   if(t.dataset.xmat){ S.xmat=S.xmat===t.dataset.xmat?'':t.dataset.xmat; render(); return; }
