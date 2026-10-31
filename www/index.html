@@ -195,6 +195,13 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
+.ch-entry{width:100%;margin-top:4px}
+.ch-entry .art{width:52px;height:52px;flex-shrink:0}
+.ch-head{display:flex;gap:14px;align-items:center;padding:14px;border-radius:18px;background:var(--tbg);border:1.5px solid var(--tb)}
+.ch-art{width:64px;height:64px;flex-shrink:0;background:var(--surface);border-radius:16px;padding:6px;display:grid;place-items:center}
+.ch-art .art{width:100%;height:100%}
+.linkbtn{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.linkbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
 .adminbar{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 14px;border-radius:14px;border:1.5px solid var(--violet);background:var(--violet-soft);color:var(--violet);font-weight:700;font-size:15px;cursor:pointer;text-align:left}
 .adminbar svg{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .when{border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;margin:0;display:flex;flex-direction:column;gap:8px}
@@ -329,6 +336,7 @@ const ICONS = {
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',
   back:'<path d="M15 5l-7 7 7 7"/>',
   pointdown:'<path d="M12 4v14M6 12l6 6 6-6"/>',
+  play:'<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/>',
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   explore:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
   report:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 16v-3M12 16V9M15 16v-5"/>',
@@ -381,7 +389,7 @@ const COURSES = {
   c7:{name:'৭ম শ্রেণি', subj:'সাধারণ গণিত', art:'setsquare', t:'green', chapters:['মূলদ সংখ্যা','বীজগাণিতিক রাশির গুণ ও ভাগ','বর্গমূল','সরল সমীকরণ','সমান্তরাল রেখা','ত্রিভুজ','তথ্য ও উপাত্ত']},
   c8:{name:'৮ম শ্রেণি', subj:'সাধারণ গণিত', art:'globe', t:'purple', chapters:['প্যাটার্ন','মুনাফা','পরিমাপ','বীজগাণিতিক সূত্রাবলি','বীজগাণিতিক ভগ্নাংশ','সরল সহসমীকরণ','সেট','চতুর্ভুজ','পিথাগোরাসের উপপাদ্য','বৃত্ত','তথ্য ও উপাত্ত']},
   c9:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'সাধারণ গণিত', art:'abacus', t:'sky', chapters:['বাস্তব সংখ্যা','সেট ও ফাংশন','বীজগাণিতিক রাশি','সূচক ও লগারিদম','এক চলকবিশিষ্ট সমীকরণ','রেখা, কোণ ও ত্রিভুজ','ব্যবহারিক জ্যামিতি','বৃত্ত','ত্রিকোণমিতিক অনুপাত','পরিমিতি','পরিসংখ্যান']},
-  c10:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', offer:{price:199, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, subj:'সাধারণ গণিত', art:'openbook', t:'mint', chapters:['সসীম ধারা','অনুপাত, সদৃশতা ও প্রতিসমতা','ক্ষেত্রফল সম্পর্কিত উপপাদ্য','দূরত্ব ও উচ্চতা','পরিমিতি','পরিসংখ্যান']},
+  c10:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', offer:{price:199, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, subj:'সাধারণ গণিত', art:'openbook', t:'mint', content:true, chapters:['বাস্তব সংখ্যা','সেট ও ফাংশন','বীজগাণিতিক রাশি','সূচক ও লগারিদম','এক চলকবিশিষ্ট সমীকরণ','রেখা, কোণ ও ত্রিভুজ','ব্যবহারিক জ্যামিতি','বৃত্ত','ত্রিকোণমিতিক অনুপাত','দূরত্ব ও উচ্চতা','বীজগাণিতিক অনুপাত ও সমানুপাত','দুই চলকবিশিষ্ট সরল সহসমীকরণ','সসীম ধারা','অনুপাত, সদৃশতা ও প্রতিসমতা','ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য','পরিমিতি','পরিসংখ্যান']},
   c9h:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'উচ্চতর গণিত', art:'hmCompass', t:'purple', chapters:['সেট ও ফাংশন','বীজগাণিতিক রাশি','জ্যামিতি','জ্যামিতিক অঙ্কন','সমীকরণ','অসমতা','অসীম ধারা']},
   c10h:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', subj:'উচ্চতর গণিত', art:'hmGraph', t:'orange', chapters:['ত্রিকোণমিতি','সূচকীয় ও লগারিদমীয় ফাংশন','দ্বিপদী বিস্তৃতি','স্থানাঙ্ক জ্যামিতি','সমতলীয় ভেক্টর','ঘন জ্যামিতি','সম্ভাবনা']},
   jb:{name:'জুনিয়র বৃত্তি গণিত', sub:'স্পেশাল ব্যাচ', art:'target', t:'yellow', chapters:['বৃত্তি পরীক্ষার সিলেবাস','অধ্যায়ভিত্তিক অনুশীলন','মানসাঙ্ক ও শর্টকাট','মডেল টেস্ট','বিগত বছরের প্রশ্ন']},
@@ -567,7 +575,9 @@ function vCourse(){
     ${sylCard(id)}
     ${c.offer?offerCard(id,c.offer):''}
     <div class="list" role="list">
-      ${c.chapters.map((ch,i)=>{const done=!!S.done[id+':'+i];return `<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
+      ${c.chapters.map((ch,i)=>{const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
+        <span class="num">${bn(i+1)}</span>
+        <span class="t">${esc(chTitle(id,i))}<br><span class="s">${chDoc(id,i)?'নোট আছে · চাপ দিয়ে পড়ুন':'নোট শিগগিরই আসবে'}</span></span>`:`<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
         <span class="num">${bn(i+1)}</span>
         <span class="t">${ch}<br><span class="s">${done?'পড়া শেষ · আবার চাপলে বাতিল':'চাপ দিয়ে পড়া শেষ চিহ্নিত করুন'}</span></span>
         <span class="pill ${done?'done':'todo'}">${done?'সম্পন্ন':'বাকি'}</span></button>`}).join('')}
@@ -585,7 +595,9 @@ function vPlay(){
     </div></section>
     <section class="zone z2"><h2>মাধ্যমিক স্তর</h2><div class="grid g3">
       ${hex('bridge','বীজগণিতের<br>সেতু','algebra','accent')}${hex('coord','স্থানাঙ্ক<br>দ্বীপ','geometry','accent')}${hex('dice','সম্ভাবনার<br>চত্বর','probability','accent')}
-    </div></section>
+    </div>
+    ${CH_COURSES().map(k=>{const c=COURSES[k];const n=c.chapters.filter((_,i)=>chDoc(k,i)).length;return `<button class="ctile wide t-${c.t} ch-entry" data-chlist="${k}">${art(c.art)}<span style="flex:1;min-width:0"><b>${c.name} (${c.sub})</b><span class="subj">${c.subj}</span><small>${bn(c.chapters.length)}টি অধ্যায়${n?' · '+bn(n)+'টিতে নোট':''}</small></span><span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>`}).join('')}
+    </section>
     <section class="zone z3"><h2>উচ্চ মাধ্যমিক স্তর</h2><div class="grid g2">
       <button class="tile row" data-quiz="calculus"><span class="ic c-violet">${svg('peak')}</span><span>ক্যালকুলাস চূড়া</span></button>
       <button class="tile row" data-quiz="algebra"><span class="ic c-violet">${svg('cube')}</span><span>ভেক্টর ও ম্যাট্রিক্স<br><span class="muted" style="font-weight:400;font-size:12px">শিগগিরই আসছে; আপাতত বীজগণিত</span></span></button>
@@ -703,7 +715,7 @@ setTimeout(function(){
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m;
-      if(S.sf&&!S.sf.dirty) S.sf.vals=null; softRender();
+      if(S.sf&&!S.sf.dirty) S.sf.vals=null; if(S.cf&&!S.cf.dirty) S.cf.vals=null; softRender();
     },()=>{});
   }catch(e){ clearTimeout(timer); RSTATE='off'; softRender(); }
 },0);
@@ -875,6 +887,102 @@ function whenISO(st){
   if(d.getTime()<=Date.now()) return {err:'প্রকাশের সময় এখনকার পরে হতে হবে। এখনই প্রকাশ করতে "এখনই প্রকাশ" বেছে নিন।'};
   return {iso:d.toISOString()};
 }
+/* ---------- অধ্যায়ভিত্তিক নোট (অ্যাডমিন প্রকাশ করে, এক্সপ্লোরে দেখা যায়) ---------- */
+const chId=(cid,i)=>`ch_${cid}_${pad2(i+1)}`;
+function chDoc(cid,i){ const r=SYL[chId(cid,i)]; return r&&canSee(r)?r:null; }
+function chTitle(cid,i){ const r=SYL[chId(cid,i)]; return (r&&r.title)||COURSES[cid].chapters[i]; }
+const safeLink=u=>/^https:\/\/[^\s"'<>]+$/i.test(String(u||'').trim())?String(u).trim():'';
+
+function vChapters(){
+  const cid=S.course||'c10', c=COURSES[cid];
+  const ready=c.chapters.filter((_,i)=>chDoc(cid,i)).length;
+  const done=c.chapters.filter((_,i)=>S.done[cid+':'+i]).length;
+  return `<div class="screen">
+    <div class="topbar"><button class="iconbtn" data-go="${S.chFrom||'play'}" aria-label="ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>${c.name} ${c.subj||''}</h1><span style="width:44px"></span></div>
+    <div class="ch-head t-${c.t}">
+      <span class="ch-art">${art(c.art)}</span>
+      <div style="min-width:0"><b style="font-size:18px">${c.name}${c.sub?' ('+c.sub+')':''}</b><br><span>${c.subj||''} · ${bn(c.chapters.length)}টি অধ্যায়</span><br>
+      <span class="muted" style="font-size:13px">${bn(ready)}টিতে নোট আছে · ${bn(done)}টি পড়া শেষ</span></div>
+    </div>
+    ${RSTATE==='loading'?'<div class="empty">অধ্যায়ের নোট আনা হচ্ছে…</div>':''}
+    <div class="list" role="list">
+      ${c.chapters.map((_,i)=>{const r=chDoc(cid,i), d=!!S.done[cid+':'+i];
+        return `<button class="item" role="listitem" data-opench="${i}">
+        <span class="num">${bn(i+1)}</span>
+        <span class="t">${esc(chTitle(cid,i))}<br><span class="s">${r?(r.link?'নোট ও ভিডিও/লিংক আছে':'নোট আছে'):'নোট শিগগিরই আসবে'}</span></span>
+        <span class="pill ${d?'done':'todo'}">${d?'পড়া শেষ':'পড়ুন'}</span></button>`}).join('')}
+    </div>
+  </div>`;
+}
+function vChapter(){
+  const cid=S.course||'c10', i=S.chIdx||0, c=COURSES[cid], r=chDoc(cid,i), k=cid+':'+i, d=!!S.done[k];
+  const link=r?safeLink(r.link):'';
+  return `<div class="screen">
+    <div class="topbar"><button class="iconbtn" data-go="chapters" aria-label="অধ্যায়ের তালিকায় ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অধ্যায় ${bn(i+1)}</h1><span style="width:44px"></span></div>
+    <div><span class="offer-tag">${c.name} · ${c.subj||''}</span>
+      <h2 class="display" style="font-size:26px;margin-top:8px;overflow-wrap:anywhere">${esc(chTitle(cid,i))}</h2></div>
+    ${r?`<section class="sylcard">
+        ${r.pending||!isLive(r)?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(r.publishAt)} থেকে</span>`:''}
+        ${r.note?`<p class="syl-text">${esc(r.note)}</p>`:''}
+        ${link?`<a class="btn ghost linkbtn" href="${esc(link)}" target="_blank" rel="noopener">${svg('play')}<span>ভিডিও / লিংক খুলুন</span></a>`:''}
+        <span class="muted" style="font-size:12.5px">প্রকাশ: ${fmtDT(r.publishAt||r.updatedAt)}</span>
+      </section>`
+      :`<div class="empty">এই অধ্যায়ের নোট এখনো প্রকাশ হয়নি।<br>প্রকাশ হলে এখানেই দেখা যাবে।</div>`}
+    <button class="btn ${d?'ghost':''}" data-chdone style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>
+    <div style="display:flex;gap:10px">
+      ${i>0?`<button class="btn ghost" style="flex:1" data-opench="${i-1}">আগের অধ্যায়</button>`:''}
+      ${i<c.chapters.length-1?`<button class="btn ghost" style="flex:1" data-opench="${i+1}">পরের অধ্যায়</button>`:''}
+    </div>
+  </div>`;
+}
+
+const CH_COURSES=()=>Object.keys(COURSES).filter(k=>COURSES[k].content);
+function cfInit(){
+  if(!S.cf) S.cf={course:CH_COURSES()[0], no:0, when:'now', at:'', vals:null, armed:false, dirty:false};
+  if(!S.cf.vals){ const r=SYL[chId(S.cf.course,S.cf.no)];
+    S.cf.vals={title:r&&r.title?String(r.title):COURSES[S.cf.course].chapters[S.cf.no], note:r?String(r.note||''):'', link:r?String(r.link||''):''}; }
+  return S.cf;
+}
+function chapterPanel(){
+  const cf=cfInit(), c=COURSES[cf.course], r=SYL[chId(cf.course,cf.no)];
+  const filled=c.chapters.filter((_,i)=>SYL[chId(cf.course,i)]).length;
+  return `<section class="admin" aria-label="অধ্যায়ের নোট প্রকাশ">
+    <div><h2 class="display" style="font-size:22px">অধ্যায়ের নোট প্রকাশ কর</h2>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">${c.name} (${c.sub}) ${c.subj}: ${bn(c.chapters.length)}টি অধ্যায়, এর মধ্যে ${bn(filled)}টিতে নোট দেওয়া হয়েছে। শিক্ষার্থীরা এক্সপ্লোর → মাধ্যমিক স্তর থেকে দেখবে।</p></div>
+    <div class="field"><label for="cfNo">অধ্যায়</label>
+      <select class="input" id="cfNo" data-cf="no">${c.chapters.map((_,i)=>`<option value="${i}" ${i===cf.no?'selected':''}>${bn(i+1)}. ${esc(chTitle(cf.course,i))}${SYL[chId(cf.course,i)]?' ✓':''}</option>`).join('')}</select></div>
+    <div class="field"><label for="cfTitle">অধ্যায়ের নাম</label>
+      <input class="input" id="cfTitle" data-cfv="title" maxlength="80" value="${esc(cf.vals.title)}"></div>
+    <div class="field"><label for="cfNote">নোট / পড়ার নির্দেশনা</label>
+      <textarea class="input area" id="cfNote" data-cfv="note" maxlength="5000" rows="8" placeholder="যেমন: মূল সূত্র, গুরুত্বপূর্ণ উদাহরণ, কোন অনুশীলনী করতে হবে">${esc(cf.vals.note)}</textarea></div>
+    <div class="field"><label for="cfLink">ভিডিও বা ফাইলের লিংক (ঐচ্ছিক)</label>
+      <input class="input" id="cfLink" data-cfv="link" type="url" inputmode="url" placeholder="https://youtube.com/..." value="${esc(cf.vals.link)}"></div>
+    ${whenUI('cf',cf)}
+    <div class="error" id="cfErr" role="alert"></div>
+    <button class="btn" data-cpublish style="width:100%" ${S.cpublishing?'disabled':''}>${S.cpublishing?'প্রকাশ হচ্ছে…':'অধ্যায়ের নোট প্রকাশ কর'}</button>
+    ${r?`<div class="cur"><b>এই অধ্যায়ে প্রকাশিত:</b> ${isLive(r)?'শিক্ষার্থীরা দেখছে':'নির্ধারিত '+fmtDT(r.publishAt)}
+      <button class="link del" data-cdel="1">${cf.armed?'নিশ্চিত? আবার চাপুন':'এই অধ্যায়ের নোট মুছুন'}</button></div>`:''}
+  </section>
+  <button class="btn ghost" data-chlist="${cf.course}">শিক্ষার্থীরা যেভাবে দেখবে</button>`;
+}
+async function publishChapter(){
+  const cf=cfInit(), el=()=>document.getElementById('cfErr'), w=whenISO(cf);
+  const title=cf.vals.title.trim(), note=cf.vals.note.trim(), link=cf.vals.link.trim();
+  if(!note&&!link){ el().textContent='নোট অথবা লিংক, অন্তত একটি দিন।'; return; }
+  if(link&&!safeLink(link)){ el().textContent='লিংকটি https:// দিয়ে শুরু হতে হবে।'; return; }
+  if(w.err){ el().textContent=w.err; return; }
+  S.cpublishing=true; render();
+  try{
+    await DB.collection('syllabus').doc(chId(cf.course,cf.no)).set({type:'chapter',course:cf.course,no:cf.no+1,title:title||COURSES[cf.course].chapters[cf.no],note,link,publishAt:w.iso,updatedAt:new Date().toISOString()});
+    S.cpublishing=false; cf.vals=null; cf.dirty=false; const later=cf.when==='later'; cf.when='now'; cf.at=''; render();
+    toast(later?'নোট নির্ধারিত সময়ে প্রকাশ হবে':'অধ্যায়ের নোট প্রকাশ হয়েছে');
+  }catch(e){
+    S.cpublishing=false; render();
+    el().textContent=e&&e.code==='permission_denied'?'প্রকাশের অনুমতি নেই। Firebase-এর Rules-এ অ্যাডমিন ইমেইল মিলিয়ে দেখুন।':'প্রকাশ করা যায়নি। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।';
+  }
+}
+
+function stFor(k){ return k==='rf'?rfInit():k==='cf'?cfInit():sfInit(); }
 function sfInit(){
   if(!S.sf) S.sf={course:'c10', when:'now', at:'', vals:null, armed:false};
   if(!S.sf.vals){ const r=SYL[S.sf.course]; S.sf.vals={title:r?String(r.title||''):'', text:r?String(r.text||''):''}; }
@@ -930,7 +1038,7 @@ function vAdmin(){
   if(!CAN_EDIT) return `<div class="screen"><div class="topbar"><button class="iconbtn" data-go="profile" aria-label="ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অ্যাডমিন প্যানেল</h1><span style="width:44px"></span></div>
     <div class="empty">এই পাতা শুধু অ্যাডমিন দেখতে পারেন।<br><button class="link" data-go="adminLogin">অ্যাডমিন লগইন</button></div></div>`;
   const tab=S.atab||'routine';
-  const live=ROUT.filter(isLive).length, sched=ROUT.length-live, syl=Object.values(SYL).length;
+  const live=ROUT.filter(isLive).length, sched=ROUT.length-live, syl=Object.values(SYL).filter(r=>r.type!=='chapter').length;
   return `<div class="screen">
     <div class="topbar"><button class="iconbtn" data-go="home" aria-label="হোমে ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অ্যাডমিন প্যানেল</h1><span style="width:44px"></span></div>
     <p class="muted" style="margin:0;font-size:14px">ফোনের অ্যাপ বা কম্পিউটারের ওয়েব সংস্করণ, যেখান থেকেই অ্যাডমিন লগইন করবেন, এখান থেকে প্রকাশ করতে পারবেন। প্রকাশ করার সাথে সাথে শিক্ষার্থীদের অ্যাপে চলে যায়।</p>
@@ -942,8 +1050,9 @@ function vAdmin(){
     <div class="seg big" role="tablist">
       <button class="seg-btn" role="tab" aria-selected="${tab==='routine'}" data-atab="routine">${svg('calendar')}রুটিন</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='syllabus'}" data-atab="syllabus">${svg('openbook')}সিলেবাস</button>
+      <button class="seg-btn" role="tab" aria-selected="${tab==='chapters'}" data-atab="chapters">${svg('book')}অধ্যায়</button>
     </div>
-    ${RSTATE!=='ready'?routineStateMsg():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
+    ${RSTATE!=='ready'?routineStateMsg():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
   </div>`;
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
@@ -956,7 +1065,7 @@ function renderTabs(){
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V();
   if(authed) renderTabs();
   const f=app.querySelector('#loginId,#otp'); if(f) f.focus({preventScroll:true});
@@ -1004,6 +1113,16 @@ app.addEventListener('submit',e=>{
 app.addEventListener('click',e=>{
   const t=e.target.closest('button'); if(!t) return;
   if(t.dataset.go) return go(t.dataset.go);
+  if(t.dataset.chlist){ S.chFrom=S.view==='admin'?'admin':S.view==='course'?'course':'play'; return go('chapters',{course:t.dataset.chlist}); }
+  if(t.dataset.opench!==undefined){ return go('chapter',{chIdx:+t.dataset.opench}); }
+  if(t.hasAttribute('data-chdone')){ const k=S.course+':'+S.chIdx; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); return; }
+  if(t.hasAttribute('data-cpublish')){ if(!S.cpublishing) publishChapter(); return; }
+  if(t.dataset.cdel){
+    const cf=cfInit();
+    if(cf.armed){ cf.armed=false; DB.collection('syllabus').doc(chId(cf.course,cf.no)).delete().then(()=>{ cf.vals=null; render(); toast('অধ্যায়ের নোট মুছে ফেলা হয়েছে'); },()=>toast('মুছে ফেলা যায়নি')); }
+    else{ cf.armed=true; render(); }
+    return;
+  }
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
   if(t.hasAttribute('data-spublish')){ if(!S.spublishing) publishSyllabus(); return; }
   if(t.dataset.sdel){
@@ -1058,14 +1177,16 @@ app.addEventListener('click',e=>{
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.rfday){ rfInit().vals[t.dataset.rfday]=t.value; }
+  if(t.dataset.cfv){ const cf=cfInit(); cf.vals[t.dataset.cfv]=t.value; cf.dirty=true; }
   if(t.dataset.sfv){ const sf=sfInit(); sf.vals[t.dataset.sfv]=t.value; sf.dirty=true; }
-  if(t.dataset.whenat){ const st=t.dataset.whenat==='rf'?rfInit():sfInit(); st.at=t.value; }
+  if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
 });
 app.addEventListener('change',e=>{
   const t=e.target;
   if(t.dataset.rf==='week'&&t.value){ const rf=rfInit(); rf.week=isoD(weekStartOf(parseD(t.value))); rf.vals=null; pendingRender=false; render(); }
-  if(t.dataset.when){ const st=t.dataset.when==='rf'?rfInit():sfInit(); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
-  if(t.dataset.whenat){ const st=t.dataset.whenat==='rf'?rfInit():sfInit(); st.at=t.value; }
+  if(t.dataset.when){ const st=stFor(t.dataset.when); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
+  if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
+  if(t.dataset.cf==='no'){ const cf=cfInit(); cf.no=+t.value; cf.vals=null; cf.dirty=false; cf.armed=false; pendingRender=false; render(); }
   if(t.dataset.sf==='course'){ const sf=sfInit(); sf.course=t.value; sf.vals=null; sf.dirty=false; sf.armed=false; pendingRender=false; render(); }
   if(t.dataset.rf==='course'){ const rf=rfInit(); rf.course=t.value; rf.vals=null; pendingRender=false; render(); }
 });

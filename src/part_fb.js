@@ -19,7 +19,7 @@ setTimeout(function(){
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m;
-      if(S.sf&&!S.sf.dirty) S.sf.vals=null; softRender();
+      if(S.sf&&!S.sf.dirty) S.sf.vals=null; if(S.cf&&!S.cf.dirty) S.cf.vals=null; softRender();
     },()=>{});
   }catch(e){ clearTimeout(timer); RSTATE='off'; softRender(); }
 },0);
