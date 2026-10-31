@@ -106,3 +106,42 @@ def dec(x):
     s = f'{float(x):.6f}'.rstrip('0').rstrip('.')
     assert F(s) == x, (s, x)
     return s
+
+def run(ex, R, fixed, eg, mg, hg, caps=(7, 7, 6)):
+    """একটি অনুশীলনীর 100 প্রশ্ন: fixed = [(q, c, wrong, e, lv)], eg/mg/hg = টেমপ্লেট ফাংশন (b নেয়)।"""
+    b = Bank(ex, R)
+    for q, c, w, e, lv in fixed: b.add(q, c, w, e, lv)
+    wrap = lambda gs: [(lambda g: (lambda: g(b)))(g) for g in gs]
+    for lv, need, gs, cap in ((E, 30, eg, caps[0]), (M, 50, mg, caps[1]), (H, 20, hg, caps[2])):
+        ws = wrap(gs)
+        for w, g in zip(ws, gs): w.__name__ = g.__name__
+        b.fill(lv, need, ws, cap)
+    return b.final()
+
+def sg(n):
+    return '+' if n >= 0 else '−'
+def num(n):
+    """ঋণাত্মক সংখ্যা যথাযথ চিহ্নে"""
+    return ('−' + fr(-F(n))) if F(n) < 0 else fr(n)
+def save(ch, items):
+    import json, pathlib
+    from collections import Counter
+    import re
+    fix = lambda t: re.sub(r'(?<![\w)\]°])-(?=\d)', '−', t)
+    for i, x in enumerate(items):
+        x['n'] = i + 1; x['q'] = fix(x['q']); x['o'] = [fix(o) for o in x['o']]; x['e'] = fix(x['e'])
+        assert len(set(x['o'])) == 4, x
+    root = pathlib.Path(__file__).resolve().parents[2]
+    (root / f'src/mcq/ch{ch}.json').write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding='utf-8')
+    c = Counter((x['ex'], x['lv']) for x in items)
+    print(f'ch{ch}:', len(items), dict(sorted(c.items())))
+
+def surd(n, k=1):
+    """k√n সরল রূপে (যেমন surd(8) = '2√2', surd(9) = '3')"""
+    out, inside = k, n
+    for f in range(int(n ** .5) + 1, 1, -1):
+        if inside % (f * f) == 0: out *= f; inside //= f * f
+    if inside == 1: return str(out)
+    return ('' if out == 1 else str(out)) + '√' + str(inside)
+SUPD = str.maketrans('0123456789-', '⁰¹²³⁴⁵⁶⁷⁸⁹⁻')
+def sup(n): return str(n).translate(SUPD)
