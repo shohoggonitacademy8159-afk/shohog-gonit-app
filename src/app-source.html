@@ -237,6 +237,13 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .file-ic{width:44px;height:52px;border-radius:8px;background:var(--bad);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
 .file-go{font-weight:700;color:var(--teal);flex-shrink:0}
 .rf-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px}
+.unit-chips{display:flex;flex-wrap:wrap;gap:6px}
+.uchip{display:inline-flex;align-items:center;gap:2px;min-height:34px;padding:2px 2px 2px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13.5px;font-weight:600}
+.uchip button{width:32px;height:32px;border:0;border-radius:999px;background:none;color:inherit;font-size:18px;line-height:1;cursor:pointer}
+.xf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.xlist{display:flex;flex-direction:column;gap:8px}
+.xitem{display:flex;align-items:center;gap:10px;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+.xitem div{min-width:0;display:flex;flex-direction:column;gap:2px}.xitem span{font-size:13px}
 @media (max-width:420px){.rf-row{grid-template-columns:minmax(0,1fr)}}
 .ex-act{margin-top:6px;display:flex;flex-direction:column}
 .ex-act .btn{height:46px;font-size:15.5px}
@@ -310,6 +317,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 select.input{appearance:auto}
 .exam{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px}
 .exam.fri{background:var(--orange-bg);border-color:var(--orange-b)}
+.exam.sp{border-color:var(--violet)}
+.exam.sp .exam-kind{background:var(--violet-soft);color:var(--violet)}
 .exam.today{border:2px solid var(--accent)}
 .exam-date{width:58px;flex-shrink:0;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0;align-self:flex-start}
 .exam.fri .exam-date{background:var(--surface);color:var(--orange-a)}
@@ -794,29 +803,48 @@ function examsFor(cid){
   const daily=ROUT.filter(r=>r.course===cid&&typeof r.date==='string'&&canSee(r));
   const byDate={}; daily.forEach(r=>byDate[r.date]=r);
   const weeks=new Set(daily.map(r=>isoD(weekStartOf(parseD(r.date)))));
-  const out=daily.map(r=>({pending:!isLive(r),publishAt:r.publishAt,id:r.id,course:cid,date:r.date,kind:'daily',chapter:r.chapter||null,ex:r.ex||null,syllabus:String(r.syllabus||''),marks:o.daily.marks,mins:o.daily.mins}));
+  const out=daily.map(r=>({pending:!isLive(r),publishAt:r.publishAt,id:r.id,course:cid,date:r.date,kind:'daily',chapter:r.chapter||null,ex:r.ex||null,units:unitsOf(r),syllabus:String(r.syllabus||''),marks:o.daily.marks,mins:o.daily.mins}));
   weeks.forEach(ws=>{
     const s=parseD(ws), items=[], chs=[];
-    for(let i=0;i<6;i++){ const d=addD(s,i), r=byDate[isoD(d)]; if(r&&r.syllabus) items.push({day:DAYN[d.getDay()],text:String(r.syllabus)}); if(r&&r.chapter&&!chs.some(u=>u.ch===r.chapter&&u.ex===(r.ex||null))) chs.push({ch:r.chapter,ex:r.ex||null}); }
+    for(let i=0;i<6;i++){ const d=addD(s,i), r=byDate[isoD(d)]; if(r&&r.syllabus) items.push({day:DAYN[d.getDay()],text:String(r.syllabus)}); if(r) unitsOf(r).forEach(v=>{ if(!chs.some(u=>u.ch===v.ch&&u.ex===v.ex)) chs.push(v); }); }
     out.push({course:cid,date:isoD(addD(s,6)),kind:'friday',items,chapters:chs,marks:o.friday.marks,mins:o.friday.mins});
   });
+  out.push(...specialExams(cid));
   return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
 }
+/* রুটিনের দিনে এক বা একাধিক অংশ (পুরোনো রুটিনে শুধু chapter/ex থাকে) */
+function unitsOf(r){
+  if(r&&Array.isArray(r.units)&&r.units.length) return r.units.filter(u=>u&&+u.ch).map(u=>({ch:+u.ch,ex:u.ex?String(u.ex):null}));
+  return r&&r.chapter?[{ch:+r.chapter,ex:r.ex?String(r.ex):null}]:[];
+}
+const unitVal=u=>u.ex?String(u.ex):String(u.ch);
+const valUnit=v=>({ch:exCh(v),ex:String(v).indexOf('.')>0?String(v):null});
+/* অ্যাডমিনের যোগ করা বিশেষ পরীক্ষা (syllabus সংগ্রহে type:'exam', তাই নতুন রুলস লাগে না) */
+function specialExams(cid){
+  return Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid&&typeof r.date==='string'&&canSee(r)).map(r=>({
+    xid:String(r.id).split('_').pop(), id:r.id, pending:!isLive(r), publishAt:r.publishAt, course:cid, date:r.date, kind:'special',
+    title:String(r.title||'বিশেষ পরীক্ষা'), syllabus:String(r.syllabus||''), units:unitsOf(r),
+    marks:Math.min(100,Math.max(1,Math.round(+r.marks)||20)), mins:Math.min(300,Math.max(1,Math.round(+r.mins)||15))}));
+}
+const kindName=e=>e.kind==='friday'?'সাপ্তাহিক লাইভ পরীক্ষা':e.kind==='special'?(e.title||'বিশেষ পরীক্ষা'):'দৈনিক লাইভ পরীক্ষা';
+const kindShort=e=>e.kind==='friday'?'সাপ্তাহিক':e.kind==='special'?(e.title||'বিশেষ পরীক্ষা'):'দৈনিক';
+const keyParts=k=>{ const p=String(k||'').split('_'); return {course:p[0],date:p[1]||''}; };
 function examCard(e,showCourse){
-  const d=parseD(e.date), isToday=e.date===todayISO(), fri=e.kind==='friday';
+  const d=parseD(e.date), isToday=e.date===todayISO(), fri=e.kind==='friday', sp=e.kind==='special';
   const syl = fri
     ? (e.items.length?`<span class="syl-label">সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</span><ul class="syl-list">${e.items.map(it=>`<li><b>${it.day}:</b> ${esc(it.text)}</li>`).join('')}</ul>`
                      :`<span class="syl-label">সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</span>`)
-    : `<p class="syl">${esc(e.syllabus)}</p>`;
-  const del = (!fri&&CAN_EDIT&&DB)?`<button class="link del" data-del="${esc(e.id)}">মুছুন</button>`:'';
-  return `<article class="exam ${fri?'fri':''} ${isToday?'today':''}">
+    : e.syllabus?`<p class="syl">${esc(e.syllabus)}</p>`:'';
+  const del = (sp&&CAN_EDIT&&DB)?`<button class="link del" data-xdel="${esc(e.id)}">মুছুন</button>`:(!fri&&CAN_EDIT&&DB)?`<button class="link del" data-del="${esc(e.id)}">মুছুন</button>`:'';
+  return `<article class="exam ${fri?'fri':''} ${sp?'sp':''} ${isToday?'today':''}">
     <div class="exam-date"><b>${d.getDate()}</b><span>${MONN[d.getMonth()]}</span></div>
     <div class="exam-body">
       <div class="exam-meta"><span class="exam-day">${DAYN[d.getDay()]}${isToday?' · আজ':''}</span>
-        <span class="exam-kind">${fri?'সাপ্তাহিক লাইভ পরীক্ষা':'দৈনিক লাইভ পরীক্ষা'}</span></div>
+        <span class="exam-kind">${esc(kindName(e))}</span></div>
       ${e.pending?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(e.publishAt)} থেকে</span>`:''}
       ${showCourse?`<span class="muted" style="font-size:13px">${COURSES[e.course].name} ${COURSES[e.course].subj||''}</span>`:''}
-      <div class="exam-marks"><span>${e.marks} নম্বর</span><span>সময় ${e.mins} মিনিট</span>${!fri&&e.chapter?`<span>${unitLabel(e.course,{ch:e.chapter,ex:e.ex})}</span>`:''}</div>
+      <div class="exam-marks"><span>${e.marks} নম্বর</span><span>সময় ${e.mins} মিনিট</span></div>
+      ${!fri&&(e.units||[]).length&&e.syllabus!==autoSyl(e.course,e.units)?`<span class="muted" style="font-size:13.5px">প্রশ্ন আসবে: ${esc(e.units.map(u=>unitLabel(e.course,u)).join(', '))}</span>`:''}
       ${syl}
       ${e.pending?'':`<div class="ex-act">${examAction(e)}</div>`}
       ${del}
@@ -824,10 +852,10 @@ function examCard(e,showCourse){
   </article>`;
 }
 /* ---------- রুটিন অনুযায়ী অনলাইন পরীক্ষা ---------- */
-const examKey=e=>`${e.course}_${e.date}`;
+const examKey=e=>e.key||(e.xid?`${e.course}_${e.date}_${e.xid}`:`${e.course}_${e.date}`);
 const bankFor=(cid,no)=>(((window.SOHOG_MCQ||{})[cid]||{})[String(no)]||[]).concat(customQs(cid,no));
 const bankQ=(cid,ref)=>bankFor(cid,ref.ch).find(x=>x.n===ref.n);
-function examChapters(e){ return e.kind==='friday'?(e.chapters||[]):(e.chapter?[{ch:e.chapter,ex:e.ex||null}]:[]); }
+function examChapters(e){ return e.kind==='friday'?(e.chapters||[]):(e.units||unitsOf(e)); }
 function examPool(e){ const seen=new Set(); return examChapters(e).flatMap(u=>unitPool(e.course,u)).filter(r=>{ const k=r.ch+'|'+r.n; if(seen.has(k)) return false; seen.add(k); return true; }); }
 const fmtLeft=ms=>{ const t=Math.max(0,Math.ceil(ms/1000)); return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`; };
 const examLeft=run=>run.start+run.mins*60000-Date.now();
@@ -852,7 +880,7 @@ function startExam(k){
   const pool=examPool(e);
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   const qs=pool.slice(0,Math.min(e.marks,pool.length));
-  S.examRun={key:k,course:e.course,date:e.date,kind:e.kind,title:(e.kind==='friday'?'সাপ্তাহিক লাইভ পরীক্ষা':'দৈনিক লাইভ পরীক্ষা')+' · '+fmtD(parseD(e.date)),
+  S.examRun={key:k,course:e.course,date:e.date,kind:e.kind,title:kindName(e)+' · '+fmtD(parseD(e.date)),
     mins:e.mins,total:qs.length,qs,ans:{},start:Date.now(),late:e.date<todayISO(),done:false};
   persist(); go('exam');
 }
@@ -904,7 +932,7 @@ function todayExamBanner(){
   if(RSTATE!=='ready') return '';
   if(S.examRun&&!S.examRun.done) return `<button class="exam-banner" data-exgo="1">${svg('calendar')}<span><b>তোমার লাইভ পরীক্ষা চলছে</b><br>${S.examRun.title} · ${fmtLeft(examLeft(S.examRun))} বাকি</span></button>`;
   const t=todayISO(), e=OFFER_IDS().flatMap(id=>examsFor(id)).find(x=>x.date===t&&!S.exams[examKey(x)]&&examPool(x).length);
-  return e?`<button class="exam-banner" data-exstart="${examKey(e)}">${svg('calendar')}<span><b>আজকের ${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} লাইভ পরীক্ষা চলছে</b><br>${COURSES[e.course].name} ${COURSES[e.course].subj} · ${e.marks} নম্বর · ${e.mins} মিনিট</span></button>`:'';
+  return e?`<button class="exam-banner" data-exstart="${examKey(e)}">${svg('calendar')}<span><b>${e.kind==='special'?`আজ ${esc(e.title)} চলছে`:`আজকের ${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} লাইভ পরীক্ষা চলছে`}</b><br>${COURSES[e.course].name} ${COURSES[e.course].subj} · ${e.marks} নম্বর · ${e.mins} মিনিট</span></button>`:'';
 }
 setInterval(()=>{
   const run=S.examRun; if(!run||run.done) return;
@@ -922,14 +950,14 @@ function rankRows(rows){
   return {on,late};
 }
 function vLeader(){
-  const k=S.leaderKey, parts=String(k||'').split('_'), cid=parts[0], date=parts.slice(1).join('_');
+  const k=S.leaderKey, {course:cid,date}=keyParts(k);
   const e=findExam(k)||{course:cid,date,kind:parseD(date).getDay()===5?'friday':'daily'};
   const {on,late}=rankRows(leaderRows(k)), me=[...on,...late].find(r=>r.device===S.dev);
   const row=(r,rk)=>`<div class="lb-row ${r.device===S.dev?'me':''}"><span class="lb-rank ${rk&&rk<=3?'top'+rk:''}">${rk||'-'}</span>
     <span class="lb-name">${esc(r.name)}${r.device===S.dev?' (তুমি)':''}${r.roll?`<small>রোল ${esc(r.roll)}</small>`:''}</span><b class="lb-score">${r.score}/${r.total}</b></div>`;
   return `<div class="screen">
     <div class="topbar"><button class="iconbtn" data-go="${S.leaderFrom||'routine'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>মেধাতালিকা</h1><span style="width:44px"></span></div>
-    <div class="lb-head"><b>${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} লাইভ পরীক্ষা · ${fmtD(parseD(date))}</b><span>${COURSES[cid]?COURSES[cid].name+' '+(COURSES[cid].subj||''):''}</span>
+    <div class="lb-head"><b>${esc(kindName(e))} · ${fmtD(parseD(date))}</b><span>${COURSES[cid]?COURSES[cid].name+' '+(COURSES[cid].subj||''):''}</span>
       ${me?`<span class="lb-me">${me.late?`তুমি দেরিতে দিয়েছ: ${me.score}/${me.total}`:`তোমার অবস্থান: ${me._rank} / ${on.length}`}</span>`:''}</div>
     ${RES_OK===false?`<div class="empty">মেধাতালিকা এখন দেখা যাচ্ছে না। একটু পরে আবার চেষ্টা করো।</div>`
       :!on.length&&!late.length?`<div class="empty">এখনো কেউ পরীক্ষা দেয়নি।</div>`
@@ -946,7 +974,7 @@ function watchResults(on){
 }
 function sendResult(k){
   const r=S.exams[k]; if(!r||r.sent||!DB||!S.student) return;
-  const parts=k.split('_'), course=parts[0], date=parts.slice(1).join('_');
+  const {course,date}=keyParts(k);
   DB.collection('results').doc(`${k}_${S.dev}`).set({course,date,kind:r.kind||(parseD(date).getDay()===5?'friday':'daily'),examKey:k,
     name:S.student.name,roll:S.student.roll||'',score:r.score,total:r.total,late:!!r.late,at:new Date(r.at).toISOString(),device:S.dev})
     .then(()=>{ r.sent=true; r.sendErr=false; persist(); softRender(); },e=>{ if(e&&e.code==='permission_denied'){ r.sendErr=true; persist(); softRender(); } });
@@ -969,7 +997,7 @@ function vStudent(){
 
 function resultsPanel(){
   const all=OFFER_IDS().flatMap(id=>examsFor(id)), keys=new Set(all.map(examKey));
-  Object.values(RES).forEach(r=>{ if(r.examKey&&!keys.has(r.examKey)){ keys.add(r.examKey); all.push({course:r.course,date:r.date,kind:r.kind,marks:r.total}); } });
+  Object.values(RES).forEach(r=>{ if(r.examKey&&!keys.has(r.examKey)){ keys.add(r.examKey); all.push({key:r.examKey,course:r.course,date:r.date,kind:r.kind,title:'বিশেষ পরীক্ষা',marks:r.total}); } });
   const list=all.sort((a,b)=>a.date<b.date?1:-1);
   const cnt=k=>Object.values(RES).filter(r=>r.examKey===k).length;
   const today=todayISO();
@@ -982,7 +1010,7 @@ function resultsPanel(){
     <div><h2 class="display" style="font-size:22px">পরীক্ষার ফলাফল</h2>
     <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থী খাতা জমা দিলেই ফলাফল এখানে চলে আসে। ইন্টারনেট না থাকলে সংযোগ পাওয়ার পর আসবে।</p></div>
     <div class="field"><label for="resSel">পরীক্ষা</label>
-      <select class="input" id="resSel" data-res="1">${list.map(e=>{const k=examKey(e);return `<option value="${k}" ${k===S.resKey?'selected':''}>${fmtD(parseD(e.date))} · ${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} · ${COURSES[e.course]?COURSES[e.course].name:''} (${cnt(k)} জন)</option>`;}).join('')}</select></div>
+      <select class="input" id="resSel" data-res="1">${list.map(e=>{const k=examKey(e);return `<option value="${k}" ${k===S.resKey?'selected':''}>${fmtD(parseD(e.date))} · ${esc(kindShort(e))} · ${COURSES[e.course]?COURSES[e.course].name:''} (${cnt(k)} জন)</option>`;}).join('')}</select></div>
     <div class="stats">
       <div class="stat"><b>${n}</b><span>জন জমা দিয়েছে</span></div>
       <div class="stat"><b>${n?avg.toFixed(1):'-'}</b><span>গড় নম্বর</span></div>
@@ -1007,7 +1035,7 @@ function weekPreview(cid){
   const s=weekStartOf(new Date()), all=examsFor(cid);
   const rows=[];
   for(let i=0;i<7;i++){
-    const d=addD(s,i), k=isoD(d), e=all.find(x=>x.date===k), fri=i===6;
+    const d=addD(s,i), k=isoD(d), e=all.find(x=>x.date===k&&x.kind!=='special'), fri=i===6;
     const txt = fri ? (e&&e.items.length?'আগের ৬ দিনের সিলেবাস':'আগের ৬ দিনের সিলেবাস') : (e?esc(e.syllabus):'<span class="muted">প্রকাশ হয়নি</span>');
     rows.push(`<div class="wk-row ${fri?'fri':''} ${k===todayISO()?'today':''}"><span class="wk-day">${DAYN[d.getDay()].replace('বার','')}<small>${fmtD(d)}</small></span><span class="wk-syl">${txt}</span><span class="wk-m">${bn(fri?COURSES[cid].offer.friday.marks:COURSES[cid].offer.daily.marks)}</span></div>`);
   }
@@ -1019,9 +1047,18 @@ function rfInit(){
   if(!S.rf.vals){
     const s=parseD(S.rf.week); S.rf.vals={};
     S.rf.chs={};
-    for(let i=0;i<6;i++){ const k=isoD(addD(s,i)); const r=ROUT.find(x=>x.course===S.rf.course&&x.date===k); S.rf.vals[k]=r?String(r.syllabus||''):''; S.rf.chs[k]=r&&r.ex?String(r.ex):(r&&r.chapter?String(r.chapter):''); }
+    for(let i=0;i<6;i++){ const k=isoD(addD(s,i)); const r=ROUT.find(x=>x.course===S.rf.course&&x.date===k); S.rf.vals[k]=r?String(r.syllabus||''):''; S.rf.chs[k]=r?unitsOf(r).map(unitVal):[]; }
   }
   return S.rf;
+}
+function autoSyl(cid,units){
+  if(!units.length) return '';
+  if(units.length===1){ const u=units[0]; return u.ex?`অনুশীলনী ${u.ex} (${COURSES[cid].chapters[u.ch-1]})`:`অধ্যায় ${u.ch}: ${COURSES[cid].chapters[u.ch-1]}`; }
+  return units.map(u=>u.ex?`অনুশীলনী ${u.ex}`:`অধ্যায় ${u.ch}`).join(', ');
+}
+function unitChips(cid,vals,attr,key){
+  vals=vals||[]; if(!vals.length) return '';
+  return `<div class="unit-chips">${vals.map((v,i)=>`<span class="uchip">${esc(unitLabel(cid,valUnit(v)))}<button type="button" data-${attr}="${key}|${i}" aria-label="${esc(unitLabel(cid,valUnit(v)))} বাদ দিন">×</button></span>`).join('')}</div>`;
 }
 function adminPanel(){
   if(!(CAN_EDIT&&DB&&RSTATE==='ready')) return '';
@@ -1037,9 +1074,10 @@ function adminPanel(){
       <button type="button" class="iconbtn" data-wk="7" aria-label="পরের সপ্তাহ" style="transform:scaleX(-1)">${svg('back','width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"')}</button></div>
       <span class="muted" style="font-size:13px">শনিবার ${fmtD(s)} থেকে শুক্রবার ${fmtD(fri)}</span></div>
     ${[0,1,2,3,4,5].map(i=>{const d=addD(s,i),k=isoD(d);return `<div class="field"><label for="rf_${k}">${DAYN[d.getDay()]}, ${fmtD(d)} <span class="muted" style="font-weight:400">· 20 নম্বর · 15 মিনিট</span></label>
-      <div class="rf-row"><select class="input rf-ch" id="rfc_${k}" data-rfch="${k}" aria-label="${DAYN[d.getDay()]}-এর অধ্যায়"><option value="">অধ্যায় নেই</option>${unitOptions(rf.course,rf.chs[k])}</select>
-      <input class="input" id="rf_${k}" data-rfday="${k}" maxlength="200" placeholder="সিলেবাস, যেমন: অনুশীলনী 1.1" value="${esc(rf.vals[k]||'')}"></div></div>`}).join('')}
-    <p class="muted" style="margin:0;font-size:13px">পুরো অধ্যায় বা নির্দিষ্ট অনুশীলনী (যেমন 3.2) বেছে দিলে শিক্ষার্থীরা সেদিন ঐ অংশের প্রশ্ন থেকে লাইভ পরীক্ষা দেবে।</p>
+      <div class="rf-row"><select class="input rf-ch" id="rfc_${k}" data-rfadd="${k}" aria-label="${DAYN[d.getDay()]}-এর পরীক্ষায় অধ্যায় বা অনুশীলনী যোগ করুন"><option value="">+ অধ্যায়/অনুশীলনী যোগ</option>${unitOptions(rf.course,'')}</select>
+      <input class="input" id="rf_${k}" data-rfday="${k}" maxlength="200" placeholder="সিলেবাস, যেমন: অনুশীলনী 1.1" value="${esc(rf.vals[k]||'')}"></div>
+      ${unitChips(rf.course,rf.chs[k],'rfrm',k)}</div>`}).join('')}
+    <p class="muted" style="margin:0;font-size:13px">প্রতিদিন এক বা একাধিক অধ্যায়/অনুশীলনী যোগ করা যায় (যেমন 3.1 ও 3.2)। শিক্ষার্থীরা সেদিন ঐ অংশগুলোর প্রশ্ন থেকে লাইভ পরীক্ষা দেবে। সিলেবাস ফাঁকা রাখলে বেছে নেওয়া অংশের নাম নিজে থেকে বসবে।</p>
     <div class="fri-auto"><b>শুক্রবার, ${fmtD(fri)} · 50 নম্বর · 40 মিনিট</b><br>সিলেবাস ও প্রশ্ন: উপরের 6 দিনের অধ্যায়গুলো একসাথে</div>
     ${whenUI('rf',rf)}
     <div class="error" id="rfErr" role="alert"></div>
@@ -1064,7 +1102,7 @@ function vRoutine(){
       <div class="fri"><b>শুক্রবার</b><span>50 নম্বর · 40 মিনিট</span><span>আগের 6 দিনের সিলেবাস</span></div>
     </div>
     ${todayExamBanner()}
-    ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>রুটিন প্রকাশ বা বদলাতে অ্যাডমিন প্যানেল খুলুন</span></button>`:''}
+    ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>রুটিন ও পরীক্ষা প্রকাশ বা বদলাতে অ্যাডমিন প্যানেল খুলুন</span></button>`:''}
     <section class="section"><h2>${ids.length>1?'সব কোর্সের পরীক্ষা':`${COURSES[ids[0]].name} ${COURSES[ids[0]].subj}`}</h2>
       <div style="display:flex;flex-direction:column;gap:10px">${msg||list}</div>
     </section>
@@ -1077,11 +1115,12 @@ async function publishRoutine(){
   S.publishing=true; render();
   try{
     for(let i=0;i<6;i++){
-      const sel=rf.chs&&rf.chs[k]?String(rf.chs[k]):'', ex=sel.indexOf('.')>0?sel:null, ch=sel?exCh(sel):null, k=isoD(addD(s,i)), id=`${rf.course}_${k}`;
+      const k=isoD(addD(s,i)), id=`${rf.course}_${k}`, units=((rf.chs&&rf.chs[k])||[]).map(valUnit).filter(u=>u.ch), ch=units.length?units[0].ch:null, ex=units.length?units[0].ex:null;
       let txt=String(rf.vals[k]||'').trim();
-      if(!txt&&ch) txt=ex?`অনুশীলনী ${ex} (${COURSES[rf.course].chapters[ch-1]})`:`অধ্যায় ${ch}: ${COURSES[rf.course].chapters[ch-1]}`;
-      const had=ROUT.find(x=>x.id===id);
-      if(txt){ if(!had||had.syllabus!==txt||(had.chapter||null)!==ch||(had.ex||null)!==ex||rf.when==='later'||!isLive(had)) await DB.collection('routines').doc(id).set({course:rf.course,date:k,kind:'daily',syllabus:txt,chapter:ch,ex,publishAt:(had&&had.syllabus===txt&&isLive(had)&&rf.when!=='later')?(had.publishAt||w.iso):w.iso,updatedAt:new Date().toISOString()}); }
+      const had=ROUT.find(x=>x.id===id), same=had&&JSON.stringify(unitsOf(had))===JSON.stringify(units);
+      if(had&&!same&&txt&&txt===autoSyl(rf.course,unitsOf(had))) txt='';
+      if(!txt&&units.length) txt=autoSyl(rf.course,units);
+      if(txt){ if(!had||had.syllabus!==txt||!same||rf.when==='later'||!isLive(had)) await DB.collection('routines').doc(id).set({course:rf.course,date:k,kind:'daily',syllabus:txt,chapter:ch,ex,units,publishAt:(had&&had.syllabus===txt&&isLive(had)&&rf.when!=='later')?(had.publishAt||w.iso):w.iso,updatedAt:new Date().toISOString()}); }
       else if(had){ await DB.collection('routines').doc(id).delete(); }
     }
     S.publishing=false; rf.vals=null; const later=rf.when==='later'; rf.when='now'; rf.at=''; render(); toast(later?'রুটিন নির্ধারিত সময়ে প্রকাশ হবে':'রুটিন প্রকাশ হয়েছে');
@@ -1411,7 +1450,64 @@ async function publishChapter(){
   }
 }
 
-function stFor(k){ return k==='rf'?rfInit():k==='cf'?cfInit():sfInit(); }
+function stFor(k){ return k==='rf'?rfInit():k==='cf'?cfInit():k==='xf'?xfInit():sfInit(); }
+function xfInit(){
+  if(!S.xf) S.xf={course:OFFER_IDS()[0], title:'', date:todayISO(), marks:'25', mins:'30', units:[], syllabus:'', when:'now', at:'', err:'', armed:''};
+  return S.xf;
+}
+function xPoolSize(cid,units){ const seen=new Set(); units.map(valUnit).forEach(u=>unitPool(cid,u).forEach(r=>seen.add(r.ch+'|'+r.n))); return seen.size; }
+function examPanel(){
+  const xf=xfInit(), cid=xf.course, pool=xPoolSize(cid,xf.units), mk=Math.round(+xf.marks)||0;
+  const list=Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid).sort((a,b)=>a.date<b.date?1:-1);
+  return `<section class="admin" aria-label="পরীক্ষা যোগ">
+    <div><span class="offer-tag">শুধু আপনার জন্য</span><h2 class="display" style="font-size:22px;margin-top:6px">নতুন পরীক্ষা যোগ কর</h2>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">দৈনিক ও শুক্রবারের রুটিনের বাইরে আলাদা পরীক্ষা (যেমন মাসিক, মডেল টেস্ট) দিন। যে অধ্যায়/অনুশীলনী যোগ করবেন, সেগুলোর প্রশ্নব্যাংক থেকে প্রতিটি শিক্ষার্থী এলোমেলো প্রশ্ন পাবে। পরীক্ষার দিন সারাদিন খোলা থাকবে, মেধাতালিকা সবাই দেখবে।</p></div>
+    ${OFFER_IDS().length>1?`<div class="field"><label for="xfCourse">কোর্স</label><select class="input" id="xfCourse" data-xf="course">${OFFER_IDS().map(k=>`<option value="${k}" ${k===cid?'selected':''}>${COURSES[k].name} ${COURSES[k].subj||''}</option>`).join('')}</select></div>`
+      :`<p style="margin:0;font-weight:600">${COURSES[cid].name} (${COURSES[cid].sub}) · ${COURSES[cid].subj}</p>`}
+    <div class="field"><label for="xfTitle">পরীক্ষার নাম</label><input class="input" id="xfTitle" data-xf="title" maxlength="60" placeholder="যেমন: মাসিক পরীক্ষা – নভেম্বর" value="${esc(xf.title)}"></div>
+    <div class="field"><label for="xfDate">পরীক্ষার তারিখ</label><input class="input" type="date" id="xfDate" data-xf="date" value="${esc(xf.date)}"></div>
+    <div class="xf-grid">
+      <div class="field"><label for="xfMarks">নম্বর (প্রশ্নসংখ্যা)</label><input class="input" type="number" inputmode="numeric" min="1" max="100" id="xfMarks" data-xf="marks" value="${esc(xf.marks)}"></div>
+      <div class="field"><label for="xfMins">সময় (মিনিট)</label><input class="input" type="number" inputmode="numeric" min="1" max="300" id="xfMins" data-xf="mins" value="${esc(xf.mins)}"></div>
+    </div>
+    <div class="field"><label for="xfAdd">প্রয়োজনীয় অধ্যায়/অনুশীলনী</label>
+      <select class="input" id="xfAdd" data-xfadd="1"><option value="">+ অধ্যায়/অনুশীলনী যোগ</option>${unitOptions(cid,'')}</select>
+      ${unitChips(cid,xf.units,'xfrm','x')}
+      <span class="muted" style="font-size:13px">${xf.units.length?`প্রশ্নব্যাংকে মোট ${pool}টি প্রশ্ন আছে${mk>pool?`; নম্বর ${pool} এর বেশি দিলে ${pool}টি প্রশ্ন আসবে`:''}।`:'এক বা একাধিক অংশ যোগ করুন।'}</span></div>
+    <div class="field"><label for="xfSyl">সিলেবাস (ঐচ্ছিক)</label><input class="input" id="xfSyl" data-xf="syllabus" maxlength="200" placeholder="ফাঁকা রাখলে অংশগুলোর নাম বসবে" value="${esc(xf.syllabus)}"></div>
+    ${whenUI('xf',xf)}
+    <div class="error" id="xfErr" role="alert">${esc(xf.err||'')}</div>
+    <button class="btn" data-xpublish style="width:100%" ${S.xpublishing?'disabled':''}>${S.xpublishing?'প্রকাশ হচ্ছে…':'পরীক্ষা প্রকাশ কর'}</button>
+  </section>
+  <section class="section"><h2>যোগ করা পরীক্ষা</h2>
+    ${list.length?`<div class="xlist">${list.map(r=>`<div class="xitem"><div><b>${esc(r.title||'বিশেষ পরীক্ষা')}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':` · প্রকাশ ${fmtDT(r.publishAt)}`}</span><span class="muted">${esc(unitsOf(r).map(u=>unitLabel(cid,u)).join(', '))}</span></div>
+      <button class="link del" data-xdel="${esc(r.id)}">${xf.armed===r.id?'নিশ্চিত?':'মুছুন'}</button></div>`).join('')}</div>`:`<div class="empty">এখনো কোনো আলাদা পরীক্ষা যোগ করা হয়নি।</div>`}
+  </section>`;
+}
+async function publishSpecial(){
+  const xf=xfInit(), w=whenISO(xf), cid=xf.course;
+  const fail=m=>{ xf.err=m; render(); };
+  const title=String(xf.title||'').trim().replace(/\s+/g,' '), marks=Math.round(+en(String(xf.marks))), mins=Math.round(+en(String(xf.mins)));
+  if(title.length<2) return fail('পরীক্ষার নাম লিখুন।');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(xf.date||'')) return fail('পরীক্ষার তারিখ বেছে নিন।');
+  if(!(marks>=1&&marks<=100)) return fail('নম্বর 1 থেকে 100 এর মধ্যে দিন।');
+  if(!(mins>=1&&mins<=300)) return fail('সময় 1 থেকে 300 মিনিটের মধ্যে দিন।');
+  if(!xf.units.length) return fail('কমপক্ষে একটি অধ্যায় বা অনুশীলনী যোগ করুন।');
+  if(!xPoolSize(cid,xf.units)) return fail('বেছে নেওয়া অংশে এখনো কোনো প্রশ্ন নেই।');
+  if(w.err) return fail(w.err);
+  const units=xf.units.map(valUnit);
+  const syl=String(xf.syllabus||'').trim()||units.map(u=>u.ex?`অনুশীলনী ${u.ex}`:`অধ্যায় ${u.ch}`).join(', ');
+  const id=`exam_${cid}_${Date.now().toString(36)}`;
+  S.xpublishing=true; xf.err=''; render();
+  try{
+    await DB.collection('syllabus').doc(id).set({type:'exam',course:cid,title,date:xf.date,marks,mins,units,syllabus:syl,publishAt:w.iso,createdAt:new Date().toISOString()});
+    const later=xf.when==='later';
+    S.xpublishing=false; S.xf=null; xfInit().course=cid; render(); toast(later?'পরীক্ষা নির্ধারিত সময়ে প্রকাশ হবে':'পরীক্ষা প্রকাশ হয়েছে');
+  }catch(e){
+    S.xpublishing=false;
+    fail(e&&e.code==='permission_denied'?'প্রকাশের অনুমতি নেই। অ্যাডমিন হিসেবে লগইন করুন।':'প্রকাশ করা যায়নি। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।');
+  }
+}
 function sfInit(){
   if(!S.sf) S.sf={course:'c10', when:'now', at:'', vals:null, armed:false};
   if(!S.sf.vals){ const r=SYL[S.sf.course]; S.sf.vals={title:r?String(r.title||''):'', text:r?String(r.text||''):''}; }
@@ -1481,9 +1577,10 @@ function vAdmin(){
       <button class="seg-btn" role="tab" aria-selected="${tab==='syllabus'}" data-atab="syllabus">${svg('openbook')}সিলেবাস</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='chapters'}" data-atab="chapters">${svg('book')}অধ্যায়</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='qbank'}" data-atab="qbank">${svg('pencil')}প্রশ্ন</button>
+      <button class="seg-btn" role="tab" aria-selected="${tab==='exam'}" data-atab="exam">${svg('report')}পরীক্ষা</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='results'}" data-atab="results">${svg('chart')}ফলাফল</button>
     </div>
-    ${RSTATE!=='ready'?routineStateMsg():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
+    ${RSTATE!=='ready'?routineStateMsg():tab==='exam'?examPanel():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
   </div>`;
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
@@ -1577,6 +1674,14 @@ app.addEventListener('click',e=>{
     return;
   }
   if(t.hasAttribute('data-publish')){ if(!S.publishing) publishRoutine(); return; }
+  if(t.hasAttribute('data-xpublish')){ if(!S.xpublishing) publishSpecial(); return; }
+  if(t.dataset.rfrm){ const [k,i]=t.dataset.rfrm.split('|'), rf=rfInit(); if(rf.chs&&rf.chs[k]) rf.chs[k].splice(+i,1); render(); return; }
+  if(t.dataset.xfrm){ const i=+t.dataset.xfrm.split('|')[1]; xfInit().units.splice(i,1); render(); return; }
+  if(t.dataset.xdel){ const id=t.dataset.xdel, xf=xfInit();
+    if(xf.armed===id||t.dataset.armed){ xf.armed=''; DB.collection('syllabus').doc(id).delete().then(()=>toast('পরীক্ষাটি মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
+    else if(S.view==='admin'){ xf.armed=id; render(); }
+    else{ t.dataset.armed='1'; t.textContent='নিশ্চিত? আবার চাপুন'; }
+    return; }
   if(t.dataset.wk){ const rf=rfInit(); rf.week=isoD(addD(parseD(rf.week),+t.dataset.wk)); rf.vals=null; render(); return; }
   if(t.hasAttribute('data-past')){ S.showPast=!S.showPast; render(); return; }
   if(t.dataset.del){
@@ -1630,6 +1735,7 @@ app.addEventListener('input',e=>{
   if(t.dataset.cfv){ const cf=cfInit(); cf.vals[t.dataset.cfv]=t.value; cf.dirty=true; }
   if(t.dataset.sfv){ const sf=sfInit(); sf.vals[t.dataset.sfv]=t.value; sf.dirty=true; }
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
+  if(t.dataset.xf&&t.dataset.xf!=='course'){ xfInit()[t.dataset.xf]=t.value; }
 });
 app.addEventListener('change',e=>{
   const t=e.target;
@@ -1645,7 +1751,10 @@ app.addEventListener('change',e=>{
   if(t.dataset.qf==='lv'){ qfInit().lv=t.value; }
   if(t.dataset.qfa!==undefined){ qfInit().a=+t.dataset.qfa; }
   if(t.dataset.qfmode){ qfInit().mode=t.dataset.qfmode; pendingRender=false; render(); }
-  if(t.dataset.rfch!==undefined){ const rf=rfInit(); rf.chs=rf.chs||{}; rf.chs[t.dataset.rfch]=t.value; }
+  if(t.dataset.rfadd!==undefined&&t.value){ const rf=rfInit(), k=t.dataset.rfadd; rf.chs=rf.chs||{}; const a=rf.chs[k]=rf.chs[k]||[]; if(!a.includes(t.value)) a.push(t.value); pendingRender=false; render(); }
+  if(t.dataset.xfadd&&t.value){ const xf=xfInit(); if(!xf.units.includes(t.value)) xf.units.push(t.value); pendingRender=false; render(); }
+  if(t.dataset.xf==='course'){ Object.assign(xfInit(),{course:t.value,units:[],armed:'',err:''}); pendingRender=false; render(); }
+  if(t.dataset.xf&&t.dataset.xf!=='course'){ xfInit()[t.dataset.xf]=t.value; }
   if(t.dataset.cf==='no'){ const cf=cfInit(); cf.ex=''; cf.no=+t.value; cf.vals=null; cf.dirty=false; cf.armed=false; pendingRender=false; render(); }
   if(t.dataset.sf==='course'){ const sf=sfInit(); sf.course=t.value; sf.vals=null; sf.dirty=false; sf.armed=false; pendingRender=false; render(); }
   if(t.dataset.rf==='course'){ const rf=rfInit(); rf.course=t.value; rf.vals=null; pendingRender=false; render(); }

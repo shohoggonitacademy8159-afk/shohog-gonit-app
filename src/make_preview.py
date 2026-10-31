@@ -20,7 +20,7 @@ MOCK = r"""
   const emit=n=>{ const docs=Object.entries(store[n]).map(([id,v])=>({id,data:()=>v})); subs[n].forEach(f=>f({docs})); };
   window.SohogDB={ init(){return true;}, onAuth(cb){ authCb=cb; setTimeout(()=>cb(null),20); },
     collection(n){ return { orderBy(){return this;}, onSnapshot(next){ subs[n].push(next); setTimeout(()=>emit(n),30); return ()=>{ subs[n]=subs[n].filter(f=>f!==next); }; },
-      doc(id){ return { set:async v=>{ store[n][id]=JSON.parse(JSON.stringify(v)); setTimeout(()=>emit(n),10); }, delete:async()=>{ delete store[n][id]; setTimeout(()=>emit(n),10); } }; } }; },
+      doc(id){ return { set:async v=>{ store[n][id]=JSON.parse(JSON.stringify(v)); emit(n); }, delete:async()=>{ delete store[n][id]; emit(n); } }; } }; },
     async signIn(email){ setTimeout(()=>authCb&&authCb({email:String(email||'').toLowerCase()}),20); },
     async signOut(){ setTimeout(()=>authCb&&authCb(null),20); } };
   window.SOHOG_FIREBASE={apiKey:'demo'};
