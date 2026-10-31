@@ -9,14 +9,13 @@ setTimeout(function(){
       // অ্যাপে নতুন অ্যাকাউন্ট খোলার কোনো ব্যবস্থা নেই, তাই লগইন করা মানেই অ্যাডমিন।
       // প্রকাশের আসল অনুমতি Firebase-এর Rules ঠিক করে (সেখানে অ্যাডমিনের ইমেইল আছে)।
       CAN_EDIT=!!u;
-      watchResults(CAN_EDIT);
       if(S.view==='adminLogin'&&CAN_EDIT){ go('admin'); toast('অ্যাডমিন হিসেবে লগইন হয়েছে'); return; }
       softRender();
     });
     DB.collection('routines').orderBy('date').onSnapshot(snap=>{
       clearTimeout(timer);
       ROUT=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
-      RSTATE='ready'; softRender(); sendPendingResults();
+      RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true);
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m;

@@ -196,6 +196,19 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
+.lb-head{display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:18px;background:var(--accent);color:var(--accent-ink)}
+.lb-head b{font-size:17px}
+.lb-me{margin-top:6px;align-self:flex-start;background:var(--accent-ink);color:var(--accent);font-weight:700;border-radius:999px;padding:3px 12px;font-size:14px}
+.lb{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid var(--line)}
+.lb-row:first-child{border-top:0}
+.lb-row.me{background:var(--accent-soft)}
+.lb-rank{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--bg);flex-shrink:0;font-variant-numeric:tabular-nums}
+.lb-rank.top1{background:#F4B400;color:#3B2A00}.lb-rank.top2{background:#C0C7D2;color:#1F2937}.lb-rank.top3{background:#D9915A;color:#2E1503}
+.lb-name{flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere}
+.lb-name small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.lb-score{font-variant-numeric:tabular-nums;color:var(--accent)}
+.ex-done .link+.link{margin-left:4px}
 .seg.big{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:380px){.seg.big{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .res-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
@@ -776,14 +789,13 @@ setTimeout(function(){
       // অ্যাপে নতুন অ্যাকাউন্ট খোলার কোনো ব্যবস্থা নেই, তাই লগইন করা মানেই অ্যাডমিন।
       // প্রকাশের আসল অনুমতি Firebase-এর Rules ঠিক করে (সেখানে অ্যাডমিনের ইমেইল আছে)।
       CAN_EDIT=!!u;
-      watchResults(CAN_EDIT);
       if(S.view==='adminLogin'&&CAN_EDIT){ go('admin'); toast('অ্যাডমিন হিসেবে লগইন হয়েছে'); return; }
       softRender();
     });
     DB.collection('routines').orderBy('date').onSnapshot(snap=>{
       clearTimeout(timer);
       ROUT=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
-      RSTATE='ready'; softRender(); sendPendingResults();
+      RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true);
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m;
@@ -833,7 +845,7 @@ function examCard(e,showCourse){
     <div class="exam-date"><b>${d.getDate()}</b><span>${MONN[d.getMonth()]}</span></div>
     <div class="exam-body">
       <div class="exam-meta"><span class="exam-day">${DAYN[d.getDay()]}${isToday?' · আজ':''}</span>
-        <span class="exam-kind">${fri?'সাপ্তাহিক পরীক্ষা':'দৈনিক পরীক্ষা'}</span></div>
+        <span class="exam-kind">${fri?'সাপ্তাহিক লাইভ পরীক্ষা':'দৈনিক লাইভ পরীক্ষা'}</span></div>
       ${e.pending?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(e.publishAt)} থেকে</span>`:''}
       ${showCourse?`<span class="muted" style="font-size:13px">${COURSES[e.course].name} ${COURSES[e.course].subj||''}</span>`:''}
       <div class="exam-marks"><span>${e.marks} নম্বর</span><span>সময় ${e.mins} মিনিট</span>${!fri&&e.chapter?`<span>অধ্যায় ${e.chapter}</span>`:''}</div>
@@ -855,13 +867,14 @@ const examLeft=run=>run.start+run.mins*60000-Date.now();
 function examAction(e){
   const k=examKey(e), done=S.exams[k], today=todayISO();
   if(S.examRun&&!S.examRun.done&&S.examRun.key===k) return `<button class="btn" data-exgo="1">পরীক্ষা চলছে · ফিরে যাও (${fmtLeft(examLeft(S.examRun))} বাকি)</button>`;
-  if(done) return `<div class="ex-done"><b>তোমার নম্বর: ${done.score}/${done.total}</b>${done.late?' <span class="muted">(দেরিতে)</span>':''}<button class="link" data-exview="${k}">উত্তর দেখো</button></div>`;
-  if(e.date>today) return `<span class="muted" style="font-size:13.5px">পরীক্ষা খুলবে ${fmtD(parseD(e.date))} থেকে</span>`;
+  if(done) return `<div class="ex-done"><b>তোমার নম্বর: ${done.score}/${done.total}</b>${done.late?' <span class="muted">(দেরিতে)</span>':''}<button class="link" data-exview="${k}">উত্তর দেখো</button><button class="link" data-leader="${k}">মেধাতালিকা</button></div>`;
+  if(e.date>today) return `<span class="muted" style="font-size:13.5px">লাইভ পরীক্ষা খুলবে ${fmtD(parseD(e.date))} থেকে (সারাদিন খোলা থাকবে)</span>`;
   const pool=examPool(e);
   if(!examChapters(e).length) return `<span class="muted" style="font-size:13.5px">এই দিনের জন্য কোনো অধ্যায় যুক্ত করা হয়নি, তাই অনলাইন পরীক্ষা নেই।</span>`;
   if(!pool.length) return `<span class="muted" style="font-size:13.5px">এই অধ্যায়ের প্রশ্ন এখনো যোগ হয়নি।</span>`;
   const n=Math.min(e.marks,pool.length);
-  return `<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'} · ${n}টি প্রশ্ন · ${e.mins} মিনিট</button>`;
+  const nRes=leaderRows(k).length;
+  return `<button class="btn" data-exstart="${k}">${e.date===today?'লাইভ পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'} · ${n}টি প্রশ্ন · ${e.mins} মিনিট</button>${nRes?`<button class="link" data-leader="${k}" style="align-self:flex-start">মেধাতালিকা (${nRes} জন দিয়েছে)</button>`:''}`;
 }
 function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id)).find(e=>examKey(e)===k); }
 function startExam(k){
@@ -871,7 +884,7 @@ function startExam(k){
   const pool=examPool(e);
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   const qs=pool.slice(0,Math.min(e.marks,pool.length));
-  S.examRun={key:k,course:e.course,date:e.date,kind:e.kind,title:(e.kind==='friday'?'সাপ্তাহিক পরীক্ষা':'দৈনিক পরীক্ষা')+' · '+fmtD(parseD(e.date)),
+  S.examRun={key:k,course:e.course,date:e.date,kind:e.kind,title:(e.kind==='friday'?'সাপ্তাহিক লাইভ পরীক্ষা':'দৈনিক লাইভ পরীক্ষা')+' · '+fmtD(parseD(e.date)),
     mins:e.mins,total:qs.length,qs,ans:{},start:Date.now(),late:e.date<todayISO(),done:false};
   persist(); go('exam');
 }
@@ -915,14 +928,15 @@ function vExamResult(){
       return `<div class="q-card" style="gap:8px"><p style="margin:0;font-weight:600">${i+1}. ${esc(q.q)}</p>
       ${q.o.map((o,k)=>`<div class="opt ${k===q.a?'right':k===my?'wrong':''}" style="cursor:default"><span class="k">${'কখগঘ'[k]}</span>${esc(o)}</div>`).join('')}
       <div class="feedback ${my===q.a?'ok':'no'}"><b>${my===undefined?'উত্তর দেওয়া হয়নি':my===q.a?'সঠিক':'ভুল'}</b> · ${esc(q.e)}</div></div>`;}).join('')}
+    <button class="btn" data-leader="${S.examView}">মেধাতালিকা দেখো</button>
     <button class="btn ghost" data-go="routine">রুটিনে ফিরে যাও</button>
   </div>`;
 }
 function todayExamBanner(){
   if(RSTATE!=='ready') return '';
-  if(S.examRun&&!S.examRun.done) return `<button class="exam-banner" data-exgo="1">${svg('calendar')}<span><b>পরীক্ষা চলছে</b><br>${S.examRun.title} · ${fmtLeft(examLeft(S.examRun))} বাকি</span></button>`;
+  if(S.examRun&&!S.examRun.done) return `<button class="exam-banner" data-exgo="1">${svg('calendar')}<span><b>তোমার লাইভ পরীক্ষা চলছে</b><br>${S.examRun.title} · ${fmtLeft(examLeft(S.examRun))} বাকি</span></button>`;
   const t=todayISO(), e=OFFER_IDS().flatMap(id=>examsFor(id)).find(x=>x.date===t&&!S.exams[examKey(x)]&&examPool(x).length);
-  return e?`<button class="exam-banner" data-exstart="${examKey(e)}">${svg('calendar')}<span><b>আজ ${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} পরীক্ষা আছে</b><br>${COURSES[e.course].name} ${COURSES[e.course].subj} · ${e.marks} নম্বর · ${e.mins} মিনিট</span></button>`:'';
+  return e?`<button class="exam-banner" data-exstart="${examKey(e)}">${svg('calendar')}<span><b>আজকের ${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} লাইভ পরীক্ষা চলছে</b><br>${COURSES[e.course].name} ${COURSES[e.course].subj} · ${e.marks} নম্বর · ${e.mins} মিনিট</span></button>`:'';
 }
 setInterval(()=>{
   const run=S.examRun; if(!run||run.done) return;
@@ -931,10 +945,34 @@ setInterval(()=>{
 },1000);
 
 /* ---------- পরীক্ষার ফলাফল অ্যাডমিনের কাছে (Firebase: results সংগ্রহ) ---------- */
-let RES={}, resUnsub=null;
+let RES={}, resUnsub=null, RES_OK=null;
+function leaderRows(k){ return Object.values(RES).filter(r=>r.examKey===k); }
+function rankRows(rows){
+  const on=rows.filter(r=>!r.late).sort((a,b)=>b.score-a.score||String(a.at).localeCompare(String(b.at)));
+  let rank=0, prev=null; on.forEach((r,i)=>{ if(r.score!==prev){ rank=i+1; prev=r.score; } r._rank=rank; });
+  const late=rows.filter(r=>r.late).sort((a,b)=>b.score-a.score);
+  return {on,late};
+}
+function vLeader(){
+  const k=S.leaderKey, parts=String(k||'').split('_'), cid=parts[0], date=parts.slice(1).join('_');
+  const e=findExam(k)||{course:cid,date,kind:parseD(date).getDay()===5?'friday':'daily'};
+  const {on,late}=rankRows(leaderRows(k)), me=[...on,...late].find(r=>r.device===S.dev);
+  const row=(r,rk)=>`<div class="lb-row ${r.device===S.dev?'me':''}"><span class="lb-rank ${rk&&rk<=3?'top'+rk:''}">${rk||'-'}</span>
+    <span class="lb-name">${esc(r.name)}${r.device===S.dev?' (তুমি)':''}${r.roll?`<small>রোল ${esc(r.roll)}</small>`:''}</span><b class="lb-score">${r.score}/${r.total}</b></div>`;
+  return `<div class="screen">
+    <div class="topbar"><button class="iconbtn" data-go="${S.leaderFrom||'routine'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>মেধাতালিকা</h1><span style="width:44px"></span></div>
+    <div class="lb-head"><b>${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} লাইভ পরীক্ষা · ${fmtD(parseD(date))}</b><span>${COURSES[cid]?COURSES[cid].name+' '+(COURSES[cid].subj||''):''}</span>
+      ${me?`<span class="lb-me">${me.late?`তুমি দেরিতে দিয়েছ: ${me.score}/${me.total}`:`তোমার অবস্থান: ${me._rank} / ${on.length}`}</span>`:''}</div>
+    ${RES_OK===false?`<div class="empty">মেধাতালিকা এখন দেখা যাচ্ছে না। একটু পরে আবার চেষ্টা করো।</div>`
+      :!on.length&&!late.length?`<div class="empty">এখনো কেউ পরীক্ষা দেয়নি।</div>`
+      :`${on.length?`<div class="lb">${on.map(r=>row(r,r._rank)).join('')}</div>`:''}
+        ${late.length?`<h2 style="margin:4px 0 0;font-size:16px">দেরিতে দেওয়া (মেধাক্রমে নেই)</h2><div class="lb">${late.map(r=>row(r,0)).join('')}</div>`:''}`}
+    <p class="muted" style="margin:0;font-size:13px">সমান নম্বর হলে আগে জমা দেওয়া শিক্ষার্থী উপরে থাকে। তালিকা নিজে থেকে হালনাগাদ হয়।</p>
+  </div>`;
+}
 function watchResults(on){
   if(on&&DB&&!resUnsub){
-    resUnsub=DB.collection('results').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); RES=m; softRender(); },()=>{ RES={}; });
+    resUnsub=DB.collection('results').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); RES=m; RES_OK=true; softRender(); },()=>{ RES={}; RES_OK=false; resUnsub=null; softRender(); });
   }
   if(!on&&resUnsub){ try{ resUnsub(); }catch(e){} resUnsub=null; RES={}; }
 }
@@ -1436,7 +1474,7 @@ function renderTabs(){
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V();
   if(authed) renderTabs();
   const f=app.querySelector('#loginId,#otp'); if(f) f.focus({preventScroll:true});
@@ -1517,6 +1555,7 @@ app.addEventListener('click',e=>{
     if(S.resArmed===id){ S.resArmed=''; DB.collection('results').doc(id).delete().then(()=>toast('ফলাফল মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
     else{ S.resArmed=id; render(); }
     return; }
+  if(t.dataset.leader){ S.leaderFrom=['examResult','routine','home'].includes(S.view)?(S.view==='examResult'?'routine':S.view):'routine'; return go('leader',{leaderKey:t.dataset.leader}); }
   if(t.dataset.exstart){ return startExam(t.dataset.exstart); }
   if(t.dataset.exgo){ return go('exam'); }
   if(t.dataset.exview){ S.examView=t.dataset.exview; return go('examResult'); }

@@ -17,9 +17,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
-    // শিক্ষার্থীর পরীক্ষার ফলাফল: শিক্ষার্থী শুধু নতুন জমা দিতে পারে, দেখতে/মুছতে পারে শুধু অ্যাডমিন
+    // শিক্ষার্থীর পরীক্ষার ফলাফল: শিক্ষার্থী শুধু নতুন জমা দিতে পারে, সবাই মেধাতালিকা দেখতে পারে, মুছতে পারে শুধু অ্যাডমিন
     match /results/{id} {
-      allow read, delete: if isAdmin();
+      allow read: if true;
+      allow delete: if isAdmin();
       allow update: if false;
       allow create: if request.resource.data.keys().hasOnly(['course','date','kind','examKey','name','roll','score','total','late','at','device'])
         && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
