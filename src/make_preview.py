@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""www/index.html থেকে claude.ai artifact প্রিভিউ বানায়: আসল Firebase-এর বদলে মেমোরিতে থাকা ডেমো ডেটাবেস।"""
+import re, sys, pathlib, json
+root = pathlib.Path(__file__).resolve().parent.parent
+out = pathlib.Path(sys.argv[1])
+s = (root / 'www/index.html').read_text(encoding='utf-8')
+mcq = (root / 'www/mcq.js').read_text(encoding='utf-8')
+
+today_note = "অনুশীলনী 2.1 (নমুনা)"
+MOCK = r"""
+<script>
+/* প্রিভিউ: মেমোরিতে থাকা ডেমো ডেটাবেস; পাতা বন্ধ করলে সব মুছে যায় */
+(function(){
+  const pad=n=>String(n).padStart(2,'0'), d=new Date(), today=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const ago=new Date(Date.now()-3600e3).toISOString();
+  const store={routines:{}, syllabus:{}, results:{}};
+  store.routines['c10_'+today]={course:'c10',date:today,kind:'daily',syllabus:'অনুশীলনী 2.1 (সেট)',chapter:2,ex:'2.1',publishAt:ago};
+  const Q=(id,q,o,a,e,lv)=>{ store.syllabus[id]={type:'mcq',course:'c10',ch:2,ex:'2.1',q,o,a,e,lv,createdAt:ago}; };
+  Q('q_demo1','A = {1, 2, 3} হলে A-এর উপসেট কয়টি? (নমুনা)',['3','6','8','9'],2,'n উপাদানের সেটের উপসেট 2ⁿ টি; 2³ = 8।','সহজ');
+  Q('q_demo2','A = {2, 4}, B = {4, 6} হলে A ∪ B = ? (নমুনা)',['{4}','{2, 4, 6}','{2, 6}','{2, 4, 4, 6}'],1,'সংযোগ সেটে দুই সেটের সব উপাদান একবার করে থাকে।','সহজ');
+  Q('q_demo3','A = {2, 4}, B = {4, 6} হলে A ∩ B = ? (নমুনা)',['{4}','{2, 6}','{2, 4, 6}','∅'],0,'ছেদ সেটে শুধু দুই সেটের সাধারণ উপাদান থাকে।','মধ্যম');
+  store.syllabus['ex_c10_2_1']={type:'exnote',course:'c10',no:2,ex:'2.1',title:'অনুশীলনী 2.1: সেট (নমুনা নোট)',note:'এটি প্রিভিউয়ের নমুনা নোট।\nঅ্যাডমিন প্যানেল → অধ্যায় ট্যাব থেকে প্রতিটি অনুশীলনীর আলাদা নোট দেওয়া যায়।',link:'',publishAt:ago};
+  const subs={routines:[],syllabus:[],results:[]}; let authCb=null;
+  const emit=n=>{ const docs=Object.entries(store[n]).map(([id,v])=>({id,data:()=>v})); subs[n].forEach(f=>f({docs})); };
+  window.SohogDB={ init(){return true;}, onAuth(cb){ authCb=cb; setTimeout(()=>cb(null),20); },
+    collection(n){ return { orderBy(){return this;}, onSnapshot(next){ subs[n].push(next); setTimeout(()=>emit(n),30); return ()=>{ subs[n]=subs[n].filter(f=>f!==next); }; },
+      doc(id){ return { set:async v=>{ store[n][id]=JSON.parse(JSON.stringify(v)); setTimeout(()=>emit(n),10); }, delete:async()=>{ delete store[n][id]; setTimeout(()=>emit(n),10); } }; } }; },
+    async signIn(email){ setTimeout(()=>authCb&&authCb({email:String(email||'').toLowerCase()}),20); },
+    async signOut(){ setTimeout(()=>authCb&&authCb(null),20); } };
+  window.SOHOG_FIREBASE={apiKey:'demo'};
+})();
+</script>
+"""
+BANNER = """<div class="demo-bar" role="note">প্রিভিউ: এখানে করা কিছুই সংরক্ষণ হয় না। অ্যাডমিন অংশ দেখতে "আরো → অ্যাডমিন লগইন"-এ যেকোনো ইমেইল ও পাসওয়ার্ড দিন।</div>"""
+title = re.search(r'<title>.*?</title>', s, re.S).group(0).replace('সহগ গণিত একাডেমি', 'সহগ গণিত একাডেমি প্রিভিউ')
+head = s[s.index('<head>')+6:s.index('</head>')]
+head = re.sub(r'<title>.*?</title>\n?', '', head, flags=re.S)
+head = re.sub(r'<meta charset[^>]*>\n?|<meta name="viewport"[^>]*>\n?|<meta name="theme-color"[^>]*>\n?|<link rel="manifest"[^>]*>\n?|<link rel="icon"[^>]*>\n?|<link rel="apple-touch-icon"[^>]*>\n?', '', head)
+head = head.replace('<script src="config.js"></script>\n', '').replace('<script src="db.js"></script>\n', MOCK).replace('<script src="mcq.js"></script>\n', '<script>\n' + mcq + '</script>\n')
+head += '<style>.demo-bar{background:var(--amber-soft);color:var(--amber);font-size:13px;font-weight:600;text-align:center;padding:8px 16px;border-bottom:1px solid var(--line)}</style>\n'
+body = s[s.index('<body>')+6:s.index('</body>')]
+page = title + '\n<meta name="claude:viewport-fit-sides" content="cover">\n' + head + BANNER + body
+assert 'config.js' not in page and 'src="db.js"' not in page
+out.write_text(page, encoding='utf-8')
+print('preview written', out, len(page))
