@@ -5,7 +5,7 @@
 import json, pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 bank = json.loads((root / 'src/mcq/mcq.json').read_text(encoding='utf-8'))
-for ch in ('2', '3', '4', '5', '6', '7', '9', '11', '12', '13', '14', '16'):
+for ch in ('2', '3', '4', '5', '6', '7', '9', '10', '11', '12', '13', '14', '15', '16', '17'):
     f = root / f'src/mcq/ch{ch}.json'
     if f.exists(): bank['c10'][ch] = json.loads(f.read_text(encoding='utf-8'))
 # অধ্যায় 8: আগের 100টি (অনুশীলনী-ট্যাগ ছাড়া, PDF-এর সাথে মেলানো) অপরিবর্তিত রেখে অনুশীলনীভিত্তিক প্রশ্ন যোগ

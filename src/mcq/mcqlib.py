@@ -42,9 +42,9 @@ class Bank:
             g = s.R.choice(live); before = s.count(lv); g()
             if s.count(lv) > before: used[g.__name__] = used.get(g.__name__, 0) + 1; miss[g.__name__] = 0
             else: miss[g.__name__] = miss.get(g.__name__, 0) + 1
-    def final(s):
+    def final(s, mult=1):
         out = []
-        for lv, n in ((E, 30), (M, 50), (H, 20)):
+        for lv, n in ((E, 30 * mult), (M, 50 * mult), (H, 20 * mult)):
             got = [x for x in s.items if x['lv'] == lv][:n]
             assert len(got) == n, (s.ex, lv, len(got))
             out += got
@@ -107,16 +107,19 @@ def dec(x):
     assert F(s) == x, (s, x)
     return s
 
-def run(ex, R, fixed, eg, mg, hg, caps=(7, 7, 6)):
+def run(ex, R, fixed, eg, mg, hg, caps=(7, 7, 6), mult=1):
     """একটি অনুশীলনীর 100 প্রশ্ন: fixed = [(q, c, wrong, e, lv)], eg/mg/hg = টেমপ্লেট ফাংশন (b নেয়)।"""
     b = Bank(ex, R)
     for q, c, w, e, lv in fixed: b.add(q, c, w, e, lv)
     wrap = lambda gs: [(lambda g: (lambda: g(b)))(g) for g in gs]
-    for lv, need, gs, cap in ((E, 30, eg, caps[0]), (M, 50, mg, caps[1]), (H, 20, hg, caps[2])):
+    for lv, need, gs, cap in ((E, 30 * mult, eg, caps[0]), (M, 50 * mult, mg, caps[1]), (H, 20 * mult, hg, caps[2])):
         ws = wrap(gs)
         for w, g in zip(ws, gs): w.__name__ = g.__name__
         b.fill(lv, need, ws, cap)
-    return b.final()
+    out = b.final(mult)
+    if ex is None:
+        for x in out: x.pop('ex', None)   # অনুশীলনী নেই: পুরো অধ্যায়ের প্রশ্ন
+    return out
 
 def sg(n):
     return '+' if n >= 0 else '−'
@@ -133,7 +136,7 @@ def save(ch, items):
         assert len(set(x['o'])) == 4, x
     root = pathlib.Path(__file__).resolve().parents[2]
     (root / f'src/mcq/ch{ch}.json').write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding='utf-8')
-    c = Counter((x['ex'], x['lv']) for x in items)
+    c = Counter((x.get('ex', '-'), x['lv']) for x in items)
     print(f'ch{ch}:', len(items), dict(sorted(c.items())))
 
 def surd(n, k=1):
