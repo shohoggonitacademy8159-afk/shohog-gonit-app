@@ -5,7 +5,7 @@
 import json, pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 bank = json.loads((root / 'src/mcq/mcq.json').read_text(encoding='utf-8'))
-for ch in ('2',):
+for ch in ('2', '3'):
     f = root / f'src/mcq/ch{ch}.json'
     if f.exists(): bank['c10'][ch] = json.loads(f.read_text(encoding='utf-8'))
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')
