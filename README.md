@@ -10,7 +10,7 @@
 
 1. `main` শাখায় কোনো পরিবর্তন গেলেই GitHub Actions নিজে থেকে APK বানায়।
 2. APK পাওয়া যায় **Releases** পাতায়। সবসময়ের সর্বশেষ APK-এর লিংক:
-   `https://github.com/<আপনার-নাম>/<রিপোর নাম>/releases/latest/download/sohog-ganit-academy.apk`
+   `https://github.com/shohoggonitacademy8159-afk/shohog-gonit-app/releases/latest/download/sohog-ganit-academy.apk`
 3. একই সাথে ওয়েব সংস্করণ GitHub Pages-এ যায়, পিসি থেকে অ্যাডমিন কাজের জন্য।
 
 ## ফাইল
