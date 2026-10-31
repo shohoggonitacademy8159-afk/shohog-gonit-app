@@ -41,14 +41,23 @@ rep("routine:vRoutine,admin:vAdmin,", "routine:vRoutine,admin:vAdmin,adminLogin:
 rep("app.addEventListener('submit',e=>{\n  e.preventDefault();", """app.addEventListener('submit',e=>{
   e.preventDefault();
   if(e.target.id==='adminForm'){
-    const em=document.getElementById('adEmail').value.trim(), pw=document.getElementById('adPass').value, er=document.getElementById('adErr');
+    const em=document.getElementById('adEmail').value.trim().toLowerCase(), pw=document.getElementById('adPass').value, er=document.getElementById('adErr');
     if(!DB){ er.textContent='অ্যাপটি এখনো সার্ভারের সাথে যুক্ত করা হয়নি।'; return; }
     if(!em||!pw){ er.textContent='ইমেইল ও পাসওয়ার্ড দুটোই লিখুন।'; return; }
     S.signing=true; render();
     S.adminDenied=false;
     DB.signIn(em,pw).then(()=>{ S.signing=false; render(); })
       .catch(err=>{ S.signing=false; render(); const x=document.getElementById('adErr');
-        const c=err&&err.code||''; if(x) x.textContent=/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c)?'ইমেইল বা পাসওয়ার্ড ঠিক নেই।':/too-many-requests/.test(c)?'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।':/network/.test(c)?'ইন্টারনেট সংযোগ নেই।':'লগইন করা যায়নি। আবার চেষ্টা করুন।'; });
+        const c=err&&err.code||'unknown';
+        const m=/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)?'ইমেইল বা পাসওয়ার্ড ঠিক নেই।'
+          :/invalid-email/.test(c)?'ইমেইলটি সঠিকভাবে লেখা হয়নি।'
+          :/operation-not-allowed/.test(c)?'Firebase-এ Email/Password লগইন চালু করা নেই।'
+          :/user-disabled/.test(c)?'এই অ্যাকাউন্টটি Firebase-এ বন্ধ করা আছে।'
+          :/too-many-requests/.test(c)?'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।'
+          :/network/.test(c)?'ইন্টারনেট সংযোগ নেই।'
+          :/api-key|app-not-authorized|unauthorized-domain/.test(c)?'অ্যাপটি Firebase-এ অনুমোদিত নয়।'
+          :'লগইন করা যায়নি।';
+        if(x) x.textContent=m+' (কোড: '+c.replace('auth/','')+')'; });
     return;
   }""")
 rep("  if(t.hasAttribute('data-logout')){ S.user=null; persist(); go('login'); return; }",

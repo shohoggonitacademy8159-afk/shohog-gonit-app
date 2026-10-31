@@ -6,14 +6,11 @@ setTimeout(function(){
     DB=window.SohogDB;
     DB.onAuth(u=>{
       ADMIN_USER=u;
-      if(!u){ CAN_EDIT=false; softRender(); return; }
-      // কে অ্যাডমিন তা সার্ভার ঠিক করে; অ্যাপে কোনো ইমেইল রাখা হয় না
-      DB.checkAdmin().then(ok=>{
-        CAN_EDIT=ok;
-        if(!ok){ S.adminDenied=true; DB.signOut(); }
-        if(S.view==='adminLogin'&&ok){ go('admin'); toast('অ্যাডমিন হিসেবে লগইন হয়েছে'); return; }
-        softRender();
-      });
+      // অ্যাপে নতুন অ্যাকাউন্ট খোলার কোনো ব্যবস্থা নেই, তাই লগইন করা মানেই অ্যাডমিন।
+      // প্রকাশের আসল অনুমতি Firebase-এর Rules ঠিক করে (সেখানে অ্যাডমিনের ইমেইল আছে)।
+      CAN_EDIT=!!u;
+      if(S.view==='adminLogin'&&CAN_EDIT){ go('admin'); toast('অ্যাডমিন হিসেবে লগইন হয়েছে'); return; }
+      softRender();
     });
     DB.collection('routines').orderBy('date').onSnapshot(snap=>{
       clearTimeout(timer);
