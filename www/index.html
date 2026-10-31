@@ -196,6 +196,11 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
+.files-box{background:var(--surface);border:1.5px solid var(--teal);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.file-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--fg);text-decoration:none;min-height:60px}
+.file-row:hover{border-color:var(--teal)}
+.file-ic{width:44px;height:52px;border-radius:8px;background:var(--bad);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex-shrink:0}
+.file-go{font-weight:700;color:var(--teal);flex-shrink:0}
 .rf-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px}
 @media (max-width:420px){.rf-row{grid-template-columns:minmax(0,1fr)}}
 .ex-act{margin-top:6px;display:flex;flex-direction:column}
@@ -1018,6 +1023,19 @@ function chDoc(cid,i){ const r=SYL[chId(cid,i)]; return r&&canSee(r)?r:null; }
 function chTitle(cid,i){ const r=SYL[chId(cid,i)]; return (r&&r.title)||COURSES[cid].chapters[i]; }
 const safeLink=u=>/^https:\/\/[^\s"'<>]+$/i.test(String(u||'').trim())?String(u).trim():'';
 
+/* ---------- অধ্যায়ের স্থায়ী নোট/ফাইল (PDF) ---------- */
+const FILE_BASE='https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/';
+const CH_FILES={c10:{1:[{title:'বাস্তব সংখ্যা · 100টি MCQ', sub:'উত্তরমালা ও ব্যাখ্যাসহ · PDF · 6 পৃষ্ঠা', url:FILE_BASE+'pdf/c10-ch1-mcq.pdf'}]}};
+const chFiles=(cid,i)=>(CH_FILES[cid]&&CH_FILES[cid][i+1])||[];
+function chFilesSection(cid,i){
+  const f=chFiles(cid,i); if(!f.length) return '';
+  return `<section class="files-box" aria-label="নোট ও ফাইল"><h2 style="margin:0;font-size:18px">নোট (PDF)</h2>
+    ${f.map(x=>`<a class="file-row" href="${esc(x.url)}" target="_blank" rel="noopener">
+      <span class="file-ic" aria-hidden="true">PDF</span>
+      <span style="flex:1;min-width:0"><b>${esc(x.title)}</b><br><span class="muted" style="font-size:13px">${esc(x.sub)}</span></span>
+      <span class="file-go">খুলুন</span></a>`).join('')}
+  </section>`;
+}
 /* ---------- MCQ প্রশ্নব্যাংক (www/mcq.js) ---------- */
 const MCQ_N=20;
 const mcqBank=(cid,i)=>(window.SOHOG_MCQ&&window.SOHOG_MCQ[cid]&&window.SOHOG_MCQ[cid][String(i+1)])||null;
@@ -1059,7 +1077,7 @@ function vChapters(){
       ${c.chapters.map((_,i)=>{const r=chDoc(cid,i), d=!!S.done[cid+':'+i];
         return `<button class="item" role="listitem" data-opench="${i}">
         <span class="num">${bn(i+1)}</span>
-        <span class="t">${esc(chTitle(cid,i))}<br><span class="s">${[r?(r.link?'নোট ও লিংক আছে':'নোট আছে'):'', mcqBank(cid,i)?mcqBank(cid,i).length+'টি MCQ':''].filter(Boolean).join(' · ')||'নোট শিগগিরই আসবে'}</span></span>
+        <span class="t">${esc(chTitle(cid,i))}<br><span class="s">${[r?(r.link?'নোট ও লিংক আছে':'নোট আছে'):'', chFiles(cid,i).length?'PDF নোট':'', mcqBank(cid,i)?mcqBank(cid,i).length+'টি MCQ':''].filter(Boolean).join(' · ')||'নোট শিগগিরই আসবে'}</span></span>
         <span class="pill ${d?'done':'todo'}">${d?'পড়া শেষ':'পড়ুন'}</span></button>`}).join('')}
     </div>
   </div>`;
@@ -1071,13 +1089,14 @@ function vChapter(){
     <div class="topbar"><button class="iconbtn" data-go="chapters" aria-label="অধ্যায়ের তালিকায় ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অধ্যায় ${bn(i+1)}</h1><span style="width:44px"></span></div>
     <div><span class="offer-tag">${c.name} · ${c.subj||''}</span>
       <h2 class="display" style="font-size:26px;margin-top:8px;overflow-wrap:anywhere">${esc(chTitle(cid,i))}</h2></div>
+    ${chFilesSection(cid,i)}
     ${r?`<section class="sylcard">
         ${r.pending||!isLive(r)?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(r.publishAt)} থেকে</span>`:''}
         ${r.note?`<p class="syl-text">${esc(r.note)}</p>`:''}
         ${link?`<a class="btn ghost linkbtn" href="${esc(link)}" target="_blank" rel="noopener">${svg('play')}<span>ভিডিও / লিংক খুলুন</span></a>`:''}
         <span class="muted" style="font-size:12.5px">প্রকাশ: ${fmtDT(r.publishAt||r.updatedAt)}</span>
       </section>`
-      :`<div class="empty">এই অধ্যায়ের নোট এখনো প্রকাশ হয়নি।<br>প্রকাশ হলে এখানেই দেখা যাবে।</div>`}
+      :(chFiles(cid,i).length?'':`<div class="empty">এই অধ্যায়ের নোট এখনো প্রকাশ হয়নি।<br>প্রকাশ হলে এখানেই দেখা যাবে।</div>`)}
     ${mcqSection(cid,i)}
     <button class="btn ${d?'ghost':''}" data-chdone style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>
     <div style="display:flex;gap:10px">
