@@ -196,6 +196,27 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
+.seg.big{grid-template-columns:repeat(2,minmax(0,1fr))}
+.qcount{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--muted)}
+.qcount b{color:var(--fg)}
+.qopt-row{display:flex;gap:8px;align-items:center}
+.qopt-row .input{flex:1;min-width:0;height:48px}
+.qopt-pick{position:relative;flex-shrink:0;cursor:pointer}
+.qopt-pick input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.qopt-pick span{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);display:grid;place-items:center;font-weight:700}
+.qopt-pick input:checked + span{background:var(--good);border-color:var(--good);color:#fff}
+.qopt-pick input:focus-visible + span{outline:3px solid var(--accent);outline-offset:2px}
+.fmt{font-size:13.5px;color:var(--muted)}
+.fmt summary{cursor:pointer;font-weight:600;color:var(--accent);min-height:32px}
+.fmt p{margin:4px 0 0}
+.parse-res{border-radius:12px;padding:10px 12px;background:var(--good-soft);color:var(--good);font-size:14px}
+.parse-res.bad{background:var(--amber-soft);color:var(--amber)}
+.parse-res ul{margin:6px 0 0;padding-left:18px}
+.qitem{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.qitem:first-child{border-top:0}
+.qitem b{font-weight:600;overflow-wrap:anywhere}
+.qitem-act{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0}
+.qitem-act .link{min-height:32px;padding:2px 0}
 .files-box{background:var(--surface);border:1.5px solid var(--teal);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .file-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--fg);text-decoration:none;min-height:60px}
 .file-row:hover{border-color:var(--teal)}
@@ -811,7 +832,7 @@ function examCard(e,showCourse){
 }
 /* ---------- রুটিন অনুযায়ী অনলাইন পরীক্ষা ---------- */
 const examKey=e=>`${e.course}_${e.date}`;
-const bankFor=(cid,no)=>(window.SOHOG_MCQ&&window.SOHOG_MCQ[cid]&&window.SOHOG_MCQ[cid][String(no)])||[];
+const bankFor=(cid,no)=>(((window.SOHOG_MCQ||{})[cid]||{})[String(no)]||[]).concat(customQs(cid,no));
 const bankQ=(cid,ref)=>bankFor(cid,ref.ch).find(x=>x.n===ref.n);
 function examChapters(e){ return e.kind==='friday'?e.chapters:(e.chapter?[e.chapter]:[]); }
 function examPool(e){ return examChapters(e).flatMap(no=>bankFor(e.course,no).map(x=>({ch:no,n:x.n}))); }
@@ -1036,16 +1057,114 @@ function chFilesSection(cid,i){
       <span class="file-go">খুলুন</span></a>`).join('')}
   </section>`;
 }
+/* ---------- অ্যাডমিনের যোগ করা MCQ (Firebase: syllabus সংগ্রহে type:'mcq') ---------- */
+const QLV=['সহজ','মধ্যম','কঠিন'];
+function customQs(cid,no){
+  return Object.values(SYL).filter(r=>r.type==='mcq'&&r.course===cid&&+r.ch===+no&&Array.isArray(r.o)&&r.o.length===4)
+    .sort((a,b)=>String(a.createdAt||'')<String(b.createdAt||'')?-1:1)
+    .map(r=>({n:'x:'+r.id,q:String(r.q),o:r.o.map(String),a:+r.a,e:String(r.e||''),lv:QLV.indexOf(r.lv)>=0?r.lv:'মধ্যম',custom:true,id:r.id}));
+}
+function qfInit(){
+  if(!S.qf) S.qf={course:CH_COURSES()[0], ch:1, mode:'one', q:'', o:['','','',''], a:-1, e:'', lv:'সহজ', bulk:'', parsed:null, editId:null, armed:'', busy:false, msg:'', showAll:false};
+  return S.qf;
+}
+const LET={'ক':0,'খ':1,'গ':2,'ঘ':3,'a':0,'b':1,'c':2,'d':3};
+function parseBulk(text){
+  const blocks=String(text||'').replace(/\r/g,'').split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean);
+  const out=[], errs=[];
+  blocks.forEach((b,bi)=>{
+    const lines=b.split('\n').map(l=>l.trim()).filter(Boolean);
+    const q={q:[],o:[null,null,null,null],a:-1,e:'',lv:'মধ্যম'};
+    lines.forEach(l=>{
+      let m;
+      if((m=l.match(/^[\(（]?\s*([কখগঘabcdABCD])\s*[\)\.।:）]\s*(.+)$/))&&q.q.length){ q.o[LET[m[1].toLowerCase()]]=m[2].trim(); return; }
+      if((m=l.match(/^(উত্তর|উঃ|উ:|ans(wer)?)\s*[:：\-=]?\s*[\(（]?\s*([কখগঘabcdABCD])/i))){ q.a=LET[m[3].toLowerCase()]; return; }
+      if((m=l.match(/^(ব্যাখ্যা|সমাধান|explanation)\s*[:：\-]\s*(.*)$/i))){ q.e=m[2].trim(); return; }
+      if((m=l.match(/^(স্তর|মান|level)\s*[:：\-]\s*(সহজ|মধ্যম|কঠিন)/i))){ q.lv=m[2]; return; }
+      if(q.o.some(Boolean)) { q.e=q.e?q.e+' '+l:l; return; }
+      q.q.push(l.replace(/^\d+\s*[\.\)।]\s*/,''));
+    });
+    const no=bi+1;
+    if(!q.q.length) errs.push(`${no} নম্বর প্রশ্ন: প্রশ্নের লেখা নেই`);
+    else if(q.o.some(x=>!x)) errs.push(`${no} নম্বর প্রশ্ন: ক, খ, গ, ঘ চারটি অপশনই লাগবে`);
+    else if(new Set(q.o).size<4) errs.push(`${no} নম্বর প্রশ্ন: দুটি অপশন একই রকম`);
+    else if(q.a<0) errs.push(`${no} নম্বর প্রশ্ন: "উত্তর: গ" এভাবে সঠিক উত্তর লিখুন`);
+    else out.push({q:q.q.join(' '),o:q.o,a:q.a,e:q.e,lv:q.lv});
+  });
+  return {qs:out,errs,blocks:blocks.length};
+}
+async function saveQ(cid,ch,x,id){
+  const docId=id||`q_${cid}_${ch}_${Date.now().toString(36)}${Math.random().toString(36).slice(2,6)}`;
+  await DB.collection('syllabus').doc(docId).set({type:'mcq',course:cid,ch:+ch,q:x.q,o:x.o,a:x.a,e:x.e||'',lv:x.lv,createdAt:(id&&SYL[id]&&SYL[id].createdAt)||new Date().toISOString(),updatedAt:new Date().toISOString()});
+}
+function qbankPanel(){
+  const qf=qfInit(), c=COURSES[qf.course], built=((window.SOHOG_MCQ||{})[qf.course]||{})[String(qf.ch)]||[], mine=customQs(qf.course,qf.ch);
+  const L=['ক','খ','গ','ঘ'];
+  const one=`<div class="field"><label for="qfQ">প্রশ্ন</label><textarea class="input area" id="qfQ" data-qf="q" rows="3" maxlength="600" placeholder="যেমন: √49 = কত?">${esc(qf.q)}</textarea></div>
+    ${L.map((l,k)=>`<div class="qopt-row"><label class="qopt-pick"><input type="radio" name="qfA" value="${k}" data-qfa="${k}" ${qf.a===k?'checked':''}><span>${l}</span></label>
+      <input class="input" data-qfo="${k}" maxlength="200" aria-label="অপশন ${l}" placeholder="অপশন ${l}" value="${esc(qf.o[k])}"></div>`).join('')}
+    <p class="muted" style="margin:0;font-size:13px">সঠিক উত্তরের অক্ষরে (ক/খ/গ/ঘ) চাপ দিন।</p>
+    <div class="field"><label for="qfLv">স্তর</label><select class="input" id="qfLv" data-qf="lv">${QLV.map(v=>`<option ${v===qf.lv?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="field"><label for="qfE">ব্যাখ্যা (ঐচ্ছিক)</label><textarea class="input area" id="qfE" data-qf="e" rows="2" maxlength="600" style="min-height:70px">${esc(qf.e)}</textarea></div>
+    <button class="btn" data-qsave style="width:100%" ${qf.busy?'disabled':''}>${qf.busy?'সংরক্ষণ হচ্ছে…':qf.editId?'পরিবর্তন সংরক্ষণ কর':'প্রশ্ন যোগ কর'}</button>
+    ${qf.editId?`<button class="btn ghost" data-qcancel style="width:100%">সম্পাদনা বাতিল</button>`:''}`;
+  const pr=qf.parsed;
+  const bulk=`<div class="field"><label for="qfBulk">প্রশ্নগুলো পেস্ট করুন</label>
+    <textarea class="input area" id="qfBulk" data-qf="bulk" rows="12" placeholder="1. √49 = কত?&#10;ক) 5&#10;খ) 6&#10;গ) 7&#10;ঘ) 8&#10;উত্তর: গ&#10;ব্যাখ্যা: 7 × 7 = 49&#10;স্তর: সহজ&#10;&#10;2. পরের প্রশ্ন…">${esc(qf.bulk)}</textarea></div>
+    <details class="fmt"><summary>লেখার নিয়ম</summary><p>প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। প্রথমে প্রশ্ন, তারপর ক) খ) গ) ঘ) চারটি অপশন, তারপর "উত্তর: গ"। "ব্যাখ্যা:" ও "স্তর: সহজ/মধ্যম/কঠিন" ঐচ্ছিক; স্তর না দিলে মধ্যম ধরা হবে। ক. বা (ক) লিখলেও চলবে।</p></details>
+    <button class="btn ghost" data-qparse style="width:100%">যাচাই কর</button>
+    ${pr?`<div class="parse-res ${pr.errs.length?'bad':''}"><b>${pr.qs.length}টি প্রশ্ন ঠিক আছে</b>${pr.errs.length?` · ${pr.errs.length}টিতে সমস্যা`:''}
+      ${pr.errs.length?`<ul>${pr.errs.slice(0,8).map(e=>`<li>${esc(e)}</li>`).join('')}${pr.errs.length>8?`<li>আরও ${pr.errs.length-8}টি…</li>`:''}</ul>`:''}</div>
+      ${pr.qs.length?`<button class="btn" data-qbulksave style="width:100%" ${qf.busy?'disabled':''}>${qf.busy?esc(qf.msg||'যোগ হচ্ছে…'):`${pr.qs.length}টি প্রশ্ন যোগ কর`}</button>`:''}`:''}`;
+  const shown=qf.showAll?mine.slice().reverse():mine.slice().reverse().slice(0,15);
+  return `<section class="admin" aria-label="প্রশ্ন যোগ">
+    <div><h2 class="display" style="font-size:22px">অধ্যায়ে প্রশ্ন যোগ কর</h2>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">যোগ করা প্রশ্ন সাথে সাথে অধ্যায়ের MCQ অনুশীলন ও রুটিনের পরীক্ষায় ব্যবহার হবে।</p></div>
+    <div class="field"><label for="qfCh">অধ্যায় (${c.name} ${c.subj||''})</label>
+      <select class="input" id="qfCh" data-qf="ch">${c.chapters.map((n,j)=>{const t=(((window.SOHOG_MCQ||{})[qf.course]||{})[String(j+1)]||[]).length+customQs(qf.course,j+1).length;return `<option value="${j+1}" ${j+1===+qf.ch?'selected':''}>${j+1}. ${esc(n)} (${t}টি প্রশ্ন)</option>`;}).join('')}</select></div>
+    <div class="qcount"><span>আগে থেকে আছে: <b>${built.length}</b></span><span>আপনি যোগ করেছেন: <b>${mine.length}</b></span><span>মোট: <b>${built.length+mine.length}</b></span></div>
+    <div class="seg" role="tablist"><label class="seg-opt"><input type="radio" name="qfmode" value="one" data-qfmode="one" ${qf.mode==='one'?'checked':''}><span>একটি করে</span></label>
+      <label class="seg-opt"><input type="radio" name="qfmode" value="bulk" data-qfmode="bulk" ${qf.mode==='bulk'?'checked':''}><span>একসাথে অনেক</span></label></div>
+    ${qf.mode==='bulk'?bulk:one}
+    <div class="error" id="qfErr" role="alert">${esc(qf.err||'')}</div>
+    ${mine.length?`<h3 style="margin:6px 0 0;font-size:16px">এই অধ্যায়ে আপনার যোগ করা প্রশ্ন</h3>
+      <div class="list">${shown.map(x=>`<div class="qitem"><div style="flex:1;min-width:0"><b>${esc(x.q)}</b><br><span class="muted" style="font-size:13px">উত্তর: ${L[x.a]}) ${esc(x.o[x.a])} · ${x.lv}</span></div>
+        <div class="qitem-act"><button class="link" data-qedit="${esc(x.id)}">সম্পাদনা</button><button class="link del" data-qdel="${esc(x.id)}">${qf.armed===x.id?'নিশ্চিত?':'মুছুন'}</button></div></div>`).join('')}</div>
+      ${mine.length>15&&!qf.showAll?`<button class="link" data-qall style="align-self:center">সবগুলো দেখাও (${mine.length}টি)</button>`:''}`:''}
+  </section>`;
+}
+async function qSaveOne(){
+  const qf=qfInit(); qf.err='';
+  const x={q:qf.q.trim(),o:qf.o.map(s=>s.trim()),a:qf.a,e:qf.e.trim(),lv:qf.lv};
+  if(!x.q) qf.err='প্রশ্নের লেখা দিন।';
+  else if(x.o.some(s=>!s)) qf.err='চারটি অপশনই পূরণ করুন।';
+  else if(new Set(x.o).size<4) qf.err='দুটি অপশন একই রকম হয়েছে।';
+  else if(x.a<0) qf.err='সঠিক উত্তরের অক্ষর (ক/খ/গ/ঘ) বেছে নিন।';
+  if(qf.err){ render(); return; }
+  qf.busy=true; render();
+  try{ await saveQ(qf.course,qf.ch,x,qf.editId); const ed=!!qf.editId; Object.assign(qf,{q:'',o:['','','',''],a:-1,e:'',editId:null,busy:false}); render(); toast(ed?'প্রশ্ন সংরক্ষণ হয়েছে':'প্রশ্ন যোগ হয়েছে'); }
+  catch(e){ qf.busy=false; qf.err=e&&e.code==='permission_denied'?'যোগ করার অনুমতি নেই। আবার অ্যাডমিন লগইন করুন।':'যোগ করা যায়নি। ইন্টারনেট সংযোগ দেখুন।'; render(); }
+}
+async function qSaveBulk(){
+  const qf=qfInit(), list=(qf.parsed&&qf.parsed.qs)||[]; if(!list.length) return;
+  qf.busy=true; qf.err=''; let done=0;
+  try{
+    for(const x of list){ qf.msg=`যোগ হচ্ছে… ${done}/${list.length}`; const b=app.querySelector('[data-qbulksave]'); if(b) b.textContent=qf.msg; await saveQ(qf.course,qf.ch,x); done++; }
+    Object.assign(qf,{bulk:'',parsed:null,busy:false,msg:''}); render(); toast(`${done}টি প্রশ্ন যোগ হয়েছে`);
+  }catch(e){ qf.busy=false; qf.err=`${done}টি যোগ হয়েছে, বাকিগুলো যোগ করা যায়নি। ইন্টারনেট দেখে আবার যাচাই করে যোগ করুন (আগেরগুলো বাদ দিয়ে)।`; render(); }
+}
+
 /* ---------- MCQ প্রশ্নব্যাংক (www/mcq.js) ---------- */
 const MCQ_N=20;
-const mcqBank=(cid,i)=>(window.SOHOG_MCQ&&window.SOHOG_MCQ[cid]&&window.SOHOG_MCQ[cid][String(i+1)])||null;
+const mcqBank=(cid,i)=>{ const b=bankFor(cid,i+1); return b.length?b:null; };
 const MCQ_LV={easy:'সহজ',mid:'মধ্যম',mix:'মিশ্র'};
-(function(){ const B=window.SOHOG_MCQ||{}; Object.keys(B).forEach(cid=>Object.keys(B[cid]).forEach(no=>Object.keys(MCQ_LV).forEach(lv=>{
-  QUIZZES[`mcq_${cid}_${no}_${lv}`]={title:`অধ্যায় ${no} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:B[cid][no].slice(0,MCQ_N)};
+(function(){ Object.keys(COURSES).filter(k=>COURSES[k].content).forEach(cid=>COURSES[cid].chapters.forEach((_,j)=>Object.keys(MCQ_LV).forEach(lv=>{
+  QUIZZES[`mcq_${cid}_${j+1}_${lv}`]={title:`অধ্যায় ${j+1} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:(((window.SOHOG_MCQ||{})[cid]||{})[String(j+1)]||[]).slice(0,MCQ_N)};
 })));})();
 function fillMcq(id){
   const m=id.match(/^mcq_(\w+?)_(\d+)_(easy|mid|mix)$/); if(!m) return;
-  const all=(window.SOHOG_MCQ[m[1]]||{})[m[2]]||[];
+  const all=bankFor(m[1],m[2]);
+  if(!QUIZZES[id]) QUIZZES[id]={title:`অধ্যায় ${m[2]} · ${MCQ_LV[m[3]]} MCQ`, skill:'MCQ', qs:[]};
   let pool=m[3]==='mix'?all.slice():all.filter(x=>x.lv===MCQ_LV[m[3]]);
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   QUIZZES[id].qs=pool.slice(0,MCQ_N);
@@ -1208,7 +1327,7 @@ function vAdmin(){
   if(!CAN_EDIT) return `<div class="screen"><div class="topbar"><button class="iconbtn" data-go="profile" aria-label="ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অ্যাডমিন প্যানেল</h1><span style="width:44px"></span></div>
     <div class="empty">এই পাতা শুধু অ্যাডমিন দেখতে পারেন।<br><button class="link" data-go="adminLogin">অ্যাডমিন লগইন</button></div></div>`;
   const tab=S.atab||'routine';
-  const live=ROUT.filter(isLive).length, sched=ROUT.length-live, syl=Object.values(SYL).filter(r=>r.type!=='chapter').length;
+  const live=ROUT.filter(isLive).length, sched=ROUT.length-live, syl=Object.values(SYL).filter(r=>!r.type).length;
   return `<div class="screen">
     <div class="topbar"><button class="iconbtn" data-go="home" aria-label="হোমে ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অ্যাডমিন প্যানেল</h1><span style="width:44px"></span></div>
     <p class="muted" style="margin:0;font-size:14px">ফোনের অ্যাপ বা কম্পিউটারের ওয়েব সংস্করণ, যেখান থেকেই অ্যাডমিন লগইন করবেন, এখান থেকে প্রকাশ করতে পারবেন। প্রকাশ করার সাথে সাথে শিক্ষার্থীদের অ্যাপে চলে যায়।</p>
@@ -1221,8 +1340,9 @@ function vAdmin(){
       <button class="seg-btn" role="tab" aria-selected="${tab==='routine'}" data-atab="routine">${svg('calendar')}রুটিন</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='syllabus'}" data-atab="syllabus">${svg('openbook')}সিলেবাস</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='chapters'}" data-atab="chapters">${svg('book')}অধ্যায়</button>
+      <button class="seg-btn" role="tab" aria-selected="${tab==='qbank'}" data-atab="qbank">${svg('pencil')}প্রশ্ন</button>
     </div>
-    ${RSTATE!=='ready'?routineStateMsg():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
+    ${RSTATE!=='ready'?routineStateMsg():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
   </div>`;
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
@@ -1294,6 +1414,16 @@ app.addEventListener('click',e=>{
     else{ cf.armed=true; render(); }
     return;
   }
+  if(t.hasAttribute('data-qsave')){ if(!qfInit().busy) qSaveOne(); return; }
+  if(t.hasAttribute('data-qcancel')){ Object.assign(qfInit(),{q:'',o:['','','',''],a:-1,e:'',editId:null,err:''}); return render(); }
+  if(t.hasAttribute('data-qparse')){ const qf=qfInit(); qf.parsed=parseBulk(qf.bulk); qf.err=qf.parsed.blocks?'':'কোনো প্রশ্ন পাওয়া যায়নি।'; return render(); }
+  if(t.hasAttribute('data-qbulksave')){ if(!qfInit().busy) qSaveBulk(); return; }
+  if(t.hasAttribute('data-qall')){ qfInit().showAll=true; return render(); }
+  if(t.dataset.qedit){ const qf=qfInit(), r=SYL[t.dataset.qedit]; if(r){ Object.assign(qf,{mode:'one',q:String(r.q),o:r.o.map(String),a:+r.a,e:String(r.e||''),lv:r.lv||'মধ্যম',editId:r.id,err:''}); render(); window.scrollTo(0,0); } return; }
+  if(t.dataset.qdel){ const qf=qfInit(), id=t.dataset.qdel;
+    if(qf.armed===id){ qf.armed=''; DB.collection('syllabus').doc(id).delete().then(()=>toast('প্রশ্ন মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
+    else{ qf.armed=id; render(); }
+    return; }
   if(t.dataset.exstart){ return startExam(t.dataset.exstart); }
   if(t.dataset.exgo){ return go('exam'); }
   if(t.dataset.exview){ S.examView=t.dataset.exview; return go('examResult'); }
@@ -1356,6 +1486,8 @@ app.addEventListener('click',e=>{
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.rfday){ rfInit().vals[t.dataset.rfday]=t.value; }
+  if(t.dataset.qf&&['q','e','bulk'].includes(t.dataset.qf)){ const qf=qfInit(); qf[t.dataset.qf]=t.value; if(t.dataset.qf==='bulk') qf.parsed=null; }
+  if(t.dataset.qfo!==undefined){ qfInit().o[+t.dataset.qfo]=t.value; }
   if(t.dataset.eq!==undefined&&S.examRun){ S.examRun.ans[+t.dataset.eq]=+t.value; persist();
     const n=Object.keys(S.examRun.ans).length, b=app.querySelector('[data-exsubmit]'), h=document.getElementById('exHint');
     if(b&&!S.exSubmitArmed) b.textContent=`খাতা জমা দাও (${n}/${S.examRun.total})`; if(h) h.textContent=S.examRun.total-n>0?`${S.examRun.total-n}টি প্রশ্নের উত্তর দেওয়া বাকি`:''; }
@@ -1368,6 +1500,10 @@ app.addEventListener('change',e=>{
   if(t.dataset.rf==='week'&&t.value){ const rf=rfInit(); rf.week=isoD(weekStartOf(parseD(t.value))); rf.vals=null; pendingRender=false; render(); }
   if(t.dataset.when){ const st=stFor(t.dataset.when); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
+  if(t.dataset.qf==='ch'){ Object.assign(qfInit(),{ch:+t.value,editId:null,armed:'',showAll:false,err:''}); pendingRender=false; render(); }
+  if(t.dataset.qf==='lv'){ qfInit().lv=t.value; }
+  if(t.dataset.qfa!==undefined){ qfInit().a=+t.dataset.qfa; }
+  if(t.dataset.qfmode){ qfInit().mode=t.dataset.qfmode; pendingRender=false; render(); }
   if(t.dataset.rfch!==undefined){ const rf=rfInit(); rf.chs=rf.chs||{}; rf.chs[t.dataset.rfch]=t.value; }
   if(t.dataset.cf==='no'){ const cf=cfInit(); cf.no=+t.value; cf.vals=null; cf.dirty=false; cf.armed=false; pendingRender=false; render(); }
   if(t.dataset.sf==='course'){ const sf=sfInit(); sf.course=t.value; sf.vals=null; sf.dirty=false; sf.armed=false; pendingRender=false; render(); }
