@@ -262,6 +262,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .eopt{display:flex;align-items:center;gap:10px;min-height:46px;padding:6px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer}
 .eopt input{position:absolute;opacity:0;width:1px;height:1px}
 .eopt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.eopt.locked{cursor:default}
+.eopt.locked:not(:has(input:checked)){opacity:.55}
 .eopt:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
 .eopt .k{width:28px;height:28px;border-radius:8px;background:var(--surface);display:grid;place-items:center;font-weight:700;font-size:14px;flex-shrink:0}
 .eopt:has(input:checked) .k{background:var(--accent);color:var(--accent-ink)}
@@ -343,6 +345,8 @@ select.input{appearance:auto}
 .xa-mats{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding-left:6px}
 .xa-act{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:2px}
 .xa-act.one{grid-template-columns:minmax(0,1fr)}
+.xa-act.three{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.xa-act.three .btn{font-size:14.5px;padding:0 6px}
 .xa-act .btn{min-height:50px;width:100%}
 .btn.outline{background:var(--surface);color:var(--fg);border:1.5px solid var(--line-strong,#9aa3b2)}
 .btn[disabled]{opacity:.55;cursor:default}
@@ -570,13 +574,14 @@ const S = {
   results: saved.results||{},     // quizId -> {best,total,last}
   done: saved.done||{},           // "courseId:idx" -> true
   exams: saved.exams||{},
+  retakes: saved.retakes||{},
   examRun: saved.examRun||null,
   student: saved.student||null,
   dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -926,33 +931,40 @@ const examLeft=run=>run.start+run.mins*60000-Date.now();
 function examAction(e){
   const k=examKey(e), done=S.exams[k], today=todayISO();
   if(S.examRun&&!S.examRun.done&&S.examRun.key===k) return `<button class="btn" data-exgo="1">পরীক্ষা চলছে · ফিরে যাও (${fmtLeft(examLeft(S.examRun))} বাকি)</button>`;
-  if(done) return `<div class="ex-done"><b>তোমার নম্বর: ${done.score}/${done.total}</b>${done.late?' <span class="muted">(দেরিতে)</span>':''}<button class="link" data-exview="${k}">উত্তর দেখো</button><button class="link" data-leader="${k}">মেধাতালিকা</button></div>`;
+  if(done) return `<div class="ex-done"><b>তোমার নম্বর: ${done.score}/${done.total}</b>${done.late?' <span class="muted">(দেরিতে)</span>':''}<button class="link" data-exview="${k}">প্রশ্ন দেখুন</button><button class="link" data-exagain="${k}">আবার দিন</button><button class="link" data-leader="${k}">মেধাতালিকা</button></div>`;
   if(e.date>today) return `<span class="muted" style="font-size:13.5px">লাইভ পরীক্ষা খুলবে ${fmtD(parseD(e.date))} থেকে (সারাদিন খোলা থাকবে)</span>`;
   const pool=examPool(e);
   if(!examChapters(e).length) return `<span class="muted" style="font-size:13.5px">এই দিনের জন্য কোনো অধ্যায় যুক্ত করা হয়নি, তাই অনলাইন পরীক্ষা নেই।</span>`;
   if(!pool.length) return `<span class="muted" style="font-size:13.5px">এই অধ্যায়ের প্রশ্ন এখনো যোগ হয়নি।</span>`;
   const n=Math.min(e.marks,pool.length);
   const nRes=leaderRows(k).length;
-  return `<button class="btn" data-exstart="${k}">${e.date===today?'লাইভ পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'} · ${n}টি প্রশ্ন · ${e.mins} মিনিট</button>${nRes?`<button class="link" data-leader="${k}" style="align-self:flex-start">মেধাতালিকা (${nRes} জন দিয়েছে)</button>`:''}`;
+  return `<button class="btn" data-exstart="${k}">${e.date===today?'লাইভ পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'} · ${n}টি প্রশ্ন · ${e.mins} মিনিট</button>`;
 }
 function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id)).find(e=>examKey(e)===k); }
-function startExam(k){
-  const e=findExam(k); if(!e||S.exams[k]) return;
+function startExam(k,again){
+  const e=findExam(k); if(!e||(S.exams[k]&&!again)||(again&&!S.exams[k])) return;
   if(!S.student){ return go('student',{pendingExam:k}); }
   if(S.examRun&&!S.examRun.done){ toast('আগে চলমান পরীক্ষাটি শেষ করো'); return go('exam'); }
   const pool=examPool(e);
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   const qs=pool.slice(0,Math.min(e.marks,pool.length));
   S.examRun={key:k,course:e.course,date:e.date,kind:e.kind,title:kindName(e)+' · '+fmtD(parseD(e.date)),
-    mins:e.mins,total:qs.length,qs,ans:{},start:Date.now(),late:e.date<todayISO(),done:false};
+    mins:e.mins,total:qs.length,qs,ans:{},start:Date.now(),late:e.date<todayISO(),done:false,again:!!again};
+  if(again) S.examRun.title+=' · আবার';
   persist(); go('exam');
 }
 function submitExam(auto){
   const run=S.examRun; if(!run||run.done) return;
   let score=0; run.qs.forEach((ref,i)=>{ const q=bankQ(run.course,ref); if(q&&run.ans[i]===q.a) score++; });
   run.done=true; run.score=score; run.end=Date.now();
+  if(run.again){   // আবার দেওয়া: শুধু নিজের অনুশীলন, মেধাতালিকা ও শিক্ষকের ফলাফলে যায় না
+    const prev=S.retakes[run.key];
+    S.retakes[run.key]={score,total:run.total,at:run.end,qs:run.qs,ans:run.ans,course:run.course,title:run.title,kind:run.kind,count:(prev&&prev.count||0)+1,best:Math.max(prev?prev.best||0:0,score)};
+    S.examView=run.key; S.examViewAgain=true; S.examRun=null; S.exSubmitArmed=false; persist();
+    go('examResult'); toast(auto?'সময় শেষ, খাতা জমা হয়েছে':'খাতা জমা হয়েছে'); return;
+  }
   S.exams[run.key]={score,total:run.total,at:run.end,late:run.late,qs:run.qs,ans:run.ans,course:run.course,title:run.title,kind:run.kind};
-  S.examView=run.key; S.examRun=null; S.exSubmitArmed=false; persist(); sendResult(run.key);
+  S.examView=run.key; S.examViewAgain=false; S.examRun=null; S.exSubmitArmed=false; persist(); sendResult(run.key);
   go('examResult'); toast(auto?'সময় শেষ, খাতা জমা হয়েছে':'খাতা জমা হয়েছে');
 }
 function vExam(){
@@ -961,24 +973,25 @@ function vExam(){
   const answered=Object.keys(run.ans).length;
   return `<div class="screen">
     <div class="exam-bar" role="timer" aria-live="off">
-      <div style="min-width:0"><b>${run.title}</b><span>${run.total} নম্বর · প্রতিটি প্রশ্নে 1</span></div>
+      <div style="min-width:0"><b>${run.title}</b><span>${run.total} নম্বর · প্রতিটি প্রশ্নে 1 · উত্তর একবার দিলে আর বদলানো যাবে না${run.again?' · মেধাতালিকায় গণনা হবে না':''}</span></div>
       <span class="timer" id="examTimer">${fmtLeft(examLeft(run))}</span>
     </div>
     ${run.qs.map((ref,i)=>{const q=bankQ(run.course,ref); if(!q) return ''; return `<fieldset class="eq"><legend>${i+1}. ${esc(q.q)}</legend>
-      ${q.o.map((o,k)=>`<label class="eopt"><input type="radio" name="eq${i}" value="${k}" data-eq="${i}" ${run.ans[i]===k?'checked':''}><span class="k">${'কখগঘ'[k]}</span><span>${esc(o)}</span></label>`).join('')}
+      ${q.o.map((o,k)=>`<label class="eopt ${run.ans[i]!==undefined?'locked':''}"><input type="radio" name="eq${i}" value="${k}" data-eq="${i}" ${run.ans[i]===k?'checked':''} ${run.ans[i]!==undefined?'disabled':''}><span class="k">${'কখগঘ'[k]}</span><span>${esc(o)}</span></label>`).join('')}
     </fieldset>`;}).join('')}
     <div class="error" role="status" id="exHint">${run.total-answered>0?`${run.total-answered}টি প্রশ্নের উত্তর দেওয়া বাকি`:''}</div>
     <button class="btn" data-exsubmit style="width:100%">${S.exSubmitArmed?'নিশ্চিত? আবার চাপলে জমা হবে':`খাতা জমা দাও (${answered}/${run.total})`}</button>
   </div>`;
 }
 function vExamResult(){
-  const r=S.exams[S.examView]; if(!r) return vRoutine();
+  const again=!!S.examViewAgain, r=again?S.retakes[S.examView]:S.exams[S.examView]; if(!r) return vRoutine();
+  const first=S.exams[S.examView];
   const pct=Math.round(r.score/r.total*100);
   return `<div class="screen">
     <div class="topbar"><button class="iconbtn" data-go="${S.resFrom||'routine'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>ফলাফল</h1><span style="width:44px"></span></div>
     <div class="q-card" style="align-items:center;text-align:center">
       <span class="muted">${r.title}${r.late?' · দেরিতে দেওয়া':''}</span>
-      <span class="muted" style="font-size:13px">${r.sent&&!r.sendErr?'ফলাফল শিক্ষকের কাছে পাঠানো হয়েছে':r.sendErr?'ফলাফল পাঠানো যায়নি':'ইন্টারনেট পেলে ফলাফল শিক্ষকের কাছে যাবে'}</span>
+      <span class="muted" style="font-size:13px">${again?`আবার দেওয়া (অনুশীলন) · মেধাতালিকায় প্রথমবারের নম্বর ${first?first.score+'/'+first.total:''} থাকবে`:r.sent&&!r.sendErr?'ফলাফল শিক্ষকের কাছে পাঠানো হয়েছে':r.sendErr?'ফলাফল পাঠানো যায়নি':'ইন্টারনেট পেলে ফলাফল শিক্ষকের কাছে যাবে'}</span>
       <b style="font-size:44px;line-height:1.1;color:${pct>=60?'var(--good)':'var(--amber)'}">${r.score}/${r.total}</b>
       <span>${pct>=80?'চমৎকার!':pct>=60?'ভালো হয়েছে!':pct>=40?'আরও অনুশীলন দরকার':'অধ্যায়টি আবার পড়ো'}</span>
     </div>
@@ -987,6 +1000,8 @@ function vExamResult(){
       return `<div class="q-card" style="gap:8px"><p style="margin:0;font-weight:600">${i+1}. ${esc(q.q)}</p>
       ${q.o.map((o,k)=>`<div class="opt ${k===q.a?'right':k===my?'wrong':''}" style="cursor:default"><span class="k">${'কখগঘ'[k]}</span>${esc(o)}</div>`).join('')}
       <div class="feedback ${my===q.a?'ok':'no'}"><b>${my===undefined?'উত্তর দেওয়া হয়নি':my===q.a?'সঠিক':'ভুল'}</b> · ${esc(q.e)}</div></div>`;}).join('')}
+    ${again&&first?`<button class="btn ghost" data-exview="${S.examView}">প্রথমবারের উত্তরপত্র দেখো</button>`:''}
+    <button class="btn ghost" data-exagain="${S.examView}">আবার দাও</button>
     <button class="btn" data-leader="${S.examView}">মেধাতালিকা দেখো</button>
     <button class="btn ghost" data-go="${S.resFrom||'routine'}">${S.resFrom==='exams'?'পরীক্ষা পাতায় ফিরে যাও':'রুটিনে ফিরে যাও'}</button>
   </div>`;
@@ -1029,11 +1044,11 @@ function xaCard(e,showCourse){
   const running=S.examRun&&!S.examRun.done&&S.examRun.key===k, pool=examPool(e).length, nRes=leaderRows(k).length;
   let left='', right='';
   if(running){ right=`<button class="btn" data-exgo="1">চলমান পরীক্ষায় ফিরে যাও · ${fmtLeft(examLeft(S.examRun))}</button>`; }
-  else if(done){ left=`<button class="btn outline" data-exview="${k}">উত্তর দেখুন</button>`; right=`<button class="btn" data-leader="${k}">মেধাতালিকা</button>`; }
+  else if(done){ left=`<button class="btn outline" data-exview="${k}">প্রশ্ন দেখুন</button><button class="btn outline" data-exagain="${k}">আবার দিন</button>`; right=`<button class="btn" data-leader="${k}">মেধাতালিকা</button>`; }
   else if(e.pending){ right=`<button class="btn" disabled>প্রকাশ হবে ${fmtDT(e.publishAt)}</button>`; }
   else if(e.date>today){ left=`<button class="btn outline" disabled>প্রশ্ন দেখুন</button>`; right=`<button class="btn" disabled>খুলবে ${fmtD(d)}</button>`; }
   else if(!examChapters(e).length||!pool){ right=`<button class="btn" disabled>${!examChapters(e).length?'অনলাইন পরীক্ষা নেই':'প্রশ্ন যোগ হয়নি'}</button>`; }
-  else { left=`<button class="btn outline" data-leader="${k}">মেধাতালিকা${nRes?` (${bn(nRes)})`:''}</button>`; right=`<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দিন':'পরীক্ষা দিন (দেরিতে)'}</button>`; }
+  else { right=`<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দিন':'পরীক্ষা দিন (দেরিতে)'}</button>`; }
   const del=CAN_EDIT&&DB&&e.kind!=='friday'?`<button class="link del" ${e.kind==='special'?`data-xdel="${esc(e.id)}"`:`data-del="${esc(e.id)}"`} style="align-self:flex-end">মুছুন</button>`:'';
   return `<article class="xa-card">
     <div class="xa-top"><span class="xa-date">${longD(d)}</span><span class="xa-chips"><span class="xa-st st-${sk}">${sk==='done'?svg('check'):svg('exam')}${sl}</span><span class="xa-tag">${esc(kindShort(e))}</span></span></div>
@@ -1042,7 +1057,8 @@ function xaCard(e,showCourse){
     <p class="xa-desc">${esc(short?full.slice(0,70).replace(/\s+\S*$/,'')+' …':full)}${full.length>70?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</p>
     ${mats.length?`<button class="xa-mat" data-xmat="${k}" aria-expanded="${matOpen}">${svg('openbook')}পড়ার উপকরণ (${bn(mats.length)}) <span aria-hidden="true">${matOpen?'▾':'▸'}</span></button>
       ${matOpen?`<div class="xa-mats">${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}`:''}
-    <div class="xa-act ${left?'':'one'}">${left}${right}</div>
+    <div class="xa-act ${done&&!running?'three':left?'':'one'}">${left}${right}</div>
+    ${done&&!running&&S.retakes[k]?`<span class="muted" style="font-size:13px">আবার দিয়েছ ${bn(S.retakes[k].count)} বার · সেরা ${S.retakes[k].best}/${S.retakes[k].total} (মেধাতালিকায় প্রথমবারের নম্বর)</span>`:''}
     ${del}
   </article>`;
 }
@@ -1851,11 +1867,12 @@ app.addEventListener('click',e=>{
   if(t.dataset.xpg){ S.xpage=+t.dataset.xpg; render(); window.scrollTo(0,0); return; }
   if(t.hasAttribute('data-xgoclr')){ S.xgo=''; S.xpage=1; render(); return; }
   if(t.dataset.goadmin){ S.atab=t.dataset.goadmin; return go('admin'); }
-  if(t.dataset.exview||t.dataset.exstart){ S.resFrom=S.view==='exams'?'exams':'routine'; }
+  if(t.dataset.exview||t.dataset.exstart||t.dataset.exagain){ if(S.view!=='examResult') S.resFrom=S.view==='exams'?'exams':'routine'; }
+  if(t.dataset.exagain){ return startExam(t.dataset.exagain,true); }
   if(t.dataset.leader){ S.leaderFrom=['examResult','routine','home','exams'].includes(S.view)?(S.view==='examResult'?(S.resFrom||'routine'):S.view):'routine'; return go('leader',{leaderKey:t.dataset.leader}); }
   if(t.dataset.exstart){ return startExam(t.dataset.exstart); }
   if(t.dataset.exgo){ return go('exam'); }
-  if(t.dataset.exview){ S.examView=t.dataset.exview; return go('examResult'); }
+  if(t.dataset.exview){ S.examView=t.dataset.exview; S.examViewAgain=false; return go('examResult'); }
   if(t.hasAttribute('data-exsubmit')){
     if(S.exSubmitArmed){ submitExam(false); }
     else{ S.exSubmitArmed=true; t.textContent='নিশ্চিত? আবার চাপলে জমা হবে'; setTimeout(()=>{ S.exSubmitArmed=false; },4000); }
@@ -1925,7 +1942,11 @@ app.addEventListener('input',e=>{
   if(t.dataset.rfday){ rfInit().vals[t.dataset.rfday]=t.value; }
   if(t.dataset.qf&&['q','e','bulk'].includes(t.dataset.qf)){ const qf=qfInit(); qf[t.dataset.qf]=t.value; if(t.dataset.qf==='bulk') qf.parsed=null; }
   if(t.dataset.qfo!==undefined){ qfInit().o[+t.dataset.qfo]=t.value; }
-  if(t.dataset.eq!==undefined&&S.examRun){ S.examRun.ans[+t.dataset.eq]=+t.value; persist();
+  if(t.dataset.eq!==undefined&&S.examRun){
+    const qi=+t.dataset.eq, fs=t.closest('fieldset');
+    if(S.examRun.ans[qi]!==undefined){ fs&&fs.querySelectorAll('input').forEach(x=>{ x.checked=+x.value===S.examRun.ans[qi]; }); return; }
+    S.examRun.ans[qi]=+t.value; persist();
+    if(fs) fs.querySelectorAll('input').forEach(x=>{ x.disabled=true; x.closest('label').classList.add('locked'); });
     const n=Object.keys(S.examRun.ans).length, b=app.querySelector('[data-exsubmit]'), h=document.getElementById('exHint');
     if(b&&!S.exSubmitArmed) b.textContent=`খাতা জমা দাও (${n}/${S.examRun.total})`; if(h) h.textContent=S.examRun.total-n>0?`${S.examRun.total-n}টি প্রশ্নের উত্তর দেওয়া বাকি`:''; }
   if(t.dataset.cfv){ const cf=cfInit(); cf.vals[t.dataset.cfv]=t.value; cf.dirty=true; }
