@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def ksPass = (System.getenv('KEYSTORE_PASSWORD') ?: '').replaceAll('\\s', '')
+
 android {
     namespace = "com.sohogganit.academy"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -20,9 +22,9 @@ android {
         release {
             storeFile file("../../signing/sohog-release.p12")
             storeType "pkcs12"
-            storePassword (System.getenv("KEYSTORE_PASSWORD") ?: "").replaceAll("\\s","")
+            storePassword ksPass
             keyAlias "sohog"
-            keyPassword (System.getenv("KEYSTORE_PASSWORD") ?: "").replaceAll("\\s","")
+            keyPassword ksPass
         }
     }
     buildTypes {
