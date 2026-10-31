@@ -1,11 +1,10 @@
-// সহগ গণিত একাডেমি — সার্ভার সংযোগ
-// Firebase কনসোল থেকে পাওয়া firebaseConfig এখানে বসাতে হবে।
+// সহগ গণিত একাডেমি — সার্ভার সংযোগ (Firebase প্রজেক্ট: shohog-gonit)
 window.SOHOG_ADMIN_EMAIL = "shohoggonitacademy8159@gmail.com";
 window.SOHOG_FIREBASE = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyBOX20jiueaFZwBZYNFP9Vkc6-KDUBAeMM",
+  authDomain: "shohog-gonit.firebaseapp.com",
+  projectId: "shohog-gonit",
+  storageBucket: "shohog-gonit.firebasestorage.app",
+  messagingSenderId: "224768090466",
+  appId: "1:224768090466:web:b62f4f6c301479bae20c3b"
 };
