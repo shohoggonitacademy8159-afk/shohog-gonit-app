@@ -1,0 +1,106 @@
+name: অ্যাপ তৈরি (APK ও ওয়েব)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: APK তৈরি
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: চাবির পাসওয়ার্ড আছে কিনা দেখা
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::KEYSTORE_PASSWORD নামের Secret যোগ করা হয়নি। Settings > Secrets and variables > Actions থেকে যোগ করুন।"
+            exit 1
+          fi
+          got=$(printf '%s' "$KEYSTORE_PASSWORD" | tr -d '[:space:]' | sha256sum | cut -c1-64)
+          if [ "$got" != "63b442f9421e5b0a1f2db5871e8102c58f1736aa26fd3ccd45a9475d957710ae" ]; then
+            echo "::error title=Secret mismatch::KEYSTORE_PASSWORD Secret-এর পাসওয়ার্ড মেলেনি। Secret-টি মুছে ঠিক পাসওয়ার্ড দিয়ে আবার যোগ করুন।"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: ওয়েব অংশ তৈরি
+        run: |
+          npm ci
+          npm run build
+          npx cap sync android
+
+      - name: APK তৈরি ও সই
+        working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          APP_VERSION_CODE: ${{ github.run_number }}
+          APP_VERSION_NAME: 1.0.${{ github.run_number }}
+        run: |
+          chmod +x gradlew
+          set -o pipefail
+          if ! ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log; then
+            msg=$( (grep -A25 "What went wrong" build.log || tail -60 build.log) | head -60 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+            echo "::error title=APK build failed::$msg"
+            exit 1
+          fi
+          cp app/build/outputs/apk/release/app-release.apk ../sohog-ganit-academy.apk
+
+      - name: APK সংরক্ষণ
+        uses: actions/upload-artifact@v4
+        with:
+          name: sohog-ganit-academy-apk
+          path: sohog-ganit-academy.apk
+
+      - name: Releases-এ প্রকাশ
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: সহগ গণিত একাডেমি ১.০.${{ github.run_number }}
+          body: শিক্ষার্থীদের পাঠানোর জন্য নিচের sohog-ganit-academy.apk ফাইলটি ডাউনলোড করুন।
+          files: sohog-ganit-academy.apk
+          make_latest: true
+
+  web:
+    name: ওয়েব সংস্করণ (পিসি থেকে অ্যাডমিনের জন্য)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: |
+          npm ci
+          npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+      - id: deploy
+        uses: actions/deploy-pages@v4

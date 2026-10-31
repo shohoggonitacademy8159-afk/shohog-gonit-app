@@ -1,0 +1,7 @@
+{
+  "appId": "com.sohogganit.academy",
+  "appName": "সহগ গণিত একাডেমি",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "server": { "androidScheme": "https" }
+}
