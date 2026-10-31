@@ -109,8 +109,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabbar nav{max-width:460px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));height:72px;align-items:center}
-.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--muted);cursor:pointer;min-height:56px;justify-content:center}
+.tabbar nav{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));height:72px;align-items:center}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;line-height:1.15;text-align:center;padding:0 2px;color:var(--muted);cursor:pointer;min-height:56px;justify-content:center}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tab[aria-current="page"]{color:var(--accent);font-weight:700}
 .tab.center .ring{width:54px;height:54px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;margin-top:-28px;border:4px solid var(--bg)}
@@ -318,6 +318,13 @@ select.input{appearance:auto}
 .exam{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px}
 .exam.fri{background:var(--orange-bg);border-color:var(--orange-b)}
 .exam.sp{border-color:var(--violet)}
+.hub-admin{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.hub-admin .adminbar{min-height:52px}
+.myx{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--surface)}
+.myx .sc{min-width:58px;text-align:center;font-weight:800;font-size:18px}
+.myx .bd{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.myx .bd span{font-size:13px}
+.myx .ac{display:flex;flex-direction:column;gap:2px;align-items:flex-end}
 .exam.sp .exam-kind{background:var(--violet-soft);color:var(--violet)}
 .exam.today{border:2px solid var(--accent)}
 .exam-date{width:58px;flex-shrink:0;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 0;align-self:flex-start}
@@ -394,6 +401,7 @@ const en = s => String(s).replace(/[০-৯]/g, d => '০১২৩৪৫৬৭�
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const ICONS = {
+  exam:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9zM9 12.5l2 2 4-4M9 17.5h6"/>',
   compass:'<path d="M12 3.5a1.8 1.8 0 1 0 0 .1M11 6L6 20M13 6l5 14M7.5 16q4.5 2.5 9 0M3 21.5h18"/>',
   blocks:'<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><path d="M15 15l4 4M19 15l-4 4"/>',
   trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8"/>',
@@ -912,7 +920,7 @@ function vExamResult(){
   const r=S.exams[S.examView]; if(!r) return vRoutine();
   const pct=Math.round(r.score/r.total*100);
   return `<div class="screen">
-    <div class="topbar"><button class="iconbtn" data-go="routine" aria-label="রুটিনে ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>ফলাফল</h1><span style="width:44px"></span></div>
+    <div class="topbar"><button class="iconbtn" data-go="${S.resFrom||'routine'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>ফলাফল</h1><span style="width:44px"></span></div>
     <div class="q-card" style="align-items:center;text-align:center">
       <span class="muted">${r.title}${r.late?' · দেরিতে দেওয়া':''}</span>
       <span class="muted" style="font-size:13px">${r.sent&&!r.sendErr?'ফলাফল শিক্ষকের কাছে পাঠানো হয়েছে':r.sendErr?'ফলাফল পাঠানো যায়নি':'ইন্টারনেট পেলে ফলাফল শিক্ষকের কাছে যাবে'}</span>
@@ -925,7 +933,37 @@ function vExamResult(){
       ${q.o.map((o,k)=>`<div class="opt ${k===q.a?'right':k===my?'wrong':''}" style="cursor:default"><span class="k">${'কখগঘ'[k]}</span>${esc(o)}</div>`).join('')}
       <div class="feedback ${my===q.a?'ok':'no'}"><b>${my===undefined?'উত্তর দেওয়া হয়নি':my===q.a?'সঠিক':'ভুল'}</b> · ${esc(q.e)}</div></div>`;}).join('')}
     <button class="btn" data-leader="${S.examView}">মেধাতালিকা দেখো</button>
-    <button class="btn ghost" data-go="routine">রুটিনে ফিরে যাও</button>
+    <button class="btn ghost" data-go="${S.resFrom||'routine'}">${S.resFrom==='exams'?'পরীক্ষা পাতায় ফিরে যাও':'রুটিনে ফিরে যাও'}</button>
+  </div>`;
+}
+/* ---------- পরীক্ষা: সব পরীক্ষা এক জায়গায় ---------- */
+function vExams(){
+  const ids=OFFER_IDS(), msg=routineStateMsg(), today=todayISO(), f=S.xfilter||'all';
+  const all=msg?[]:ids.flatMap(id=>examsFor(id)).filter(e=>f==='all'||e.kind===f).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  const tod=all.filter(e=>e.date===today), up=all.filter(e=>e.date>today), past=all.filter(e=>e.date<today&&!S.exams[examKey(e)]).reverse();
+  const mine=Object.entries(S.exams||{}).filter(([k,r])=>r&&r.total&&(f==='all'||(r.kind||'daily')===f)).sort((a,b)=>(b[1].at||0)-(a[1].at||0));
+  const avg=mine.length?Math.round(mine.reduce((s,[,r])=>s+r.score/r.total,0)/mine.length*100):0;
+  const best=mine.length?Math.max(...mine.map(([,r])=>Math.round(r.score/r.total*100))):0;
+  const seg=[['all','সব'],['daily','দৈনিক'],['friday','সাপ্তাহিক'],['special','বিশেষ']];
+  const sec=(t,body)=>`<section class="section"><h2>${t}</h2><div style="display:flex;flex-direction:column;gap:10px">${body}</div></section>`;
+  return `<div class="screen">
+    <div class="topbar"><span style="width:44px"></span><h1>পরীক্ষা</h1><span style="width:44px"></span></div>
+    ${todayExamBanner()}
+    ${CAN_EDIT?`<div class="hub-admin"><button class="adminbar" data-goadmin="exam">${svg('pencil')}<span>নতুন পরীক্ষা যোগ কর</span></button><button class="adminbar" data-goadmin="routine">${svg('calendar')}<span>রুটিন প্রকাশ কর</span></button></div>`:''}
+    <div class="stats">
+      <div class="stat"><b>${bn(mine.length)}</b><span>দেওয়া পরীক্ষা</span></div>
+      <div class="stat"><b>${mine.length?bn(avg)+'%':'-'}</b><span>গড় নম্বর</span></div>
+      <div class="stat"><b>${mine.length?bn(best)+'%':'-'}</b><span>সর্বোচ্চ</span></div>
+    </div>
+    <div class="seg" role="tablist" style="grid-template-columns:repeat(4,minmax(0,1fr))">${seg.map(([v,l])=>`<button class="seg-btn" role="tab" aria-selected="${f===v}" data-xfilter="${v}">${l}</button>`).join('')}</div>
+    ${msg?msg:`
+    ${sec('আজকের পরীক্ষা',tod.length?tod.map(e=>examCard(e,ids.length>1)).join(''):`<div class="empty">আজ কোনো পরীক্ষা নেই।</div>`)}
+    ${sec('সামনের পরীক্ষা',up.length?up.map(e=>examCard(e,ids.length>1)).join(''):`<div class="empty">সামনের কোনো পরীক্ষা এখনো প্রকাশ হয়নি।</div>`)}
+    ${sec('আমার দেওয়া পরীক্ষা',mine.length?mine.map(([k,r])=>{ const pct=Math.round(r.score/r.total*100);
+      return `<div class="myx"><span class="sc" style="color:${pct>=60?'var(--good)':'var(--amber)'}">${r.score}/${r.total}</span>
+        <div class="bd"><b>${esc(r.title||'পরীক্ষা')}</b><span class="muted">${r.late?'দেরিতে দেওয়া · ':''}${pct}% নম্বর</span></div>
+        <div class="ac"><button class="link" data-exview="${esc(k)}">উত্তর দেখো</button><button class="link" data-leader="${esc(k)}">মেধাতালিকা</button></div></div>`; }).join(''):`<div class="empty">এখনো কোনো পরীক্ষা দাওনি।</div>`)}
+    ${past.length?`<button class="link" data-xpast style="align-self:center">${S.showXPast?'আগের পরীক্ষা লুকাও':`আগের যেসব পরীক্ষা দাওনি (${bn(past.length)}টি) — দেরিতে দেওয়া যাবে`}</button>${S.showXPast?past.map(e=>examCard(e,ids.length>1)).join(''):''}`:''}`}
   </div>`;
 }
 function todayExamBanner(){
@@ -1585,7 +1623,7 @@ function vAdmin(){
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 
-const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['report','লার্নিং রিপোর্ট','report'],['profile','আরো','grid']];
+const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','লার্নিং রিপোর্ট','report'],['profile','আরো','grid']];
 function renderTabs(){
   const active = S.view==='course'?'home':S.view;
   tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}>${svg(ic)}${l}</button>`).join('');
@@ -1593,7 +1631,7 @@ function renderTabs(){
 function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
-  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={exams:vExams,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V();
   if(authed) renderTabs();
   const f=app.querySelector('#loginId,#otp'); if(f) f.focus({preventScroll:true});
@@ -1656,7 +1694,11 @@ app.addEventListener('click',e=>{
     if(S.resArmed===id){ S.resArmed=''; DB.collection('results').doc(id).delete().then(()=>toast('ফলাফল মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
     else{ S.resArmed=id; render(); }
     return; }
-  if(t.dataset.leader){ S.leaderFrom=['examResult','routine','home'].includes(S.view)?(S.view==='examResult'?'routine':S.view):'routine'; return go('leader',{leaderKey:t.dataset.leader}); }
+  if(t.dataset.xfilter){ S.xfilter=t.dataset.xfilter; render(); return; }
+  if(t.hasAttribute('data-xpast')){ S.showXPast=!S.showXPast; render(); return; }
+  if(t.dataset.goadmin){ S.atab=t.dataset.goadmin; return go('admin'); }
+  if(t.dataset.exview||t.dataset.exstart){ S.resFrom=S.view==='exams'?'exams':'routine'; }
+  if(t.dataset.leader){ S.leaderFrom=['examResult','routine','home','exams'].includes(S.view)?(S.view==='examResult'?(S.resFrom||'routine'):S.view):'routine'; return go('leader',{leaderKey:t.dataset.leader}); }
   if(t.dataset.exstart){ return startExam(t.dataset.exstart); }
   if(t.dataset.exgo){ return go('exam'); }
   if(t.dataset.exview){ S.examView=t.dataset.exview; return go('examResult'); }
