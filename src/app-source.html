@@ -1054,6 +1054,10 @@ function resultsPanel(){
       <div class="stat"><b>${n?avg.toFixed(1):'-'}</b><span>গড় নম্বর</span></div>
       <div class="stat"><b>${n?top+'/'+tot:'-'}</b><span>সর্বোচ্চ</span></div>
     </div>
+    <div class="hub-admin">
+      <button class="btn ghost" data-csv="one" ${n?'':'disabled'}>এই পরীক্ষা (Excel/CSV)</button>
+      <button class="btn ghost" data-csv="all" ${Object.keys(RES).length?'':'disabled'}>সব পরীক্ষা একসাথে</button>
+    </div>
     ${n?`<div class="res-wrap"><table class="res-table"><thead><tr><th>মেধা</th><th>নাম</th><th>রোল</th><th>নম্বর</th><th>জমা</th><th></th></tr></thead><tbody>
       ${rows.map((r,i)=>{ if(r.score!==prev){ rank=i+1; prev=r.score; } const d=new Date(r.at);
         return `<tr><td>${rank}</td><td class="nm">${esc(r.name)}${r.late?' <span class="late">দেরিতে</span>':''}</td><td>${esc(r.roll||'-')}</td><td><b>${r.score}/${r.total}</b></td><td class="tm">${isNaN(d)?'':pad2(d.getHours())+':'+pad2(d.getMinutes())}</td>
@@ -1062,6 +1066,40 @@ function resultsPanel(){
   </section>`;
 }
 
+/* ---------- ফলাফল ডাউনলোড (CSV: Excel/Google Sheets-এ খোলে) ---------- */
+function examMeta(k){
+  const e=findExam(k); if(e) return {name:kindName(e),date:e.date,course:e.course};
+  const r=Object.values(RES).find(x=>x.examKey===k)||{}, {course,date}=keyParts(k);
+  return {name:r.kind==='friday'?'সাপ্তাহিক লাইভ পরীক্ষা':r.kind==='special'?'বিশেষ পরীক্ষা':'দৈনিক লাইভ পরীক্ষা',date:r.date||date,course:r.course||course};
+}
+const csvCell=v=>{ v=String(v==null?'':v); return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+function resultsCSV(keys){
+  const head=['পরীক্ষা','তারিখ','শ্রেণি','মেধা','নাম','রোল','প্রাপ্ত নম্বর','মোট নম্বর','শতকরা','দেরিতে','জমার সময়'];
+  const lines=[head];
+  keys.forEach(k=>{
+    const m=examMeta(k), rows=Object.values(RES).filter(r=>r.examKey===k).sort((a,b)=>b.score-a.score||String(a.at).localeCompare(String(b.at)));
+    let rank=0, prev=null;
+    rows.forEach((r,i)=>{ if(r.score!==prev){ rank=i+1; prev=r.score; } const d=new Date(r.at);
+      lines.push([m.name,m.date,COURSES[m.course]?COURSES[m.course].name:'',rank,r.name,r.roll||'',r.score,r.total,r.total?Math.round(r.score/r.total*1000)/10:'',r.late?'হ্যাঁ':'না',isNaN(d)?'':`${isoD(d)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`]); });
+  });
+  return '\uFEFF'+lines.map(l=>l.map(csvCell).join(',')).join('\r\n');
+}
+async function downloadCSV(all){
+  const keys=all?[...new Set(Object.values(RES).map(r=>r.examKey).filter(Boolean))].sort((a,b)=>examMeta(b).date.localeCompare(examMeta(a).date)):[S.resKey];
+  if(!keys.length||!keys[0]) return toast('কোনো ফলাফল নেই');
+  const text=resultsCSV(keys), name=all?`sohog-result-all-${todayISO()}.csv`:`sohog-result-${keys[0]}.csv`;
+  const cap=window.Capacitor;
+  if(cap&&cap.isNativePlatform&&cap.isNativePlatform()){
+    try{ await cap.nativePromise('SohogFile','share',{name,mime:'text/csv',content:text,title:'ফলাফল সংরক্ষণ বা শেয়ার'}); }
+    catch(e){ toast('এই অ্যাপ সংস্করণে ফাইল তৈরি করা যায়নি। নতুন APK নিন বা পিসি থেকে নামান।'); }
+    return;
+  }
+  try{
+    const url=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'})), a=document.createElement('a');
+    a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+    toast('ফলাফলের ফাইল নামানো হয়েছে');
+  }catch(e){ toast('ফাইল নামানো যায়নি'); }
+}
 function routineStateMsg(){
   if(RSTATE==='loading') return `<div class="empty">রুটিন আনা হচ্ছে…</div>`;
   if(RSTATE==='off') return `<div class="empty">রুটিন দেখতে claude.ai-তে সাইন ইন করে অ্যাপটি খুলুন।</div>`;
@@ -1690,6 +1728,7 @@ app.addEventListener('click',e=>{
     if(qf.armed===id){ qf.armed=''; DB.collection('syllabus').doc(id).delete().then(()=>toast('প্রশ্ন মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
     else{ qf.armed=id; render(); }
     return; }
+  if(t.dataset.csv){ downloadCSV(t.dataset.csv==='all'); return; }
   if(t.dataset.resdel){ const id=t.dataset.resdel;
     if(S.resArmed===id){ S.resArmed=''; DB.collection('results').doc(id).delete().then(()=>toast('ফলাফল মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
     else{ S.resArmed=id; render(); }
