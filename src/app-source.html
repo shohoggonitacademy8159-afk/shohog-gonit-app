@@ -179,6 +179,28 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
+.rf-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px}
+@media (max-width:420px){.rf-row{grid-template-columns:minmax(0,1fr)}}
+.ex-act{margin-top:6px;display:flex;flex-direction:column}
+.ex-act .btn{height:46px;font-size:15.5px}
+.ex-done{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px}
+.ex-done .link{min-height:36px;padding:0}
+.exam-banner{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:0;background:var(--orange-a);color:#fff;cursor:pointer;text-align:left;font-size:14px;line-height:1.4}
+.exam-banner svg{width:30px;height:30px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.exam-banner b{font-size:16px}
+.exam-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:16px;background:var(--surface);border:1.5px solid var(--accent);box-shadow:0 6px 14px -10px rgba(16,35,63,.4)}
+.exam-bar b{display:block;font-size:15px}
+.exam-bar span{font-size:12.5px;color:var(--muted)}
+.exam-bar .timer{font-size:24px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;flex-shrink:0}
+.exam-bar .timer.low{color:var(--bad)}
+.eq{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 14px;margin:0;display:flex;flex-direction:column;gap:8px}
+.eq legend{float:left;width:100%;padding:0;margin-bottom:4px;font-weight:600;font-size:16px;line-height:1.45}
+.eopt{display:flex;align-items:center;gap:10px;min-height:46px;padding:6px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer}
+.eopt input{position:absolute;opacity:0;width:1px;height:1px}
+.eopt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.eopt:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.eopt .k{width:28px;height:28px;border-radius:8px;background:var(--surface);display:grid;place-items:center;font-weight:700;font-size:14px;flex-shrink:0}
+.eopt:has(input:checked) .k{background:var(--accent);color:var(--accent-ink)}
 .mcq-box{background:var(--surface);border:1.5px solid var(--accent);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .mcq-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .mcq-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 6px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;text-align:center;min-height:88px;justify-content:center}
@@ -432,10 +454,12 @@ const S = {
   enrolled: saved.enrolled||{},
   results: saved.results||{},     // quizId -> {best,total,last}
   done: saved.done||{},           // "courseId:idx" -> true
+  exams: saved.exams||{},
+  examRun: saved.examRun||null,
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({exams:S.exams,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -517,6 +541,7 @@ function vHome(){
       <button class="iconbtn" data-go="report" aria-label="লার্নিং রিপোর্ট">${svg('growth','width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4"')}</button>
     </header>
     ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>অ্যাডমিন প্যানেল: রুটিন ও সিলেবাস প্রকাশ</span></button>`:''}
+    ${todayExamBanner()}
     <div class="pickbar" role="heading" aria-level="2">
       <span class="pick-ic">${svg('pointdown','width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"')}</span>
       <span>তোমার শ্রেণি নির্বাচন কর</span>
@@ -669,7 +694,7 @@ const parseD=s=>{const[y,m,d]=String(s).split('-').map(Number);return new Date(y
 const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
 const DAYN=['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
 const MONN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
-const fmtD=d=>`${bn(d.getDate())} ${MONN[d.getMonth()]}`;
+const fmtD=d=>`${d.getDate()} ${MONN[d.getMonth()]}`;
 const weekStartOf=d=>addD(d,-((d.getDay()+1)%7)); // শনিবার
 const todayISO=()=>isoD(new Date());
 const OFFER_IDS=()=>Object.keys(COURSES).filter(k=>COURSES[k].offer);
@@ -677,7 +702,7 @@ const OFFER_IDS=()=>Object.keys(COURSES).filter(k=>COURSES[k].offer);
 let SYL={};
 let DB=null, CAN_EDIT=false, ROUT=[], RSTATE='loading', pendingRender=false;
 function softRender(){
-  if(['quiz','login','otp'].includes(S.view)) return;
+  if(['quiz','login','otp','exam'].includes(S.view)) return;
   const a=document.activeElement;
   if(a&&app.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)){ pendingRender=true; return; }
   render();
@@ -709,11 +734,11 @@ function examsFor(cid){
   const daily=ROUT.filter(r=>r.course===cid&&typeof r.date==='string'&&canSee(r));
   const byDate={}; daily.forEach(r=>byDate[r.date]=r);
   const weeks=new Set(daily.map(r=>isoD(weekStartOf(parseD(r.date)))));
-  const out=daily.map(r=>({pending:!isLive(r),publishAt:r.publishAt,id:r.id,course:cid,date:r.date,kind:'daily',syllabus:String(r.syllabus||''),marks:o.daily.marks,mins:o.daily.mins}));
+  const out=daily.map(r=>({pending:!isLive(r),publishAt:r.publishAt,id:r.id,course:cid,date:r.date,kind:'daily',chapter:r.chapter||null,syllabus:String(r.syllabus||''),marks:o.daily.marks,mins:o.daily.mins}));
   weeks.forEach(ws=>{
-    const s=parseD(ws), items=[];
-    for(let i=0;i<6;i++){ const d=addD(s,i), r=byDate[isoD(d)]; if(r&&r.syllabus) items.push({day:DAYN[d.getDay()],text:String(r.syllabus)}); }
-    out.push({course:cid,date:isoD(addD(s,6)),kind:'friday',items,marks:o.friday.marks,mins:o.friday.mins});
+    const s=parseD(ws), items=[], chs=[];
+    for(let i=0;i<6;i++){ const d=addD(s,i), r=byDate[isoD(d)]; if(r&&r.syllabus) items.push({day:DAYN[d.getDay()],text:String(r.syllabus)}); if(r&&r.chapter&&chs.indexOf(r.chapter)<0) chs.push(r.chapter); }
+    out.push({course:cid,date:isoD(addD(s,6)),kind:'friday',items,chapters:chs,marks:o.friday.marks,mins:o.friday.mins});
   });
   return out.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
 }
@@ -725,18 +750,104 @@ function examCard(e,showCourse){
     : `<p class="syl">${esc(e.syllabus)}</p>`;
   const del = (!fri&&CAN_EDIT&&DB)?`<button class="link del" data-del="${esc(e.id)}">মুছুন</button>`:'';
   return `<article class="exam ${fri?'fri':''} ${isToday?'today':''}">
-    <div class="exam-date"><b>${bn(d.getDate())}</b><span>${MONN[d.getMonth()]}</span></div>
+    <div class="exam-date"><b>${d.getDate()}</b><span>${MONN[d.getMonth()]}</span></div>
     <div class="exam-body">
       <div class="exam-meta"><span class="exam-day">${DAYN[d.getDay()]}${isToday?' · আজ':''}</span>
         <span class="exam-kind">${fri?'সাপ্তাহিক পরীক্ষা':'দৈনিক পরীক্ষা'}</span></div>
       ${e.pending?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(e.publishAt)} থেকে</span>`:''}
       ${showCourse?`<span class="muted" style="font-size:13px">${COURSES[e.course].name} ${COURSES[e.course].subj||''}</span>`:''}
-      <div class="exam-marks"><span>${bn(e.marks)} নম্বর</span><span>সময় ${bn(e.mins)} মিনিট</span></div>
+      <div class="exam-marks"><span>${e.marks} নম্বর</span><span>সময় ${e.mins} মিনিট</span>${!fri&&e.chapter?`<span>অধ্যায় ${e.chapter}</span>`:''}</div>
       ${syl}
+      ${e.pending?'':`<div class="ex-act">${examAction(e)}</div>`}
       ${del}
     </div>
   </article>`;
 }
+/* ---------- রুটিন অনুযায়ী অনলাইন পরীক্ষা ---------- */
+const examKey=e=>`${e.course}_${e.date}`;
+const bankFor=(cid,no)=>(window.SOHOG_MCQ&&window.SOHOG_MCQ[cid]&&window.SOHOG_MCQ[cid][String(no)])||[];
+const bankQ=(cid,ref)=>bankFor(cid,ref.ch).find(x=>x.n===ref.n);
+function examChapters(e){ return e.kind==='friday'?e.chapters:(e.chapter?[e.chapter]:[]); }
+function examPool(e){ return examChapters(e).flatMap(no=>bankFor(e.course,no).map(x=>({ch:no,n:x.n}))); }
+const fmtLeft=ms=>{ const t=Math.max(0,Math.ceil(ms/1000)); return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`; };
+const examLeft=run=>run.start+run.mins*60000-Date.now();
+
+function examAction(e){
+  const k=examKey(e), done=S.exams[k], today=todayISO();
+  if(S.examRun&&!S.examRun.done&&S.examRun.key===k) return `<button class="btn" data-exgo="1">পরীক্ষা চলছে · ফিরে যাও (${fmtLeft(examLeft(S.examRun))} বাকি)</button>`;
+  if(done) return `<div class="ex-done"><b>তোমার নম্বর: ${done.score}/${done.total}</b>${done.late?' <span class="muted">(দেরিতে)</span>':''}<button class="link" data-exview="${k}">উত্তর দেখো</button></div>`;
+  if(e.date>today) return `<span class="muted" style="font-size:13.5px">পরীক্ষা খুলবে ${fmtD(parseD(e.date))} থেকে</span>`;
+  const pool=examPool(e);
+  if(!examChapters(e).length) return `<span class="muted" style="font-size:13.5px">এই দিনের জন্য কোনো অধ্যায় যুক্ত করা হয়নি, তাই অনলাইন পরীক্ষা নেই।</span>`;
+  if(!pool.length) return `<span class="muted" style="font-size:13.5px">এই অধ্যায়ের প্রশ্ন এখনো যোগ হয়নি।</span>`;
+  const n=Math.min(e.marks,pool.length);
+  return `<button class="btn" data-exstart="${k}">${e.date===today?'পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'} · ${n}টি প্রশ্ন · ${e.mins} মিনিট</button>`;
+}
+function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id)).find(e=>examKey(e)===k); }
+function startExam(k){
+  const e=findExam(k); if(!e||S.exams[k]) return;
+  if(S.examRun&&!S.examRun.done){ toast('আগে চলমান পরীক্ষাটি শেষ করো'); return go('exam'); }
+  const pool=examPool(e);
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const qs=pool.slice(0,Math.min(e.marks,pool.length));
+  S.examRun={key:k,course:e.course,date:e.date,kind:e.kind,title:(e.kind==='friday'?'সাপ্তাহিক পরীক্ষা':'দৈনিক পরীক্ষা')+' · '+fmtD(parseD(e.date)),
+    mins:e.mins,total:qs.length,qs,ans:{},start:Date.now(),late:e.date<todayISO(),done:false};
+  persist(); go('exam');
+}
+function submitExam(auto){
+  const run=S.examRun; if(!run||run.done) return;
+  let score=0; run.qs.forEach((ref,i)=>{ const q=bankQ(run.course,ref); if(q&&run.ans[i]===q.a) score++; });
+  run.done=true; run.score=score; run.end=Date.now();
+  S.exams[run.key]={score,total:run.total,at:run.end,late:run.late,qs:run.qs,ans:run.ans,course:run.course,title:run.title};
+  S.examView=run.key; S.examRun=null; S.exSubmitArmed=false; persist();
+  go('examResult'); toast(auto?'সময় শেষ, খাতা জমা হয়েছে':'খাতা জমা হয়েছে');
+}
+function vExam(){
+  const run=S.examRun;
+  if(!run) return vRoutine();
+  const answered=Object.keys(run.ans).length;
+  return `<div class="screen">
+    <div class="exam-bar" role="timer" aria-live="off">
+      <div style="min-width:0"><b>${run.title}</b><span>${run.total} নম্বর · প্রতিটি প্রশ্নে 1</span></div>
+      <span class="timer" id="examTimer">${fmtLeft(examLeft(run))}</span>
+    </div>
+    ${run.qs.map((ref,i)=>{const q=bankQ(run.course,ref); if(!q) return ''; return `<fieldset class="eq"><legend>${i+1}. ${esc(q.q)}</legend>
+      ${q.o.map((o,k)=>`<label class="eopt"><input type="radio" name="eq${i}" value="${k}" data-eq="${i}" ${run.ans[i]===k?'checked':''}><span class="k">${'কখগঘ'[k]}</span><span>${esc(o)}</span></label>`).join('')}
+    </fieldset>`;}).join('')}
+    <div class="error" role="status" id="exHint">${run.total-answered>0?`${run.total-answered}টি প্রশ্নের উত্তর দেওয়া বাকি`:''}</div>
+    <button class="btn" data-exsubmit style="width:100%">${S.exSubmitArmed?'নিশ্চিত? আবার চাপলে জমা হবে':`খাতা জমা দাও (${answered}/${run.total})`}</button>
+  </div>`;
+}
+function vExamResult(){
+  const r=S.exams[S.examView]; if(!r) return vRoutine();
+  const pct=Math.round(r.score/r.total*100);
+  return `<div class="screen">
+    <div class="topbar"><button class="iconbtn" data-go="routine" aria-label="রুটিনে ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>ফলাফল</h1><span style="width:44px"></span></div>
+    <div class="q-card" style="align-items:center;text-align:center">
+      <span class="muted">${r.title}${r.late?' · দেরিতে দেওয়া':''}</span>
+      <b style="font-size:44px;line-height:1.1;color:${pct>=60?'var(--good)':'var(--amber)'}">${r.score}/${r.total}</b>
+      <span>${pct>=80?'চমৎকার!':pct>=60?'ভালো হয়েছে!':pct>=40?'আরও অনুশীলন দরকার':'অধ্যায়টি আবার পড়ো'}</span>
+    </div>
+    <h2 style="margin:0;font-size:17px">উত্তরপত্র</h2>
+    ${r.qs.map((ref,i)=>{const q=bankQ(r.course,ref); if(!q) return ''; const my=r.ans[i];
+      return `<div class="q-card" style="gap:8px"><p style="margin:0;font-weight:600">${i+1}. ${esc(q.q)}</p>
+      ${q.o.map((o,k)=>`<div class="opt ${k===q.a?'right':k===my?'wrong':''}" style="cursor:default"><span class="k">${'কখগঘ'[k]}</span>${esc(o)}</div>`).join('')}
+      <div class="feedback ${my===q.a?'ok':'no'}"><b>${my===undefined?'উত্তর দেওয়া হয়নি':my===q.a?'সঠিক':'ভুল'}</b> · ${esc(q.e)}</div></div>`;}).join('')}
+    <button class="btn ghost" data-go="routine">রুটিনে ফিরে যাও</button>
+  </div>`;
+}
+function todayExamBanner(){
+  if(RSTATE!=='ready') return '';
+  if(S.examRun&&!S.examRun.done) return `<button class="exam-banner" data-exgo="1">${svg('calendar')}<span><b>পরীক্ষা চলছে</b><br>${S.examRun.title} · ${fmtLeft(examLeft(S.examRun))} বাকি</span></button>`;
+  const t=todayISO(), e=OFFER_IDS().flatMap(id=>examsFor(id)).find(x=>x.date===t&&!S.exams[examKey(x)]&&examPool(x).length);
+  return e?`<button class="exam-banner" data-exstart="${examKey(e)}">${svg('calendar')}<span><b>আজ ${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} পরীক্ষা আছে</b><br>${COURSES[e.course].name} ${COURSES[e.course].subj} · ${e.marks} নম্বর · ${e.mins} মিনিট</span></button>`:'';
+}
+setInterval(()=>{
+  const run=S.examRun; if(!run||run.done) return;
+  if(examLeft(run)<=0){ submitExam(true); return; }
+  const el=document.getElementById('examTimer'); if(el){ el.textContent=fmtLeft(examLeft(run)); el.classList.toggle('low',examLeft(run)<60000); }
+},1000);
+
 function routineStateMsg(){
   if(RSTATE==='loading') return `<div class="empty">রুটিন আনা হচ্ছে…</div>`;
   if(RSTATE==='off') return `<div class="empty">রুটিন দেখতে claude.ai-তে সাইন ইন করে অ্যাপটি খুলুন।</div>`;
@@ -759,7 +870,8 @@ function rfInit(){
   if(!S.rf){ S.rf={course:OFFER_IDS()[0], week:isoD(weekStartOf(new Date())), vals:null, armed:'', when:'now', at:''}; }
   if(!S.rf.vals){
     const s=parseD(S.rf.week); S.rf.vals={};
-    for(let i=0;i<6;i++){ const k=isoD(addD(s,i)); const r=ROUT.find(x=>x.course===S.rf.course&&x.date===k); S.rf.vals[k]=r?String(r.syllabus||''):''; }
+    S.rf.chs={};
+    for(let i=0;i<6;i++){ const k=isoD(addD(s,i)); const r=ROUT.find(x=>x.course===S.rf.course&&x.date===k); S.rf.vals[k]=r?String(r.syllabus||''):''; S.rf.chs[k]=r&&r.chapter?String(r.chapter):''; }
   }
   return S.rf;
 }
@@ -776,9 +888,11 @@ function adminPanel(){
       <input class="input" type="date" id="rfWeek" data-rf="week" value="${rf.week}" style="flex:1;min-width:0">
       <button type="button" class="iconbtn" data-wk="7" aria-label="পরের সপ্তাহ" style="transform:scaleX(-1)">${svg('back','width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"')}</button></div>
       <span class="muted" style="font-size:13px">শনিবার ${fmtD(s)} থেকে শুক্রবার ${fmtD(fri)}</span></div>
-    ${[0,1,2,3,4,5].map(i=>{const d=addD(s,i),k=isoD(d);return `<div class="field"><label for="rf_${k}">${DAYN[d.getDay()]}, ${fmtD(d)} <span class="muted" style="font-weight:400">· ২০ নম্বর · ১৫ মিনিট</span></label>
-      <input class="input" id="rf_${k}" data-rfday="${k}" maxlength="200" placeholder="যেমন: অধ্যায় ২ – অনুপাত (অনুশীলনী ২.১)" value="${esc(rf.vals[k]||'')}"></div>`}).join('')}
-    <div class="fri-auto"><b>শুক্রবার, ${fmtD(fri)} · ৫০ নম্বর · ৪০ মিনিট</b><br>সিলেবাস: উপরের ৬ দিনের সিলেবাস একসাথে</div>
+    ${[0,1,2,3,4,5].map(i=>{const d=addD(s,i),k=isoD(d);return `<div class="field"><label for="rf_${k}">${DAYN[d.getDay()]}, ${fmtD(d)} <span class="muted" style="font-weight:400">· 20 নম্বর · 15 মিনিট</span></label>
+      <div class="rf-row"><select class="input rf-ch" id="rfc_${k}" data-rfch="${k}" aria-label="${DAYN[d.getDay()]}-এর অধ্যায়"><option value="">অধ্যায় নেই</option>${COURSES[rf.course].chapters.map((c,j)=>`<option value="${j+1}" ${String(j+1)===rf.chs[k]?'selected':''}>${j+1}. ${esc(c)}${bankFor(rf.course,j+1).length?' ('+bankFor(rf.course,j+1).length+' MCQ)':''}</option>`).join('')}</select>
+      <input class="input" id="rf_${k}" data-rfday="${k}" maxlength="200" placeholder="সিলেবাস, যেমন: অনুশীলনী 1.1" value="${esc(rf.vals[k]||'')}"></div></div>`}).join('')}
+    <p class="muted" style="margin:0;font-size:13px">অধ্যায় বেছে দিলে শিক্ষার্থীরা সেদিন ওই অধ্যায়ের প্রশ্নব্যাংক থেকে অনলাইন পরীক্ষা দিতে পারবে। এখন প্রশ্ন আছে অধ্যায় 1 ও 8-এ।</p>
+    <div class="fri-auto"><b>শুক্রবার, ${fmtD(fri)} · 50 নম্বর · 40 মিনিট</b><br>সিলেবাস ও প্রশ্ন: উপরের 6 দিনের অধ্যায়গুলো একসাথে</div>
     ${whenUI('rf',rf)}
     <div class="error" id="rfErr" role="alert"></div>
     <button class="btn" data-publish style="width:100%" ${S.publishing?'disabled':''}>${S.publishing?'প্রকাশ হচ্ছে…':'রুটিন প্রকাশ কর'}</button>
@@ -798,9 +912,10 @@ function vRoutine(){
   return `<div class="screen">
     <div class="topbar"><span style="width:44px"></span><h1>পরীক্ষার রুটিন</h1><span style="width:44px"></span></div>
     <div class="rules-strip">
-      <div><b>শনি – বৃহস্পতি</b><span>২০ নম্বর · ১৫ মিনিট</span></div>
-      <div class="fri"><b>শুক্রবার</b><span>৫০ নম্বর · ৪০ মিনিট</span><span>আগের ৬ দিনের সিলেবাস</span></div>
+      <div><b>শনি – বৃহস্পতি</b><span>20 নম্বর · 15 মিনিট</span></div>
+      <div class="fri"><b>শুক্রবার</b><span>50 নম্বর · 40 মিনিট</span><span>আগের 6 দিনের সিলেবাস</span></div>
     </div>
+    ${todayExamBanner()}
     ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>রুটিন প্রকাশ বা বদলাতে অ্যাডমিন প্যানেল খুলুন</span></button>`:''}
     <section class="section"><h2>${ids.length>1?'সব কোর্সের পরীক্ষা':`${COURSES[ids[0]].name} ${COURSES[ids[0]].subj}`}</h2>
       <div style="display:flex;flex-direction:column;gap:10px">${msg||list}</div>
@@ -814,9 +929,11 @@ async function publishRoutine(){
   S.publishing=true; render();
   try{
     for(let i=0;i<6;i++){
-      const k=isoD(addD(s,i)), txt=String(rf.vals[k]||'').trim(), id=`${rf.course}_${k}`;
+      const k=isoD(addD(s,i)), ch=rf.chs&&rf.chs[k]?+rf.chs[k]:null, id=`${rf.course}_${k}`;
+      let txt=String(rf.vals[k]||'').trim();
+      if(!txt&&ch) txt=`অধ্যায় ${ch}: ${COURSES[rf.course].chapters[ch-1]}`;
       const had=ROUT.find(x=>x.id===id);
-      if(txt){ if(!had||had.syllabus!==txt||rf.when==='later'||!isLive(had)) await DB.collection('routines').doc(id).set({course:rf.course,date:k,kind:'daily',syllabus:txt,publishAt:(had&&had.syllabus===txt&&isLive(had)&&rf.when!=='later')?(had.publishAt||w.iso):w.iso,updatedAt:new Date().toISOString()}); }
+      if(txt){ if(!had||had.syllabus!==txt||(had.chapter||null)!==ch||rf.when==='later'||!isLive(had)) await DB.collection('routines').doc(id).set({course:rf.course,date:k,kind:'daily',syllabus:txt,chapter:ch,publishAt:(had&&had.syllabus===txt&&isLive(had)&&rf.when!=='later')?(had.publishAt||w.iso):w.iso,updatedAt:new Date().toISOString()}); }
       else if(had){ await DB.collection('routines').doc(id).delete(); }
     }
     S.publishing=false; rf.vals=null; const later=rf.when==='later'; rf.when='now'; rf.at=''; render(); toast(later?'রুটিন নির্ধারিত সময়ে প্রকাশ হবে':'রুটিন প্রকাশ হয়েছে');
@@ -834,7 +951,7 @@ function fmtDT(iso){
   const d=new Date(iso); if(isNaN(d)) return '';
   const h=d.getHours(), m=d.getMinutes();
   const part=h<4?'রাত':h<6?'ভোর':h<12?'সকাল':h<15?'দুপুর':h<18?'বিকাল':h<20?'সন্ধ্যা':'রাত';
-  return `${fmtD(d)}, ${part} ${bn(h%12||12)}:${bn(pad2(m))}`;
+  return `${fmtD(d)}, ${part} ${h%12||12}:${pad2(m)}`;
 }
 const localDT = d => `${isoD(d)}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 function whenUI(key, st){
@@ -1058,7 +1175,7 @@ function renderTabs(){
 function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
-  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V();
   if(authed) renderTabs();
   const f=app.querySelector('#loginId,#otp'); if(f) f.focus({preventScroll:true});
@@ -1095,6 +1212,14 @@ app.addEventListener('click',e=>{
     const cf=cfInit();
     if(cf.armed){ cf.armed=false; DB.collection('syllabus').doc(chId(cf.course,cf.no)).delete().then(()=>{ cf.vals=null; render(); toast('অধ্যায়ের নোট মুছে ফেলা হয়েছে'); },()=>toast('মুছে ফেলা যায়নি')); }
     else{ cf.armed=true; render(); }
+    return;
+  }
+  if(t.dataset.exstart){ return startExam(t.dataset.exstart); }
+  if(t.dataset.exgo){ return go('exam'); }
+  if(t.dataset.exview){ S.examView=t.dataset.exview; return go('examResult'); }
+  if(t.hasAttribute('data-exsubmit')){
+    if(S.exSubmitArmed){ submitExam(false); }
+    else{ S.exSubmitArmed=true; t.textContent='নিশ্চিত? আবার চাপলে জমা হবে'; setTimeout(()=>{ S.exSubmitArmed=false; },4000); }
     return;
   }
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
@@ -1151,6 +1276,9 @@ app.addEventListener('click',e=>{
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.rfday){ rfInit().vals[t.dataset.rfday]=t.value; }
+  if(t.dataset.eq!==undefined&&S.examRun){ S.examRun.ans[+t.dataset.eq]=+t.value; persist();
+    const n=Object.keys(S.examRun.ans).length, b=app.querySelector('[data-exsubmit]'), h=document.getElementById('exHint');
+    if(b&&!S.exSubmitArmed) b.textContent=`খাতা জমা দাও (${n}/${S.examRun.total})`; if(h) h.textContent=S.examRun.total-n>0?`${S.examRun.total-n}টি প্রশ্নের উত্তর দেওয়া বাকি`:''; }
   if(t.dataset.cfv){ const cf=cfInit(); cf.vals[t.dataset.cfv]=t.value; cf.dirty=true; }
   if(t.dataset.sfv){ const sf=sfInit(); sf.vals[t.dataset.sfv]=t.value; sf.dirty=true; }
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
@@ -1160,6 +1288,7 @@ app.addEventListener('change',e=>{
   if(t.dataset.rf==='week'&&t.value){ const rf=rfInit(); rf.week=isoD(weekStartOf(parseD(t.value))); rf.vals=null; pendingRender=false; render(); }
   if(t.dataset.when){ const st=stFor(t.dataset.when); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
+  if(t.dataset.rfch!==undefined){ const rf=rfInit(); rf.chs=rf.chs||{}; rf.chs[t.dataset.rfch]=t.value; }
   if(t.dataset.cf==='no'){ const cf=cfInit(); cf.no=+t.value; cf.vals=null; cf.dirty=false; cf.armed=false; pendingRender=false; render(); }
   if(t.dataset.sf==='course'){ const sf=sfInit(); sf.course=t.value; sf.vals=null; sf.dirty=false; sf.armed=false; pendingRender=false; render(); }
   if(t.dataset.rf==='course'){ const rf=rfInit(); rf.course=t.value; rf.vals=null; pendingRender=false; render(); }
