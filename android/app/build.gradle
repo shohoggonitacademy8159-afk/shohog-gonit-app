@@ -20,9 +20,9 @@ android {
         release {
             storeFile file("../../signing/sohog-release.p12")
             storeType "pkcs12"
-            storePassword System.getenv("KEYSTORE_PASSWORD") ?: ""
+            storePassword (System.getenv("KEYSTORE_PASSWORD") ?: "").replaceAll("\\s","")
             keyAlias "sohog"
-            keyPassword System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyPassword (System.getenv("KEYSTORE_PASSWORD") ?: "").replaceAll("\\s","")
         }
     }
     buildTypes {

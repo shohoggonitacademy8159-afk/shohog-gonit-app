@@ -29,6 +29,11 @@ jobs:
             echo "::error::KEYSTORE_PASSWORD নামের Secret যোগ করা হয়নি। Settings > Secrets and variables > Actions থেকে যোগ করুন।"
             exit 1
           fi
+          got=$(printf '%s' "$KEYSTORE_PASSWORD" | tr -d '[:space:]' | sha256sum | cut -c1-64)
+          if [ "$got" != "63b442f9421e5b0a1f2db5871e8102c58f1736aa26fd3ccd45a9475d957710ae" ]; then
+            echo "::error title=Secret mismatch::KEYSTORE_PASSWORD Secret-এর পাসওয়ার্ড মেলেনি। Secret-টি মুছে ঠিক পাসওয়ার্ড দিয়ে আবার যোগ করুন।"
+            exit 1
+          fi
 
       - uses: actions/setup-node@v4
         with:
