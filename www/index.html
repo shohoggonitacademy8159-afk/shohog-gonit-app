@@ -196,7 +196,16 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
-.seg.big{grid-template-columns:repeat(2,minmax(0,1fr))}
+.seg.big{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:380px){.seg.big{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.res-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+.res-table{width:100%;border-collapse:collapse;font-size:14px;min-width:420px}
+.res-table th{text-align:left;font-size:12.5px;color:var(--muted);font-weight:600;padding:8px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+.res-table td{padding:8px 10px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums;vertical-align:middle}
+.res-table td.nm{font-weight:600;overflow-wrap:anywhere}
+.res-table td.tm{color:var(--muted);font-size:13px}
+.res-table .late{font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-soft);border-radius:999px;padding:1px 7px;white-space:nowrap}
+.res-table .link{min-height:32px;padding:0}
 .qcount{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--muted)}
 .qcount b{color:var(--fg)}
 .qopt-row{display:flex;gap:8px;align-items:center}
@@ -444,7 +453,7 @@ const COURSES = {
   c6:{name:'৬ষ্ঠ শ্রেণি', subj:'সাধারণ গণিত', art:'bookstack', t:'pink', chapters:['সংখ্যার ধারণা','মৌলিক উৎপাদক','বীজগণিতের সূচনা','ভগ্নাংশ ও দশমিক','অনুপাত ও শতকরা','জ্যামিতির মৌলিক ধারণা','উপাত্ত ও লেখচিত্র']},
   c7:{name:'৭ম শ্রেণি', subj:'সাধারণ গণিত', art:'setsquare', t:'green', chapters:['মূলদ সংখ্যা','বীজগাণিতিক রাশির গুণ ও ভাগ','বর্গমূল','সরল সমীকরণ','সমান্তরাল রেখা','ত্রিভুজ','তথ্য ও উপাত্ত']},
   c8:{name:'৮ম শ্রেণি', subj:'সাধারণ গণিত', art:'globe', t:'purple', chapters:['প্যাটার্ন','মুনাফা','পরিমাপ','বীজগাণিতিক সূত্রাবলি','বীজগাণিতিক ভগ্নাংশ','সরল সহসমীকরণ','সেট','চতুর্ভুজ','পিথাগোরাসের উপপাদ্য','বৃত্ত','তথ্য ও উপাত্ত']},
-  c9:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'সাধারণ গণিত', art:'abacus', t:'sky', chapters:['বাস্তব সংখ্যা','সেট ও ফাংশন','বীজগাণিতিক রাশি','সূচক ও লগারিদম','এক চলকবিশিষ্ট সমীকরণ','রেখা, কোণ ও ত্রিভুজ','ব্যবহারিক জ্যামিতি','বৃত্ত','ত্রিকোণমিতিক অনুপাত','পরিমিতি','পরিসংখ্যান']},
+  c9:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'সাধারণ গণিত', art:'abacus', t:'sky', content:true, chapters:['বাস্তব সংখ্যা','সেট ও ফাংশন','বীজগাণিতিক রাশি','সূচক ও লগারিদম','এক চলকবিশিষ্ট সমীকরণ','রেখা, কোণ ও ত্রিভুজ','ব্যবহারিক জ্যামিতি','বৃত্ত','ত্রিকোণমিতিক অনুপাত','দূরত্ব ও উচ্চতা','বীজগাণিতিক অনুপাত ও সমানুপাত','দুই চলকবিশিষ্ট সরল সহসমীকরণ','সসীম ধারা','অনুপাত, সদৃশতা ও প্রতিসমতা','ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য','পরিমিতি','পরিসংখ্যান']},
   c10:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', offer:{price:199, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, subj:'সাধারণ গণিত', art:'openbook', t:'mint', content:true, chapters:['বাস্তব সংখ্যা','সেট ও ফাংশন','বীজগাণিতিক রাশি','সূচক ও লগারিদম','এক চলকবিশিষ্ট সমীকরণ','রেখা, কোণ ও ত্রিভুজ','ব্যবহারিক জ্যামিতি','বৃত্ত','ত্রিকোণমিতিক অনুপাত','দূরত্ব ও উচ্চতা','বীজগাণিতিক অনুপাত ও সমানুপাত','দুই চলকবিশিষ্ট সরল সহসমীকরণ','সসীম ধারা','অনুপাত, সদৃশতা ও প্রতিসমতা','ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য','পরিমিতি','পরিসংখ্যান']},
   c9h:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'উচ্চতর গণিত', art:'hmCompass', t:'purple', chapters:['সেট ও ফাংশন','বীজগাণিতিক রাশি','জ্যামিতি','জ্যামিতিক অঙ্কন','সমীকরণ','অসমতা','অসীম ধারা']},
   c10h:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', subj:'উচ্চতর গণিত', art:'hmGraph', t:'orange', chapters:['ত্রিকোণমিতি','সূচকীয় ও লগারিদমীয় ফাংশন','দ্বিপদী বিস্তৃতি','স্থানাঙ্ক জ্যামিতি','সমতলীয় ভেক্টর','ঘন জ্যামিতি','সম্ভাবনা']},
@@ -501,10 +510,12 @@ const S = {
   done: saved.done||{},           // "courseId:idx" -> true
   exams: saved.exams||{},
   examRun: saved.examRun||null,
+  student: saved.student||null,
+  dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: 'home',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({exams:S.exams,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -722,7 +733,8 @@ function vProfile(){
     <div class="topbar"><span style="width:44px"></span><h1>আরো</h1><span style="width:44px"></span></div>
     <div class="profile-card"><span class="avatar">স</span><div style="min-width:0"><b style="font-size:18px">${CAN_EDIT?'অ্যাডমিন':'শিক্ষার্থী'}</b><br><span class="muted" style="word-break:break-all">সহগ গণিত একাডেমি</span></div></div>
     <div class="list">
-      ${CAN_EDIT?`<button class="item" data-go="admin"><span class="ic c-violet">${svg('pencil')}</span><span class="t">অ্যাডমিন প্যানেল<br><span class="s">রুটিন ও সিলেবাস প্রকাশ</span></span></button>`:''}
+      ${CAN_EDIT?`<button class="item" data-go="admin"><span class="ic c-violet">${svg('pencil')}</span><span class="t">অ্যাডমিন প্যানেল<br><span class="s">রুটিন, প্রশ্ন ও ফলাফল</span></span></button>`:''}
+      <button class="item" data-go="student"><span class="ic c-teal">${svg('user')}</span><span class="t">আমার তথ্য<br><span class="s">${S.student?esc(S.student.name)+(S.student.roll?' · রোল '+esc(S.student.roll):''):'নাম দেওয়া হয়নি'}</span></span></button>
       <button class="item" data-go="routine"><span class="ic c-blue">${svg('calendar')}</span><span class="t">পরীক্ষার রুটিন</span></button>
       <button class="item" data-quiz="daily"><span class="ic c-teal">${svg('pencil')}</span><span class="t">আজকের গণিত চ্যালেঞ্জ</span></button>
       <button class="item" data-go="report"><span class="ic c-blue">${svg('chart')}</span><span class="t">আমার লার্নিং রিপোর্ট</span></button>
@@ -764,13 +776,14 @@ setTimeout(function(){
       // অ্যাপে নতুন অ্যাকাউন্ট খোলার কোনো ব্যবস্থা নেই, তাই লগইন করা মানেই অ্যাডমিন।
       // প্রকাশের আসল অনুমতি Firebase-এর Rules ঠিক করে (সেখানে অ্যাডমিনের ইমেইল আছে)।
       CAN_EDIT=!!u;
+      watchResults(CAN_EDIT);
       if(S.view==='adminLogin'&&CAN_EDIT){ go('admin'); toast('অ্যাডমিন হিসেবে লগইন হয়েছে'); return; }
       softRender();
     });
     DB.collection('routines').orderBy('date').onSnapshot(snap=>{
       clearTimeout(timer);
       ROUT=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
-      RSTATE='ready'; softRender();
+      RSTATE='ready'; softRender(); sendPendingResults();
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m;
@@ -853,6 +866,7 @@ function examAction(e){
 function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id)).find(e=>examKey(e)===k); }
 function startExam(k){
   const e=findExam(k); if(!e||S.exams[k]) return;
+  if(!S.student){ return go('student',{pendingExam:k}); }
   if(S.examRun&&!S.examRun.done){ toast('আগে চলমান পরীক্ষাটি শেষ করো'); return go('exam'); }
   const pool=examPool(e);
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
@@ -865,8 +879,8 @@ function submitExam(auto){
   const run=S.examRun; if(!run||run.done) return;
   let score=0; run.qs.forEach((ref,i)=>{ const q=bankQ(run.course,ref); if(q&&run.ans[i]===q.a) score++; });
   run.done=true; run.score=score; run.end=Date.now();
-  S.exams[run.key]={score,total:run.total,at:run.end,late:run.late,qs:run.qs,ans:run.ans,course:run.course,title:run.title};
-  S.examView=run.key; S.examRun=null; S.exSubmitArmed=false; persist();
+  S.exams[run.key]={score,total:run.total,at:run.end,late:run.late,qs:run.qs,ans:run.ans,course:run.course,title:run.title,kind:run.kind};
+  S.examView=run.key; S.examRun=null; S.exSubmitArmed=false; persist(); sendResult(run.key);
   go('examResult'); toast(auto?'সময় শেষ, খাতা জমা হয়েছে':'খাতা জমা হয়েছে');
 }
 function vExam(){
@@ -892,6 +906,7 @@ function vExamResult(){
     <div class="topbar"><button class="iconbtn" data-go="routine" aria-label="রুটিনে ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>ফলাফল</h1><span style="width:44px"></span></div>
     <div class="q-card" style="align-items:center;text-align:center">
       <span class="muted">${r.title}${r.late?' · দেরিতে দেওয়া':''}</span>
+      <span class="muted" style="font-size:13px">${r.sent&&!r.sendErr?'ফলাফল শিক্ষকের কাছে পাঠানো হয়েছে':r.sendErr?'ফলাফল পাঠানো যায়নি':'ইন্টারনেট পেলে ফলাফল শিক্ষকের কাছে যাবে'}</span>
       <b style="font-size:44px;line-height:1.1;color:${pct>=60?'var(--good)':'var(--amber)'}">${r.score}/${r.total}</b>
       <span>${pct>=80?'চমৎকার!':pct>=60?'ভালো হয়েছে!':pct>=40?'আরও অনুশীলন দরকার':'অধ্যায়টি আবার পড়ো'}</span>
     </div>
@@ -914,6 +929,66 @@ setInterval(()=>{
   if(examLeft(run)<=0){ submitExam(true); return; }
   const el=document.getElementById('examTimer'); if(el){ el.textContent=fmtLeft(examLeft(run)); el.classList.toggle('low',examLeft(run)<60000); }
 },1000);
+
+/* ---------- পরীক্ষার ফলাফল অ্যাডমিনের কাছে (Firebase: results সংগ্রহ) ---------- */
+let RES={}, resUnsub=null;
+function watchResults(on){
+  if(on&&DB&&!resUnsub){
+    resUnsub=DB.collection('results').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); RES=m; softRender(); },()=>{ RES={}; });
+  }
+  if(!on&&resUnsub){ try{ resUnsub(); }catch(e){} resUnsub=null; RES={}; }
+}
+function sendResult(k){
+  const r=S.exams[k]; if(!r||r.sent||!DB||!S.student) return;
+  const parts=k.split('_'), course=parts[0], date=parts.slice(1).join('_');
+  DB.collection('results').doc(`${k}_${S.dev}`).set({course,date,kind:r.kind||(parseD(date).getDay()===5?'friday':'daily'),examKey:k,
+    name:S.student.name,roll:S.student.roll||'',score:r.score,total:r.total,late:!!r.late,at:new Date(r.at).toISOString(),device:S.dev})
+    .then(()=>{ r.sent=true; r.sendErr=false; persist(); softRender(); },e=>{ if(e&&e.code==='permission_denied'){ r.sendErr=true; persist(); softRender(); } });
+}
+function sendPendingResults(){ Object.keys(S.exams||{}).forEach(sendResult); }
+
+function vStudent(){
+  const st=S.student||{name:'',roll:''};
+  return `<div class="screen">
+    <div class="topbar"><button class="iconbtn" data-go="${S.pendingExam?'routine':'profile'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>তোমার তথ্য</h1><span style="width:44px"></span></div>
+    <p class="muted" style="margin:0">পরীক্ষার ফলাফল এই নামে শিক্ষকের কাছে যাবে। একবার দিলেই হবে, পরে "আরো" থেকে বদলানো যাবে।</p>
+    <form id="stuForm" novalidate style="display:flex;flex-direction:column;gap:14px">
+      <div class="field"><label for="stName">তোমার নাম</label><input class="input" id="stName" maxlength="60" autocomplete="name" value="${esc(st.name)}" placeholder="যেমন: রাফি আহমেদ"></div>
+      <div class="field"><label for="stRoll">রোল বা মোবাইল নম্বর (ঐচ্ছিক)</label><input class="input" id="stRoll" maxlength="20" inputmode="numeric" value="${esc(st.roll||'')}" placeholder="যেমন: 12"></div>
+      <div class="error" id="stErr" role="alert"></div>
+      <button class="btn" type="submit">${S.pendingExam?'সংরক্ষণ করে পরীক্ষা শুরু করো':'সংরক্ষণ করো'}</button>
+    </form>
+  </div>`;
+}
+
+function resultsPanel(){
+  const all=OFFER_IDS().flatMap(id=>examsFor(id)), keys=new Set(all.map(examKey));
+  Object.values(RES).forEach(r=>{ if(r.examKey&&!keys.has(r.examKey)){ keys.add(r.examKey); all.push({course:r.course,date:r.date,kind:r.kind,marks:r.total}); } });
+  const list=all.sort((a,b)=>a.date<b.date?1:-1);
+  const cnt=k=>Object.values(RES).filter(r=>r.examKey===k).length;
+  const today=todayISO();
+  if(!S.resKey||!keys.has(S.resKey)){ const f=list.find(e=>e.date<=today&&cnt(examKey(e)))||list.find(e=>e.date<=today)||list[0]; S.resKey=f?examKey(f):''; }
+  if(!list.length) return `<section class="admin"><div class="empty">এখনো কোনো পরীক্ষার রুটিন নেই। রুটিন প্রকাশ করলে এখানে প্রতিটি পরীক্ষার ফলাফল দেখা যাবে।</div></section>`;
+  const rows=Object.values(RES).filter(r=>r.examKey===S.resKey).sort((a,b)=>b.score-a.score||String(a.at).localeCompare(String(b.at)));
+  const n=rows.length, avg=n?(rows.reduce((s,r)=>s+r.score,0)/n):0, top=n?rows[0].score:0, tot=n?rows[0].total:0;
+  let rank=0, prev=null;
+  return `<section class="admin" aria-label="ফলাফল">
+    <div><h2 class="display" style="font-size:22px">পরীক্ষার ফলাফল</h2>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থী খাতা জমা দিলেই ফলাফল এখানে চলে আসে। ইন্টারনেট না থাকলে সংযোগ পাওয়ার পর আসবে।</p></div>
+    <div class="field"><label for="resSel">পরীক্ষা</label>
+      <select class="input" id="resSel" data-res="1">${list.map(e=>{const k=examKey(e);return `<option value="${k}" ${k===S.resKey?'selected':''}>${fmtD(parseD(e.date))} · ${e.kind==='friday'?'সাপ্তাহিক':'দৈনিক'} · ${COURSES[e.course]?COURSES[e.course].name:''} (${cnt(k)} জন)</option>`;}).join('')}</select></div>
+    <div class="stats">
+      <div class="stat"><b>${n}</b><span>জন জমা দিয়েছে</span></div>
+      <div class="stat"><b>${n?avg.toFixed(1):'-'}</b><span>গড় নম্বর</span></div>
+      <div class="stat"><b>${n?top+'/'+tot:'-'}</b><span>সর্বোচ্চ</span></div>
+    </div>
+    ${n?`<div class="res-wrap"><table class="res-table"><thead><tr><th>মেধা</th><th>নাম</th><th>রোল</th><th>নম্বর</th><th>জমা</th><th></th></tr></thead><tbody>
+      ${rows.map((r,i)=>{ if(r.score!==prev){ rank=i+1; prev=r.score; } const d=new Date(r.at);
+        return `<tr><td>${rank}</td><td class="nm">${esc(r.name)}${r.late?' <span class="late">দেরিতে</span>':''}</td><td>${esc(r.roll||'-')}</td><td><b>${r.score}/${r.total}</b></td><td class="tm">${isNaN(d)?'':pad2(d.getHours())+':'+pad2(d.getMinutes())}</td>
+        <td><button class="link del" data-resdel="${esc(r.id)}">${S.resArmed===r.id?'নিশ্চিত?':'মুছুন'}</button></td></tr>`; }).join('')}
+    </tbody></table></div>`:`<div class="empty">এই পরীক্ষার কোনো ফলাফল এখনো আসেনি।</div>`}
+  </section>`;
+}
 
 function routineStateMsg(){
   if(RSTATE==='loading') return `<div class="empty">রুটিন আনা হচ্ছে…</div>`;
@@ -1046,7 +1121,9 @@ const safeLink=u=>/^https:\/\/[^\s"'<>]+$/i.test(String(u||'').trim())?String(u)
 
 /* ---------- অধ্যায়ের স্থায়ী নোট/ফাইল (PDF) ---------- */
 const FILE_BASE='https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/';
-const CH_FILES={c10:{1:[{title:'বাস্তব সংখ্যা · 100টি MCQ', sub:'উত্তরমালা ও ব্যাখ্যাসহ · PDF · 6 পৃষ্ঠা', url:FILE_BASE+'pdf/c10-ch1-mcq.pdf'}]}};
+const PDF1={title:'বাস্তব সংখ্যা · 100টি MCQ', sub:'উত্তরমালা ও ব্যাখ্যাসহ · PDF · 6 পৃষ্ঠা', url:FILE_BASE+'pdf/c10-ch1-mcq.pdf'};
+const PDF8={title:'বৃত্ত · 100টি MCQ', sub:'উত্তরমালা ও ব্যাখ্যাসহ · PDF · 7 পৃষ্ঠা', url:FILE_BASE+'pdf/c10-ch8-mcq.pdf'};
+const CH_FILES={c10:{1:[PDF1],8:[PDF8]},c9:{1:[PDF1],8:[PDF8]}};
 const chFiles=(cid,i)=>(CH_FILES[cid]&&CH_FILES[cid][i+1])||[];
 function chFilesSection(cid,i){
   const f=chFiles(cid,i); if(!f.length) return '';
@@ -1120,6 +1197,7 @@ function qbankPanel(){
   return `<section class="admin" aria-label="প্রশ্ন যোগ">
     <div><h2 class="display" style="font-size:22px">অধ্যায়ে প্রশ্ন যোগ কর</h2>
     <p class="muted" style="margin:4px 0 0;font-size:14px">যোগ করা প্রশ্ন সাথে সাথে অধ্যায়ের MCQ অনুশীলন ও রুটিনের পরীক্ষায় ব্যবহার হবে।</p></div>
+    ${CH_COURSES().length>1?`<div class="field"><label for="qfCourse">শ্রেণি</label><select class="input" id="qfCourse" data-qf="course">${CH_COURSES().map(k=>`<option value="${k}" ${k===qf.course?'selected':''}>${COURSES[k].name} (${COURSES[k].sub}) ${COURSES[k].subj}</option>`).join('')}</select></div>`:''}
     <div class="field"><label for="qfCh">অধ্যায় (${c.name} ${c.subj||''})</label>
       <select class="input" id="qfCh" data-qf="ch">${c.chapters.map((n,j)=>{const t=(((window.SOHOG_MCQ||{})[qf.course]||{})[String(j+1)]||[]).length+customQs(qf.course,j+1).length;return `<option value="${j+1}" ${j+1===+qf.ch?'selected':''}>${j+1}. ${esc(n)} (${t}টি প্রশ্ন)</option>`;}).join('')}</select></div>
     <div class="qcount"><span>আগে থেকে আছে: <b>${built.length}</b></span><span>আপনি যোগ করেছেন: <b>${mine.length}</b></span><span>মোট: <b>${built.length+mine.length}</b></span></div>
@@ -1156,6 +1234,7 @@ async function qSaveBulk(){
 
 /* ---------- MCQ প্রশ্নব্যাংক (www/mcq.js) ---------- */
 const MCQ_N=20;
+if(window.SOHOG_MCQ&&window.SOHOG_MCQ.c10&&!window.SOHOG_MCQ.c9) window.SOHOG_MCQ.c9=window.SOHOG_MCQ.c10;
 const mcqBank=(cid,i)=>{ const b=bankFor(cid,i+1); return b.length?b:null; };
 const MCQ_LV={easy:'সহজ',mid:'মধ্যম',mix:'মিশ্র'};
 (function(){ Object.keys(COURSES).filter(k=>COURSES[k].content).forEach(cid=>COURSES[cid].chapters.forEach((_,j)=>Object.keys(MCQ_LV).forEach(lv=>{
@@ -1225,7 +1304,7 @@ function vChapter(){
   </div>`;
 }
 
-const CH_COURSES=()=>Object.keys(COURSES).filter(k=>COURSES[k].content);
+const CH_COURSES=()=>Object.keys(COURSES).filter(k=>COURSES[k].content).sort((a,b)=>(a==='c10'?0:1)-(b==='c10'?0:1));
 function cfInit(){
   if(!S.cf) S.cf={course:CH_COURSES()[0], no:0, when:'now', at:'', vals:null, armed:false, dirty:false};
   if(!S.cf.vals){ const r=SYL[chId(S.cf.course,S.cf.no)];
@@ -1238,6 +1317,7 @@ function chapterPanel(){
   return `<section class="admin" aria-label="অধ্যায়ের নোট প্রকাশ">
     <div><h2 class="display" style="font-size:22px">অধ্যায়ের নোট প্রকাশ কর</h2>
     <p class="muted" style="margin:4px 0 0;font-size:14px">${c.name} (${c.sub}) ${c.subj}: ${bn(c.chapters.length)}টি অধ্যায়, এর মধ্যে ${bn(filled)}টিতে নোট দেওয়া হয়েছে। শিক্ষার্থীরা এক্সপ্লোর → মাধ্যমিক স্তর থেকে দেখবে।</p></div>
+    ${CH_COURSES().length>1?`<div class="field"><label for="cfCourse">শ্রেণি</label><select class="input" id="cfCourse" data-cf="course">${CH_COURSES().map(k=>`<option value="${k}" ${k===cf.course?'selected':''}>${COURSES[k].name} (${COURSES[k].sub}) ${COURSES[k].subj}</option>`).join('')}</select></div>`:''}
     <div class="field"><label for="cfNo">অধ্যায়</label>
       <select class="input" id="cfNo" data-cf="no">${c.chapters.map((_,i)=>`<option value="${i}" ${i===cf.no?'selected':''}>${bn(i+1)}. ${esc(chTitle(cf.course,i))}${SYL[chId(cf.course,i)]?' ✓':''}</option>`).join('')}</select></div>
     <div class="field"><label for="cfTitle">অধ্যায়ের নাম</label>
@@ -1332,17 +1412,18 @@ function vAdmin(){
     <div class="topbar"><button class="iconbtn" data-go="home" aria-label="হোমে ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অ্যাডমিন প্যানেল</h1><span style="width:44px"></span></div>
     <p class="muted" style="margin:0;font-size:14px">ফোনের অ্যাপ বা কম্পিউটারের ওয়েব সংস্করণ, যেখান থেকেই অ্যাডমিন লগইন করবেন, এখান থেকে প্রকাশ করতে পারবেন। প্রকাশ করার সাথে সাথে শিক্ষার্থীদের অ্যাপে চলে যায়।</p>
     <div class="stats">
-      <div class="stat"><b>${bn(live)}</b><span>প্রকাশিত পরীক্ষা</span></div>
-      <div class="stat"><b>${bn(sched)}</b><span>নির্ধারিত সময়ে</span></div>
-      <div class="stat"><b>${bn(syl)}</b><span>সিলেবাস</span></div>
+      <div class="stat"><b>${live}</b><span>প্রকাশিত পরীক্ষা</span></div>
+      <div class="stat"><b>${sched}</b><span>নির্ধারিত সময়ে</span></div>
+      <div class="stat"><b>${syl}</b><span>সিলেবাস</span></div>
     </div>
     <div class="seg big" role="tablist">
       <button class="seg-btn" role="tab" aria-selected="${tab==='routine'}" data-atab="routine">${svg('calendar')}রুটিন</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='syllabus'}" data-atab="syllabus">${svg('openbook')}সিলেবাস</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='chapters'}" data-atab="chapters">${svg('book')}অধ্যায়</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='qbank'}" data-atab="qbank">${svg('pencil')}প্রশ্ন</button>
+      <button class="seg-btn" role="tab" aria-selected="${tab==='results'}" data-atab="results">${svg('chart')}ফলাফল</button>
     </div>
-    ${RSTATE!=='ready'?routineStateMsg():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
+    ${RSTATE!=='ready'?routineStateMsg():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
   </div>`;
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
@@ -1355,7 +1436,7 @@ function renderTabs(){
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V();
   if(authed) renderTabs();
   const f=app.querySelector('#loginId,#otp'); if(f) f.focus({preventScroll:true});
@@ -1388,6 +1469,14 @@ app.addEventListener('submit',e=>{
           :'লগইন করা যায়নি।';
         if(x) x.textContent=m+' (কোড: '+c.replace('auth/','')+')'; });
     return;
+  }
+  if(e.target.id==='stuForm'){
+    const nm=document.getElementById('stName').value.trim().replace(/\s+/g,' '), rl=document.getElementById('stRoll').value.trim();
+    if(nm.length<2){ document.getElementById('stErr').textContent='তোমার নাম লেখো।'; return; }
+    S.student={name:nm.slice(0,60),roll:rl.slice(0,20)}; persist();
+    const pe=S.pendingExam; S.pendingExam=null;
+    if(pe) return startExam(pe);
+    toast('তথ্য সংরক্ষণ হয়েছে'); return go('profile');
   }
   if(e.target.id==='loginForm'){
     const raw=en(document.getElementById('loginId').value.trim()).replace(/[\s-]/g,'');
@@ -1423,6 +1512,10 @@ app.addEventListener('click',e=>{
   if(t.dataset.qdel){ const qf=qfInit(), id=t.dataset.qdel;
     if(qf.armed===id){ qf.armed=''; DB.collection('syllabus').doc(id).delete().then(()=>toast('প্রশ্ন মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
     else{ qf.armed=id; render(); }
+    return; }
+  if(t.dataset.resdel){ const id=t.dataset.resdel;
+    if(S.resArmed===id){ S.resArmed=''; DB.collection('results').doc(id).delete().then(()=>toast('ফলাফল মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); }
+    else{ S.resArmed=id; render(); }
     return; }
   if(t.dataset.exstart){ return startExam(t.dataset.exstart); }
   if(t.dataset.exgo){ return go('exam'); }
@@ -1500,6 +1593,9 @@ app.addEventListener('change',e=>{
   if(t.dataset.rf==='week'&&t.value){ const rf=rfInit(); rf.week=isoD(weekStartOf(parseD(t.value))); rf.vals=null; pendingRender=false; render(); }
   if(t.dataset.when){ const st=stFor(t.dataset.when); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
+  if(t.dataset.res){ S.resKey=t.value; pendingRender=false; render(); }
+  if(t.dataset.cf==='course'){ Object.assign(cfInit(),{course:t.value,no:0,vals:null,dirty:false,armed:false}); pendingRender=false; render(); }
+  if(t.dataset.qf==='course'){ Object.assign(qfInit(),{course:t.value,ch:1,editId:null,armed:'',showAll:false,err:''}); pendingRender=false; render(); }
   if(t.dataset.qf==='ch'){ Object.assign(qfInit(),{ch:+t.value,editId:null,armed:'',showAll:false,err:''}); pendingRender=false; render(); }
   if(t.dataset.qf==='lv'){ qfInit().lv=t.value; }
   if(t.dataset.qfa!==undefined){ qfInit().a=+t.dataset.qfa; }

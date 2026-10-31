@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // রুটিন ও সিলেবাস: সবাই পড়তে পারবে, শুধু অ্যাডমিন লিখতে পারবে
+    // অ্যাডমিন: Firebase কনসোলে বসানোর সময় ADMIN_EMAIL জায়গায় আসল ইমেইল দিন
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email == 'ADMIN_EMAIL';
@@ -10,13 +10,23 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
-    // অ্যাপ এটা পড়ে বোঝে লগইন করা ব্যক্তি অ্যাডমিন কিনা
     match /admin/{id} {
       allow read: if isAdmin();
     }
     match /syllabus/{id} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+    // শিক্ষার্থীর পরীক্ষার ফলাফল: শিক্ষার্থী শুধু নতুন জমা দিতে পারে, দেখতে/মুছতে পারে শুধু অ্যাডমিন
+    match /results/{id} {
+      allow read, delete: if isAdmin();
+      allow update: if false;
+      allow create: if request.resource.data.keys().hasOnly(['course','date','kind','examKey','name','roll','score','total','late','at','device'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.roll is string && request.resource.data.roll.size() <= 20
+        && request.resource.data.score is int && request.resource.data.total is int
+        && request.resource.data.score >= 0 && request.resource.data.score <= request.resource.data.total
+        && request.resource.data.total <= 100;
     }
   }
 }
