@@ -514,6 +514,18 @@ select.input{appearance:auto}
 .dl-ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .dl-group{display:flex;flex-direction:column;gap:8px}
 .tab{font-size:11px!important}
+.prow{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -14px;padding:2px 14px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.prow::-webkit-scrollbar{display:none}
+.prow .pcard{flex:0 0 84%;scroll-snap-align:start}
+.prow-hint{margin:-4px 0 0;font-size:12.5px;color:var(--muted);text-align:right}
+.cbanner.free{background:linear-gradient(125deg,#064e3b,#0f8a5f,#22c55e,#14b8a6,#0f766e,#064e3b);background-size:320% 320%}
+.cbanner.free .cb-badge{color:#0f8a5f}
+.free-sec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px 10px 10px;display:flex;flex-direction:column;gap:8px}
+.free-head{display:flex;align-items:center;gap:10px;border:0;background:none;color:var(--fg);font:inherit;text-align:left;min-height:56px;cursor:pointer;padding:4px 2px}
+.free-head b{display:block;font-size:16.5px}.free-head small{display:block;font-size:13px;color:var(--muted)}
+.free-ic{font-size:26px;width:44px;height:44px;border-radius:12px;background:var(--bg);display:grid;place-items:center;flex-shrink:0}
+.free-n{font-size:12.5px;font-weight:700;color:#1b7a3a;background:#e7f6ec;border-radius:999px;padding:2px 9px}
+.free-ch{font-size:18px;color:var(--muted)}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -994,6 +1006,58 @@ function vCourse(){
     <p class="muted" style="margin:0;font-size:13px">অধ্যায়ের তালিকা নমুনা হিসেবে দেওয়া; আপনার সিলেবাস অনুযায়ী বদলে নিতে পারবেন।</p>`}
   </div>`;
 }
+/* দশম শ্রেণি ফ্রী ব্যাচ: সাজেশন PDF, NCTB বই, টেস্ট পরীক্ষার প্রশ্ন সমাধান (অ্যাডমিন → ফ্রী ব্যাচ ট্যাব থেকে দেওয়া) */
+const FREE_BATCH={c10:{title:'দশম শ্রেণি ফ্রী ব্যাচ',banner:{badge:'ফ্রী',main:'দশম শ্রেণি',sub:'ফ্রী ব্যাচ'}}};
+const FREE_CATS=[['sugg','ফ্রী সাজেশন PDF','📄','গুরুত্বপূর্ণ অধ্যায় ও প্রশ্নের সাজেশন'],['nctb','NCTB বই','📚','বোর্ডের পাঠ্যবই (অনলাইন সংস্করণ)'],['test','টেস্ট পরীক্ষার প্রশ্ন সমাধান','✅','বিভিন্ন স্কুলের টেস্ট পরীক্ষার প্রশ্ন ও সমাধান']];
+const FREE_DEFAULT={nctb:[{t:'NCTB পাঠ্যপুস্তক (অনলাইন সংস্করণ)',u:'https://nctb.gov.bd/'}]};
+const freeId=cid=>`freebatch_${cid}`;
+function freeItems(cid){
+  const r=SYL[freeId(cid)], out={};
+  FREE_CATS.forEach(([k])=>{ const a=r&&r.items&&Array.isArray(r.items[k])?r.items[k].filter(f=>f&&safeLink(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:safeLink(f.u)})):null; out[k]=a&&a.length?a:(r&&r.items&&Array.isArray(r.items[k])?[]:(FREE_DEFAULT[k]||[])); });
+  return out;
+}
+function freeBanner(cid,size){
+  const b=FREE_BATCH[cid].banner, sym=['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
+  return `<div class="cbanner free ${size||''}" aria-hidden="true">${sym.map((x,i)=>`<span class="cb-sym" style="--i:${i}">${x}</span>`).join('')}
+    <span class="cb-badge">${esc(b.badge)}</span><span class="cb-main">${esc(b.main)}</span><span class="cb-sub">${esc(b.sub)}</span>
+    <span class="cb-chip"><i></i>সাজেশন · NCTB বই · টেস্ট পরীক্ষা</span><span class="cb-shine"></span></div>`;
+}
+function freeCard(cid){
+  return `<article class="pcard"><button class="pc-img" data-free="${cid}" aria-label="${esc(FREE_BATCH[cid].title)}">${freeBanner(cid,'sm')}</button>
+    <b class="pc-title">${esc(FREE_BATCH[cid].title)}</b><button class="pc-more" data-free="${cid}">বিস্তারিত দেখো</button></article>`;
+}
+function vFree(){
+  const cid=S.freeCid||'c10', fb=FREE_BATCH[cid], items=freeItems(cid), open=S.freeOpen===undefined?'sugg':S.freeOpen;
+  return `<div class="screen">${backTop(fb.title,S.freeFrom||'play')}
+    ${freeBanner(cid,'big')}
+    <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। এসএসসি পরীক্ষার প্রস্তুতির জন্য সাজেশন, বোর্ডের বই আর টেস্ট পরীক্ষার প্রশ্নের সমাধান এক জায়গায়।</p></div>
+    ${FREE_CATS.map(([k,l,ic,d])=>{ const a=items[k]||[], on=open===k;
+      return `<section class="free-sec ${on?'open':''}"><button class="free-head" data-freecat="${k}" aria-expanded="${on}"><span class="free-ic">${ic}</span><span style="flex:1;min-width:0"><b>${l}</b><small>${d}</small></span><span class="free-n">${a.length?bn(a.length)+'টি':'শীঘ্রই'}</span><span class="free-ch">${on?'▾':'›'}</span></button>
+        ${on?(a.length?pdfList(a):`<div class="empty" style="padding:12px">শীঘ্রই এখানে যোগ হবে।</div>`):''}</section>`; }).join('')}
+    ${COURSES[cid]&&COURSES[cid].offer?weeklyBtn(cid):''}
+    ${COURSES[cid]&&COURSES[cid].offer?`<article class="pcard"><b class="pc-title">প্রতিদিন লাইভ পরীক্ষা দিয়ে পুরো প্রস্তুতি নিতে চাও?</b><button class="btn" data-course="${cid}">${esc(ptitle(COURSES[cid]))} দেখো</button></article>`:''}
+  </div>`;
+}
+/* অ্যাডমিন: ফ্রী ব্যাচের PDF */
+function frInit(){
+  if(!S.fr){ const it=freeItems('c10'); S.fr={cid:'c10',items:{sugg:it.sugg.slice(),nctb:it.nctb.slice(),test:it.test.slice()},dirty:false}; }
+  return S.fr;
+}
+function freePanel(){
+  const fr=frInit();
+  return `<section class="admin" aria-label="ফ্রী ব্যাচ"><div><span class="offer-tag">সবার জন্য ফ্রী</span><h2 class="display" style="font-size:22px;margin-top:6px">${esc(FREE_BATCH[fr.cid].title)}</h2>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → দশম শ্রেণি ফ্রী ব্যাচ থেকে দেখবে। PDF Google Drive-এ রেখে "Anyone with the link" করে লিংক দিন।</p></div>
+    ${FREE_CATS.map(([k,l,ic])=>`<div class="field"><label>${ic} ${l}</label>${pdfEditor('fr|'+k,fr.items[k])}</div>`).join('')}
+    <div class="error" id="frErr" role="alert"></div>
+    <button class="btn" data-frpublish style="width:100%" ${S.frBusy?'disabled':''}>${S.frBusy?'প্রকাশ হচ্ছে…':'ফ্রী ব্যাচ প্রকাশ কর'}</button>
+  </section>`;
+}
+async function publishFree(){
+  const fr=frInit(); S.frBusy=true; render();
+  try{ await DB.collection('syllabus').doc(freeId(fr.cid)).set({type:'freebatch',course:fr.cid,items:{sugg:fr.items.sugg.slice(0,30),nctb:fr.items.nctb.slice(0,30),test:fr.items.test.slice(0,30)},updatedAt:new Date().toISOString()});
+    S.frBusy=false; S.fr=null; render(); toast('ফ্রী ব্যাচ প্রকাশ হয়েছে'); }
+  catch(e){ S.frBusy=false; render(); const el=document.getElementById('frErr'); if(el) el.textContent=e&&e.code==='permission_denied'?'প্রকাশের অনুমতি নেই। আবার অ্যাডমিন লগইন করুন।':'প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
+}
 function vPlay(){
   const chev='<span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>';
   const ids=sec=>sec.rows.flatMap(r=>r.kind==='primary'?['p5']:(r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer);
@@ -1003,11 +1067,11 @@ function vPlay(){
     <p class="muted" style="margin:0">যেসব কোর্স এখন চলছে, সেগুলো এখানে। কোর্সে চাপ দিলে বিস্তারিত, রুটিন ও পরীক্ষা দেখা যাবে।</p>
     ${SECTIONS.map((sec,si)=>{ const list=ids(sec);
       return `<section class="zone ${zone[si]||'z2'}"><h2>${sec.title} স্তর</h2>
-        ${list.length?list.map(k=>{ const c=COURSES[k], n=c.chapters.filter((_,i)=>chDoc(k,i)).length;
+        ${list.length?`<div class="prow">${list.map(k=>{ const c=COURSES[k], n=c.chapters.filter((_,i)=>chDoc(k,i)).length;
           return `<article class="pcard">${liveToday(k)?'<span class="live-badge"><i></i>লাইভ</span>':''}
             <button class="pc-img" data-course="${k}" aria-label="${esc(ptitle(c))}">${courseBanner(k,'sm')}</button>
             <b class="pc-title">${esc(ptitle(c))}</b>
-            <button class="pc-more" data-course="${k}">বিস্তারিত দেখো</button></article>`; }).join('')
+            <button class="pc-more" data-course="${k}">বিস্তারিত দেখো</button></article>`+(FREE_BATCH[k]?freeCard(k):''); }).join('')}</div>${list.some(k=>FREE_BATCH[k])?'<p class="prow-hint">ডানে সরিয়ে আরও দেখো →</p>':''}`
           :`<div class="empty soon-empty">কোর্স চালু নেই, শীঘ্রই চালু হবে।</div>`}
       </section>`; }).join('')}
   </div>`;
@@ -1345,7 +1409,7 @@ function pdfEditor(key,files){
       <button type="button" class="btn ghost" data-pdfadd="${key}">+ PDF যোগ</button></div>
   </div>`;
 }
-function pdfTarget(key){ if(key==='cf'){ const cf=cfInit(); cf.dirty=true; cf.vals.files=cf.vals.files||[]; return cf.vals.files; } if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
+function pdfTarget(key){ if(key.indexOf('fr|')===0){ const fr=frInit(); fr.dirty=true; const k=key.split('|')[1]; return fr.items[k]=fr.items[k]||[]; } if(key==='cf'){ const cf=cfInit(); cf.dirty=true; cf.vals.files=cf.vals.files||[]; return cf.vals.files; } if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
 function specialExams(cid){
   return Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid&&typeof r.date==='string'&&canSee(r)).map(r=>({
     xid:String(r.id).split('_').pop(), id:r.id, pending:!isLive(r), publishAt:r.publishAt, course:cid, date:r.date, kind:'special',
@@ -2393,9 +2457,10 @@ function vAdmin(){
       <button class="seg-btn" role="tab" aria-selected="${tab==='qbank'}" data-atab="qbank">${svg('pencil')}প্রশ্ন</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='exam'}" data-atab="exam">${svg('report')}পরীক্ষা</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='results'}" data-atab="results">${svg('chart')}ফলাফল</button>
+      <button class="seg-btn" role="tab" aria-selected="${tab==='free'}" data-atab="free">${svg('download')}ফ্রী ব্যাচ</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='reports'}" data-atab="reports">${svg('flag')}রিপোর্ট${Object.values(REP).filter(r=>r.status!=='done').length?` (${bn(Object.values(REP).filter(r=>r.status!=='done').length)})`:''}</button>
     </div>
-    ${RSTATE!=='ready'?routineStateMsg():tab==='reports'?reportsPanel():tab==='exam'?examPanel():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
+    ${RSTATE!=='ready'?routineStateMsg():tab==='free'?freePanel():tab==='reports'?reportsPanel():tab==='exam'?examPanel():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
   </div>`;
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
@@ -2409,7 +2474,7 @@ function renderTabs(){
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
   if(authed) renderTabs();
@@ -2515,6 +2580,9 @@ app.addEventListener('click',e=>{
     if(!S.stuOutArmed){ S.stuOutArmed=true; render(); setTimeout(()=>{ if(S.stuOutArmed){ S.stuOutArmed=false; render(); } },5000); return; }
     S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
     persist(); go('home'); toast('লগ আউট হয়েছে'); return; }
+  if(t.dataset.free){ S.freeCid=t.dataset.free; S.freeFrom=S.view==='play'?'play':'home'; S.freeOpen=undefined; return go('free'); }
+  if(t.dataset.freecat){ const k=t.dataset.freecat; S.freeOpen=(S.freeOpen===undefined?'sugg':S.freeOpen)===k?'':k; render(); return; }
+  if(t.hasAttribute('data-frpublish')){ if(!S.frBusy) publishFree(); return; }
   if(t.dataset.hub){ S.hubCourse=t.dataset.hubc||hubCourse(); S.hubFrom=S.view==='course'?'course':S.view==='routine'?'routine':'exams'; if(t.dataset.hub==='routine') return go('routine'); S.wlim=20; return go(t.dataset.hub); }
   if(t.dataset.hubcourse){ S.hubCourse=t.dataset.hubcourse; render(); return; }
   if(t.dataset.hubch){ const [c,i]=t.dataset.hubch.split('|'); S.course=c; S.chFrom='play'; return go('chapter',{chIdx:+i}); }
