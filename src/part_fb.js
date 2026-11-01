@@ -15,7 +15,7 @@ setTimeout(function(){
     DB.collection('routines').orderBy('date').onSnapshot(snap=>{
       clearTimeout(timer);
       ROUT=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
-      RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true); sendPendingReports();
+      RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true); sendPendingReports(); refreshPays();
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m;

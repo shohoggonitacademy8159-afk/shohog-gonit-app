@@ -35,6 +35,18 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    // পেমেন্ট: শিক্ষার্থী শুধু "pending" অনুরোধ তৈরি করবে, নিজের id জানলে অবস্থা পড়বে; অ্যাডমিন তালিকা দেখবে ও অনুমোদন দেবে
+    match /payments/{id} {
+      allow get: if true;
+      allow list, update, delete: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['course','method','amount','months','sender','trx','name','roll','device','at','status'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.method in ['bkash','nagad','rocket']
+        && request.resource.data.trx is string && request.resource.data.trx.size() >= 8 && request.resource.data.trx.size() <= 12
+        && request.resource.data.sender is string && request.resource.data.sender.size() == 11
+        && request.resource.data.name is string && request.resource.data.name.size() <= 60
+        && request.resource.data.amount is int && request.resource.data.amount > 0 && request.resource.data.amount <= 10000;
+    }
     match /reports/{id} {
       allow read, update, delete: if isAdmin();
       allow create: if request.resource.data.keys().hasOnly(['type','text','improve','rating','exam','name','roll','phone','device','ua','at','status','ref'])

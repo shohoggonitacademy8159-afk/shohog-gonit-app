@@ -13,10 +13,10 @@ MOCK = r"""
 (function(){
   const pad=n=>String(n).padStart(2,'0'), d=new Date(), today=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const ago=new Date(Date.now()-3600e3).toISOString();
-  const store={routines:{}, syllabus:{}, results:{}, reports:{}, pdfs:{}};
+  const store={routines:{}, syllabus:{}, results:{}, reports:{}, pdfs:{}, payments:{}};
   store.routines['c10_'+today]={course:'c10',date:today,kind:'daily',syllabus:'অনুশীলনী 2.1 (সেট)',chapter:2,ex:'2.1',publishAt:ago};
   store.syllabus['ex_c10_2_1']={type:'exnote',course:'c10',no:2,ex:'2.1',title:'অনুশীলনী 2.1: সেট (নমুনা নোট)',note:'এটি প্রিভিউয়ের নমুনা নোট।\nঅ্যাডমিন প্যানেল → অধ্যায় ট্যাব থেকে প্রতিটি অনুশীলনীর আলাদা নোট দেওয়া যায়।',link:'',publishAt:ago};
-  const subs={routines:[],syllabus:[],results:[],reports:[],pdfs:[]}; let authCb=null;
+  const subs={routines:[],syllabus:[],results:[],reports:[],pdfs:[],payments:[]}; let authCb=null;
   const emit=n=>{ const docs=Object.entries(store[n]).map(([id,v])=>({id,data:()=>v})); subs[n].forEach(f=>f({docs})); };
   window.SohogDB={ init(){return true;}, onAuth(cb){ authCb=cb; setTimeout(()=>cb(null),20); },
     collection(n){ return { orderBy(){return this;}, onSnapshot(next){ subs[n].push(next); setTimeout(()=>emit(n),30); return ()=>{ subs[n]=subs[n].filter(f=>f!==next); }; },

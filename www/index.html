@@ -527,6 +527,31 @@ button.pdf-row{width:100%;font:inherit;text-align:left;cursor:pointer}
 .prow{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -14px;padding:2px 14px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .prow::-webkit-scrollbar{display:none}
 .prow .pcard{flex:0 0 84%;scroll-snap-align:start}
+.pay .pay-h{display:flex;align-items:center;gap:8px;margin:6px 0 0;font-size:17px}
+.pay-h span{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:14px}
+.pay-sum{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--surface)}
+.pay-sum>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pay-ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px}
+.pay-m{border:2px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font:inherit}
+.pay-m b{color:var(--pc);font-size:18px}.pay-m small{color:var(--muted);font-size:12px}
+.pay-m[aria-pressed="true"]{border-color:var(--pc);background:color-mix(in srgb,var(--pc) 10%,var(--surface))}
+.pay-box{border:2px solid var(--pc);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px;background:color-mix(in srgb,var(--pc) 5%,var(--surface))}
+.pay-num{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pay-num div,.pay-amt{display:flex;flex-direction:column}
+.pay-num small,.pay-amt small{color:var(--muted);font-size:12.5px}
+.pay-num b{font-size:24px;letter-spacing:1px;color:var(--pc)}
+.pay-amt b{font-size:22px}
+.pay-steps{margin:0;padding-left:20px;font-size:14.5px;line-height:1.7}
+.pay-rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:14px}
+.pay-rows span{color:var(--muted)}.pay-rows b{overflow-wrap:anywhere}
+.pay-rows .trx{font-family:monospace;font-size:15px;letter-spacing:.5px}
+.pay-stat{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pay-stat div{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;background:var(--surface)}
+.pay-stat b{font-size:20px}.pay-stat span{font-size:13px;color:var(--muted)}
+.pay-tog{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;font-weight:600}
+.pay-tog input{width:22px;height:22px;margin-top:2px;flex:none}
+.pay-tog small{display:block;font-weight:400;color:var(--muted);font-size:12.5px;margin-top:2px}
+.enrolled.pend{background:#fff4e0;color:#a15c00}
 .prow-h{margin:6px 0 -4px;font-size:16px;font-weight:700}
 .prow-hint{margin:-4px 0 0;font-size:12.5px;color:var(--muted);text-align:right}
 .cbanner.free{background:linear-gradient(125deg,#064e3b,#0f8a5f,#22c55e,#14b8a6,#0f766e,#064e3b);background-size:320% 320%}
@@ -796,13 +821,14 @@ const S = {
   fav: saved.fav||{},
   favx: saved.favx||{},
   reports: saved.reports||[],
+  pays: saved.pays||{},
   examRun: saved.examRun||null,
   student: saved.student||null,
   dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: 'home',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -943,9 +969,9 @@ function offerCard(id,o){
       <div><span class="offer-tag">মাসিক ফি</span><p class="muted" style="margin:6px 0 0;font-size:13.5px">সব সুবিধা এক প্যাকেজে</p></div>
       <div class="price"><b>৳${bn(o.price)}</b><span>প্রতি মাস</span></div>
     </div>
-    ${enrolled
+    ${pkgBadge(id)||(enrolled&&false
       ?`<div class="enrolled">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ নেওয়া হয়েছে। পেমেন্ট ব্যবস্থা চালু হলে এখান থেকেই মাসিক ফি দেওয়া যাবে।</div>`
-      :`<button class="btn pk-btn" data-enroll="${id}" style="width:100%">প্যাকেজ নাও · ৳${bn(o.price)}/মাস</button>`}
+      :`<button class="btn pk-btn" data-buy="${id}" style="width:100%">প্যাকেজ নাও · ৳${bn(o.price)}/মাস</button>`)}
     <div style="display:flex;flex-direction:column;gap:8px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:16px">এই সপ্তাহের রুটিন</b><button class="link" data-go="routine">পুরো রুটিন</button></div>
       ${weekPreview(id)}
@@ -1000,9 +1026,9 @@ function vCourseOffer(){
     <section class="cd-week"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:17px">এই সপ্তাহের রুটিন</b><button class="link" data-go="routine">পুরো রুটিন</button></div>${weekPreview(id)}</section>
     ${examTiles(id)}
     ${sylCard(id)}
-    <div class="buybar">${enrolled
-      ?`<div class="enrolled" style="flex:1">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ নেওয়া হয়েছে</div>`
-      :`<div class="bb-price"><span>মাসিক ফি</span><b>৳${bn(o.price)}</b></div><button class="btn bb-btn" data-enroll="${id}">প্যাকেজ নাও</button>`}</div>
+    <div class="buybar">${pkgActive(id)||pendingPay(id)
+      ?pkgBadge(id)+(pkgActive(id)?`<button class="btn outline bb-btn" data-buy="${id}">নবায়ন</button>`:'')
+      :`<div class="bb-price"><span>মাসিক ফি</span><b>৳${bn(o.price)}</b></div><button class="btn bb-btn" data-buy="${id}">প্যাকেজ নাও</button>`}</div>
   </div>`;
 }
 function vCourse(){
@@ -1219,17 +1245,169 @@ function vProfile(){
     </div>
   </div>`;
 }
+/* ---------- পেমেন্ট (বিকাশ/নগদ/রকেট Send Money → অ্যাডমিন যাচাই) ----------
+   নম্বর ও সেটিং: syllabus/paycfg (অ্যাডমিন লেখে, সবাই পড়ে)
+   অনুরোধ: payments সংগ্রহ (শিক্ষার্থী তৈরি করে status:'pending'; অ্যাডমিন অনুমোদন/বাতিল করে; শিক্ষার্থী নিজের id দিয়ে অবস্থা পড়ে) */
+const PAYM=[['bkash','বিকাশ','#e2136e'],['nagad','নগদ','#ec1c24'],['rocket','রকেট','#8c3494']];
+const payName=m=>(PAYM.find(x=>x[0]===m)||['',m])[1];
+const payCfg=()=>{ const r=SYL.paycfg||{}; return {bkash:String(r.bkash||''),nagad:String(r.nagad||''),rocket:String(r.rocket||''),note:String(r.note||''),enforce:!!r.enforce,days:Math.min(366,Math.max(1,+r.days||30))}; };
+const payMethods=()=>{ const c=payCfg(); return PAYM.filter(([k])=>c[k]); };
+const DAYMS=86400000;
+function pkgUntil(cid){ const e=S.enrolled&&S.enrolled[cid]; return e&&e.until?+e.until:0; }
+const pkgActive=cid=>pkgUntil(cid)>Date.now();
+const pendingPay=cid=>Object.values(S.pays||{}).some(p=>p.course===cid&&p.status==='pending');
+/* পেইড কোর্সের পরীক্ষায় প্যাকেজ লাগবে কি না (অ্যাডমিন সেটিং চালু থাকলে) */
+function needPay(e){ return !!(e&&payCfg().enforce&&e.kind!=='free'&&COURSES[e.course]&&COURSES[e.course].offer&&!pkgActive(e.course)&&!CAN_EDIT); }
+function pkgBadge(cid){
+  const u=pkgUntil(cid);
+  if(u>Date.now()) return `<div class="enrolled" style="flex:1">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ চালু · ${bnD(new Date(u)).split(',')[0]} পর্যন্ত</div>`;
+  if(pendingPay(cid)) return `<div class="enrolled pend" style="flex:1">⏳ পেমেন্ট যাচাই হচ্ছে</div>`;
+  return '';
+}
+function vBuy(){
+  const cid=S.buyCid, c=COURSES[cid];
+  if(!c||!c.offer) return `<div class="screen">${backTop('পেমেন্ট','play')}<div class="empty">কোর্সটি পাওয়া যায়নি।</div></div>`;
+  const ms=payMethods(), cfg=payCfg(), f=S.buy=S.buy&&S.buy.cid===cid?S.buy:{cid,m:(ms[0]||[''])[0],months:1,sender:'',trx:'',name:S.student?S.student.name:'',err:'',busy:false};
+  const amt=c.offer.price*f.months, num_=cfg[f.m]||'';
+  return `<div class="screen pay">${backTop('প্যাকেজ নাও','course')}
+    <section class="pay-sum"><div><b>${esc(ptitle(c))}</b><span class="muted">মাসিক ফি ৳${bn(c.offer.price)} · প্রতি মাসে ${bn(cfg.days)} দিন</span></div>
+      ${pkgActive(cid)?`<span class="chip" style="color:var(--good)">চালু · ${bnD(new Date(pkgUntil(cid))).split(',')[0]} পর্যন্ত</span>`:''}</section>
+    ${!ms.length?`<div class="empty">পেমেন্ট নম্বর এখনো যোগ করা হয়নি। কিছুক্ষণ পর আবার চেষ্টা করো।</div>`:`
+    <h3 class="pay-h"><span>১</span> কোন মাধ্যমে পাঠাবে?</h3>
+    <div class="pay-ms">${ms.map(([k,l,col])=>`<button class="pay-m" style="--pc:${col}" aria-pressed="${f.m===k}" data-paym="${k}"><b>${l}</b><small>Send Money</small></button>`).join('')}</div>
+    <div class="field"><label>কত মাসের ফি দেবে?</label><div class="seg" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[1,2,3].map(n=>`<button class="seg-btn" aria-selected="${f.months===n}" data-paymo="${n}">${bn(n)} মাস</button>`).join('')}</div></div>
+    <h3 class="pay-h"><span>২</span> টাকা পাঠাও</h3>
+    <section class="pay-box" style="--pc:${(PAYM.find(x=>x[0]===f.m)||PAYM[0])[2]}">
+      <div class="pay-num"><div><small>${payName(f.m)} পার্সোনাল নম্বর</small><b>${esc(num_)}</b></div><button class="btn ghost" data-paycopy="${esc(num_)}">কপি</button></div>
+      <div class="pay-amt"><small>পাঠাতে হবে</small><b>৳${bn(amt)}</b></div>
+      <ol class="pay-steps"><li>${payName(f.m)} অ্যাপ খুলে <b>Send Money</b> বেছে নাও।</li><li>উপরের নম্বরে <b>৳${bn(amt)}</b> পাঠাও।</li><li>Reference-এ নিজের নাম লেখো।</li><li>পাঠানোর পর মেসেজে আসা <b>Transaction ID (TrxID)</b> নিচে লেখো।</li></ol>
+      ${cfg.note?`<p class="muted" style="margin:0;font-size:13.5px;white-space:pre-line">${esc(cfg.note)}</p>`:''}
+    </section>
+    <h3 class="pay-h"><span>৩</span> তথ্য জমা দাও</h3>
+    <div class="field"><label for="payName">তোমার নাম</label><input class="input" id="payName" data-payf="name" maxlength="60" value="${esc(f.name)}" placeholder="যেমন: রাফি আহমেদ"></div>
+    <div class="field"><label for="paySender">যে নম্বর থেকে টাকা পাঠিয়েছ</label><input class="input" id="paySender" data-payf="sender" inputmode="tel" maxlength="14" value="${esc(f.sender)}" placeholder="01XXXXXXXXX"></div>
+    <div class="field"><label for="payTrx">Transaction ID (TrxID)</label><input class="input" id="payTrx" data-payf="trx" maxlength="20" autocapitalize="characters" value="${esc(f.trx)}" placeholder="যেমন: 9KD4ABC12X"></div>
+    <div class="error" role="alert">${esc(f.err||'')}</div>
+    <button class="btn" data-paysend style="width:100%" ${f.busy?'disabled':''}>${f.busy?'জমা হচ্ছে…':`পেমেন্ট যাচাইয়ের জন্য জমা দাও · ৳${bn(amt)}`}</button>
+    <p class="muted" style="margin:0;font-size:13px;text-align:center">শিক্ষক TrxID মিলিয়ে দেখে অনুমোদন দিলে প্যাকেজ চালু হবে। অবস্থা দেখা যাবে "আরো → পেমেন্ট ও অর্ডার হিস্ট্রি"-তে।</p>`}
+  </div>`;
+}
+async function sendPay(){
+  const f=S.buy, c=COURSES[f.cid];
+  const fail=m=>{ f.err=m; f.busy=false; render(); };
+  const name=String(f.name||'').trim().replace(/\s+/g,' '), sender=en(String(f.sender||'')).replace(/[^\d]/g,''), trx=String(f.trx||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(name.length<2) return fail('নাম লেখো।');
+  if(!/^01[3-9]\d{8}$/.test(sender)) return fail('সঠিক ১১ অঙ্কের মোবাইল নম্বর লেখো (01 দিয়ে শুরু)।');
+  if(trx.length<8||trx.length>12) return fail('Transaction ID ঠিকমতো লেখো (৮–১২ অক্ষর, মেসেজে যেমন আছে)।');
+  if(Object.values(S.pays||{}).some(p=>p.trx===trx&&p.status!=='rejected')) return fail('এই TrxID আগেই জমা দেওয়া হয়েছে।');
+  if(!DB) return fail('ইন্টারনেট সংযোগ নেই। সংযোগ চালু করে আবার চেষ্টা করো।');
+  f.busy=true; f.err=''; render();
+  const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const r={course:f.cid,method:f.m,amount:c.offer.price*f.months,months:f.months,sender,trx,name:name.slice(0,60),roll:S.student&&S.student.roll?String(S.student.roll).slice(0,20):'',device:S.dev,at:new Date().toISOString(),status:'pending'};
+  try{
+    await DB.collection('payments').doc(id).set(r);
+    S.pays=S.pays||{}; S.pays[id]=Object.assign({},r); if(!S.student) S.student={name:r.name,roll:''};
+    persist(); S.buy=null; toast('জমা হয়েছে · যাচাইয়ের পর প্যাকেজ চালু হবে'); go('pay');
+  }catch(e){ fail(e&&e.code==='permission_denied'?'পেমেন্ট জমা নেওয়া যাচ্ছে না (Firebase Rules-এ "payments" অংশ যোগ হয়নি)। শিক্ষককে জানাও।':'জমা দেওয়া যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করো।'); }
+}
+/* শিক্ষার্থীর পেমেন্টের অবস্থা সার্ভার থেকে হালনাগাদ */
+let payChecking=false;
+async function refreshPays(){
+  if(payChecking||!DB||!S.pays) return;
+  const ids=Object.keys(S.pays).filter(k=>S.pays[k].status==='pending'||(S.pays[k].status==='approved'&&!S.pays[k].synced));
+  if(!ids.length) return;
+  payChecking=true; let changed=false;
+  for(const id of ids){
+    try{ const d=await DB.collection('payments').doc(id).get(); if(!d) continue;
+      const p=S.pays[id]; if(d.status!==p.status||d.until!==p.until){ Object.assign(p,{status:d.status,until:d.until||0,note:d.note||''}); changed=true; }
+      if(d.status==='approved'&&d.until){ const cur=S.enrolled[p.course]; if(!cur||!cur.until||+cur.until<+d.until) S.enrolled[p.course]={at:Date.now(),until:+d.until,pay:id}; p.synced=true; changed=true; }
+    }catch(e){}
+  }
+  payChecking=false;
+  if(changed){ persist(); softRender(); }
+}
+/* অ্যাডমিন */
+let PAY={}, payUnsub=null, PAY_OK=null;
+function watchPays(){
+  if(payUnsub||!DB) return;
+  try{ payUnsub=DB.collection('payments').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); PAY=m; PAY_OK=true; softRender(); },()=>{ PAY_OK=false; payUnsub=null; softRender(); }); }catch(e){ PAY_OK=false; }
+}
+function pcInit(){ if(!S.pc){ const c=payCfg(); S.pc=Object.assign({},c,{busy:false,err:''}); } return S.pc; }
+function payPanel(){
+  watchPays();
+  const pc=pcInit(), list=Object.values(PAY).sort((a,b)=>String(b.at).localeCompare(String(a.at))), f=S.payF||'pending';
+  const trxCount={}; list.forEach(p=>{ if(p.status!=='rejected') trxCount[p.trx]=(trxCount[p.trx]||0)+1; });
+  const shown=list.filter(p=>f==='all'||p.status===f);
+  const sum=list.filter(p=>p.status==='approved'&&String(p.decidedAt||p.at).slice(0,7)===todayISO().slice(0,7)).reduce((n,p)=>n+(+p.amount||0),0);
+  const fmtT=t=>t?bnD(new Date(t)).split(',')[0]+' · '+pad2(new Date(t).getHours())+':'+pad2(new Date(t).getMinutes()):'';
+  return `<section class="admin" aria-label="পেমেন্ট"><div><h2 class="display" style="font-size:22px">পেমেন্ট</h2>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থী Send Money করে TrxID জমা দেয়। নিজের বিকাশ/নগদ/রকেট অ্যাপে TrxID ও টাকার পরিমাণ মিলিয়ে অনুমোদন দিন।</p></div>
+    <details class="pdf-box" ${S.pcOpen||!payMethods().length?'open':''} data-pcbox><summary>⚙️ পেমেন্ট নম্বর ও সেটিং</summary>
+      <div style="display:flex;flex-direction:column;gap:10px">
+      ${PAYM.map(([k,l])=>`<div class="field"><label>${l} পার্সোনাল নম্বর</label><input class="input" data-pcf="${k}" inputmode="tel" maxlength="14" value="${esc(pc[k])}" placeholder="খালি রাখলে এই মাধ্যম দেখাবে না"></div>`).join('')}
+      <div class="field"><label>শিক্ষার্থীদের জন্য নির্দেশনা (ঐচ্ছিক)</label><textarea class="input area" data-pcf="note" maxlength="300" rows="2" placeholder="যেমন: শুধু Send Money করবেন, Cash Out নয়।">${esc(pc.note)}</textarea></div>
+      <div class="field"><label>এক মাসের ফি দিলে প্যাকেজ কত দিন চালু থাকবে</label><input class="input" data-pcf="days" inputmode="numeric" maxlength="3" value="${esc(String(pc.days))}"></div>
+      <label class="pay-tog"><input type="checkbox" data-pcf="enforce" ${pc.enforce?'checked':''}><span>পেমেন্ট ছাড়া পেইড কোর্সের পরীক্ষা বন্ধ রাখুন<small>চালু করলে প্যাকেজ না থাকলে শিক্ষার্থী দৈনিক/সাপ্তাহিক/বিশেষ পরীক্ষা দিতে পারবে না (ফ্রী ব্যাচ খোলা থাকবে)।</small></span></label>
+      <div class="error" role="alert">${esc(pc.err||'')}</div>
+      <button class="btn" data-pcsave ${pc.busy?'disabled':''}>${pc.busy?'সংরক্ষণ হচ্ছে…':'সেটিং সংরক্ষণ কর'}</button></div></details>
+    ${PAY_OK===false?`<div class="empty">পেমেন্ট তালিকা দেখা যাচ্ছে না। Firebase Rules-এ "payments" অংশটি যোগ করা হয়েছে কি না দেখুন।</div>`:''}
+    <div class="pay-stat"><div><b>${bn(list.filter(p=>p.status==='pending').length)}</b><span>যাচাই বাকি</span></div><div><b>৳${bn(sum)}</b><span>এই মাসে অনুমোদিত</span></div></div>
+    <div class="seg" style="grid-template-columns:repeat(4,minmax(0,1fr))">${[['pending','বাকি'],['approved','অনুমোদিত'],['rejected','বাতিল'],['all','সব']].map(([v,l])=>`<button class="seg-btn" aria-selected="${f===v}" data-payf2="${v}">${l} (${bn(list.filter(p=>v==='all'||p.status===v).length)})</button>`).join('')}</div>
+    ${shown.length?shown.map(p=>{ const c=COURSES[p.course], dup=trxCount[p.trx]>1;
+      return `<article class="xa-card"><div class="xa-top"><span class="xa-date">${fmtT(p.at)}</span><span class="xa-pill ${p.status==='approved'?'st-done':p.status==='rejected'?'st-miss':'st-sched'}">${p.status==='approved'?'অনুমোদিত':p.status==='rejected'?'বাতিল':'যাচাই বাকি'}</span></div>
+        <h3 class="xa-title" style="font-size:17px">${esc(p.name||'')}${p.roll?' · রোল '+esc(p.roll):''}</h3>
+        <div class="pay-rows">
+          <span>কোর্স</span><b>${c?esc(c.name+' '+(c.subj||'')):esc(p.course)}</b>
+          <span>মাধ্যম</span><b>${payName(p.method)} · ${bn(p.months||1)} মাস</b>
+          <span>টাকা</span><b>৳${bn(p.amount)}</b>
+          <span>পাঠানো নম্বর</span><b><a href="tel:${esc(p.sender)}">${esc(p.sender)}</a></b>
+          <span>TrxID</span><b class="trx">${esc(p.trx)} <button class="link" data-paycopy="${esc(p.trx)}">কপি</button></b>
+          ${p.until?`<span>প্যাকেজ চালু</span><b>${bnD(new Date(p.until)).split(',')[0]} পর্যন্ত</b>`:''}
+        </div>
+        ${dup?`<div class="hub-banner" style="background:#fdecea;color:#b3261e">⚠️ এই TrxID দিয়ে একাধিক পেমেন্ট জমা পড়েছে — সাবধানে যাচাই করুন।</div>`:''}
+        <div class="xa-act">${p.status==='pending'
+          ?`<button class="btn outline" data-payno="${esc(p.id)}">${S.payArmed===p.id+'n'?'নিশ্চিত বাতিল?':'বাতিল'}</button><button class="btn" data-payok="${esc(p.id)}">${S.payArmed===p.id+'y'?'নিশ্চিত অনুমোদন?':'যাচাই হয়েছে · অনুমোদন'}</button>`
+          :`<button class="btn outline" data-payundo="${esc(p.id)}">আবার "বাকি" করুন</button>`}</div></article>`; }).join('')
+      :`<div class="empty">${PAY_OK?'এই তালিকায় কোনো পেমেন্ট নেই।':'পেমেন্ট আনা হচ্ছে…'}</div>`}
+  </section>`;
+}
+async function decidePay(id,status){
+  const p=PAY[id]; if(!p||!DB) return;
+  const r=Object.assign({},p); delete r.id;
+  r.status=status; r.decidedAt=new Date().toISOString();
+  if(status==='approved'){
+    const prev=Object.values(PAY).filter(x=>x.id!==id&&x.status==='approved'&&x.course===p.course&&x.device===p.device&&x.until).reduce((m,x)=>Math.max(m,+x.until),0);
+    const start=Math.max(Date.now(),prev); r.until=start+payCfg().days*(+p.months||1)*DAYMS;
+  } else if(status==='pending'){ delete r.until; delete r.decidedAt; }
+  else delete r.until;
+  try{ await DB.collection('payments').doc(id).set(r); toast(status==='approved'?'অনুমোদন দেওয়া হয়েছে':status==='rejected'?'বাতিল করা হয়েছে':'আবার বাকি তালিকায়'); }
+  catch(e){ toast('পরিবর্তন করা যায়নি'); }
+}
+async function savePayCfg(){
+  const pc=pcInit(), clean=v=>en(String(v||'')).replace(/[^\d]/g,'');
+  const r={type:'paycfg',bkash:clean(pc.bkash),nagad:clean(pc.nagad),rocket:clean(pc.rocket),note:String(pc.note||'').slice(0,300),enforce:!!pc.enforce,days:Math.min(366,Math.max(1,Math.round(+en(String(pc.days))||30))),publishAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  if(['bkash','nagad','rocket'].some(k=>r[k]&&!/^01[3-9]\d{8}$/.test(r[k]))){ pc.err='প্রতিটি নম্বর ১১ অঙ্কের হতে হবে (01 দিয়ে শুরু)।'; render(); return; }
+  if(!r.bkash&&!r.nagad&&!r.rocket){ pc.err='কমপক্ষে একটি নম্বর দিন।'; render(); return; }
+  pc.busy=true; pc.err=''; render();
+  try{ await DB.collection('syllabus').doc('paycfg').set(r); S.pc=null; S.pcOpen=false; toast('পেমেন্ট সেটিং সংরক্ষণ হয়েছে'); }
+  catch(e){ pc.busy=false; pc.err='সংরক্ষণ করা যায়নি।'; }
+  render();
+}
 /* পেমেন্ট ও অর্ডার হিস্ট্রি */
 function vPay(){
-  const rows=Object.keys(S.enrolled||{}).filter(k=>S.enrolled[k]&&COURSES[k]).map(k=>({k,c:COURSES[k],at:S.enrolled[k]&&S.enrolled[k].at}));
+  refreshPays();
+  const pays=Object.entries(S.pays||{}).map(([id,p])=>Object.assign({id},p)).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  const act=OFFER_IDS().filter(k=>pkgUntil(k));
   return `<div class="screen">${backTop('পেমেন্ট ও অর্ডার হিস্ট্রি','profile')}
-    ${rows.length?rows.map(r=>`<article class="xa-card">
-        <div class="xa-top"><span class="xa-date">${r.at?bnD(new Date(r.at)):'তারিখ জানা নেই'}</span><span class="xa-pill st-sched">পেমেন্ট বাকি</span></div>
-        <h3 class="xa-title">${esc(ptitle(r.c))}</h3>
-        <div class="xa-line">মাসিক প্যাকেজ · <b>৳${bn(r.c.offer?r.c.offer.price:0)}</b> / মাস</div>
-        <p class="muted" style="margin:0;font-size:13.5px">অনলাইন পেমেন্ট ব্যবস্থা (বিকাশ/নগদ) চালু হলে এখান থেকেই মাসিক ফি দেওয়া যাবে এবং প্রতিটি পেমেন্টের রসিদ এখানে দেখা যাবে।</p>
-        <button class="btn outline" data-course="${r.k}">কোর্স দেখো</button></article>`).join('')
-      :`<div class="empty">এখনো কোনো প্যাকেজ নেওয়া হয়নি।<br><button class="btn" data-go="play" style="margin-top:12px">চলমান কোর্স দেখো</button></div>`}
+    ${act.map(k=>{ const on=pkgActive(k); return `<section class="pay-sum"><div><b>${esc(ptitle(COURSES[k]))}</b><span class="muted">${on?`প্যাকেজ চালু · ${bnD(new Date(pkgUntil(k))).split(',')[0]} পর্যন্ত`:`মেয়াদ শেষ হয়েছে ${bnD(new Date(pkgUntil(k))).split(',')[0]}`}</span></div><button class="btn ${on?'outline':''}" data-buy="${k}">${on?'আগাম নবায়ন':'নবায়ন করো'}</button></section>`; }).join('')}
+    ${pays.length?`<h3 class="m-sec">পেমেন্টের তালিকা</h3>`+pays.map(p=>{ const c=COURSES[p.course];
+      return `<article class="xa-card"><div class="xa-top"><span class="xa-date">${p.at?bnD(new Date(p.at)):''}</span><span class="xa-pill ${p.status==='approved'?'st-done':p.status==='rejected'?'st-miss':'st-sched'}">${p.status==='approved'?'অনুমোদিত':p.status==='rejected'?'বাতিল':'যাচাই হচ্ছে'}</span></div>
+        <h3 class="xa-title">${c?esc(ptitle(c)):esc(p.course)}</h3>
+        <div class="pay-rows"><span>টাকা</span><b>৳${bn(p.amount)} · ${bn(p.months||1)} মাস</b><span>মাধ্যম</span><b>${payName(p.method)} · ${esc(p.sender)}</b><span>TrxID</span><b class="trx">${esc(p.trx)}</b>${p.until&&p.status==='approved'?`<span>চালু থাকবে</span><b>${bnD(new Date(p.until)).split(',')[0]} পর্যন্ত</b>`:''}</div>
+        ${p.status==='pending'?`<p class="muted" style="margin:0;font-size:13.5px">শিক্ষক TrxID মিলিয়ে দেখছেন। অনুমোদন হলে প্যাকেজ নিজে থেকে চালু হবে।</p><button class="btn outline" data-paycheck>অবস্থা আবার দেখো</button>`
+          :p.status==='rejected'?`<p class="muted" style="margin:0;font-size:13.5px">TrxID মেলেনি। ঠিক TrxID দিয়ে আবার জমা দাও বা "সমস্যা জানাও" থেকে যোগাযোগ করো।</p><button class="btn" data-buy="${esc(p.course)}">আবার জমা দাও</button>`:''}
+      </article>`; }).join('')
+      :`<div class="empty">এখনো কোনো পেমেন্ট করা হয়নি।<br><button class="btn" data-go="play" style="margin-top:12px">চলমান কোর্স দেখো</button></div>`}
   </div>`;
 }
 const backTop=(title,to)=>`<div class="topbar"><button class="iconbtn" data-go="${to}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>${title}</h1><span style="width:44px"></span></div>`;
@@ -1392,7 +1570,7 @@ setTimeout(function(){
     DB.collection('routines').orderBy('date').onSnapshot(snap=>{
       clearTimeout(timer);
       ROUT=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
-      RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true); sendPendingReports();
+      RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true); sendPendingReports(); refreshPays();
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m;
@@ -1621,6 +1799,7 @@ function examAction(e){
 function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id).concat(freeExams(id))).find(e=>examKey(e)===k); }
 function startExam(k,again){
   const e=findExam(k); if(!e||(S.exams[k]&&!again)||(again&&!S.exams[k])) return;
+  if(needPay(e)){ S.buyCid=e.course; S.course=e.course; S.buy=null; return go('buy'); }
   if(!S.student){ return go('student',{pendingExam:k}); }
   if(S.examRun&&!S.examRun.done){ toast('আগে চলমান পরীক্ষাটি শেষ করো'); return go('exam'); }
   const pool=examPool(e);
@@ -2609,9 +2788,10 @@ function vAdmin(){
       <button class="seg-btn" role="tab" aria-selected="${tab==='exam'}" data-atab="exam">${svg('report')}পরীক্ষা</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='results'}" data-atab="results">${svg('chart')}ফলাফল</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='free'}" data-atab="free">${svg('download')}ফ্রী ব্যাচ</button>
+      <button class="seg-btn" role="tab" aria-selected="${tab==='pay'}" data-atab="pay">${svg('wallet')}পেমেন্ট${Object.values(PAY).filter(p=>p.status==='pending').length?` (${bn(Object.values(PAY).filter(p=>p.status==='pending').length)})`:''}</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='reports'}" data-atab="reports">${svg('flag')}রিপোর্ট${Object.values(REP).filter(r=>r.status!=='done').length?` (${bn(Object.values(REP).filter(r=>r.status!=='done').length)})`:''}</button>
     </div>
-    ${RSTATE!=='ready'?routineStateMsg():tab==='free'?freePanel():tab==='reports'?reportsPanel():tab==='exam'?examPanel():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
+    ${RSTATE!=='ready'?routineStateMsg():tab==='free'?freePanel():tab==='pay'?payPanel():tab==='reports'?reportsPanel():tab==='exam'?examPanel():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
   </div>`;
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
@@ -2625,7 +2805,7 @@ function renderTabs(){
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
   if(authed) renderTabs();
@@ -2733,7 +2913,7 @@ app.addEventListener('click',e=>{
   if(t.dataset.repdel){ const id=t.dataset.repdel; if(S.repArmed===id){ S.repArmed=''; DB.collection('reports').doc(id).delete().then(()=>toast('রিপোর্ট মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); } else { S.repArmed=id; render(); } return; }
   if(t.hasAttribute('data-stulogout')){
     if(!S.stuOutArmed){ S.stuOutArmed=true; render(); setTimeout(()=>{ if(S.stuOutArmed){ S.stuOutArmed=false; render(); } },5000); return; }
-    S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
+    S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
     persist(); go('home'); toast('লগ আউট হয়েছে'); return; }
   if(t.hasAttribute('data-frpast')){ S.frPast=!S.frPast; render(); return; }
   if(t.dataset.frcourse){ if(S.fr&&S.fr.dirty&&S.fr.cid!==t.dataset.frcourse) toast('আগের ফ্রী ব্যাচের অপ্রকাশিত পরিবর্তন বাদ গেছে'); S.frCid=t.dataset.frcourse; S.fr=null; render(); return; }
@@ -2766,7 +2946,7 @@ app.addEventListener('click',e=>{
   if(t.hasAttribute('data-xyes')){ const c=S.xconfirm; S.xconfirm=null; if(c) return startExam(c.k,c.again); render(); return; }
   if(t.dataset.exagain){ S.xconfirm={k:t.dataset.exagain,again:true}; render(); return; }
   if(t.dataset.leader){ S.leaderFrom=S.view==='examResult'?(S.resFrom||'routine'):(HUBV.includes(S.view)&&S.view!=='course')||S.view==='home'?S.view:'routine'; return go('leader',{leaderKey:t.dataset.leader}); }
-  if(t.dataset.exstart){ S.xconfirm={k:t.dataset.exstart,again:false}; render(); return; }
+  if(t.dataset.exstart){ const e=findExam(t.dataset.exstart); if(needPay(e)){ toast('এই পরীক্ষা দিতে প্যাকেজ নিতে হবে'); S.buyCid=e.course; S.course=e.course; S.buy=null; return go('buy'); } S.xconfirm={k:t.dataset.exstart,again:false}; render(); return; }
   if(t.dataset.exgo){ return go('exam'); }
   if(t.dataset.exview){ S.examView=t.dataset.exview; S.examViewAgain=false; return go('examResult'); }
   if(t.hasAttribute('data-exsubmit')){
@@ -2798,7 +2978,17 @@ app.addEventListener('click',e=>{
     else{ t.dataset.armed='1'; t.textContent='নিশ্চিত? আবার চাপুন'; }
     return;
   }
-  if(t.dataset.enroll){ S.enrolled[t.dataset.enroll]={at:Date.now()}; persist(); render(); toast('প্যাকেজ নেওয়া হয়েছে'); return; }
+  if(t.dataset.buy){ S.buyCid=t.dataset.buy; S.course=t.dataset.buy; S.buy=null; return go('buy'); }
+  if(t.dataset.paym){ S.buy.m=t.dataset.paym; render(); return; }
+  if(t.dataset.paymo){ S.buy.months=+t.dataset.paymo; render(); return; }
+  if(t.dataset.paycopy!==undefined){ const v=t.dataset.paycopy; (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast('কপি হয়েছে: '+v),()=>toast(v)); return; }
+  if(t.hasAttribute('data-paysend')){ if(!S.buy.busy) sendPay(); return; }
+  if(t.hasAttribute('data-paycheck')){ Object.values(S.pays||{}).forEach(p=>{}); refreshPays().then(()=>toast('অবস্থা হালনাগাদ হয়েছে')); return; }
+  if(t.dataset.payf2){ S.payF=t.dataset.payf2; render(); return; }
+  if(t.dataset.payok||t.dataset.payno){ const id=t.dataset.payok||t.dataset.payno, tag=id+(t.dataset.payok?'y':'n');
+    if(S.payArmed===tag){ S.payArmed=''; decidePay(id,t.dataset.payok?'approved':'rejected'); } else { S.payArmed=tag; render(); } return; }
+  if(t.dataset.payundo){ decidePay(t.dataset.payundo,'pending'); return; }
+  if(t.hasAttribute('data-pcsave')){ savePayCfg(); return; }
   if(t.hasAttribute('data-primary')){
     if(!S.joined){ S.joined=true; persist(); toast('পঞ্চম শ্রেণিতে ফ্রীতে যুক্ত হয়েছ'); }
     return go('course',{course:'p5'});
@@ -2835,6 +3025,8 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('input',e=>{
   const t=e.target;
+  if(t.dataset.payf&&S.buy){ S.buy[t.dataset.payf]=t.value; }
+  if(t.dataset.pcf&&t.type!=='checkbox'){ pcInit()[t.dataset.pcf]=t.value; }
   if(t.dataset.rfday){ rfInit().vals[t.dataset.rfday]=t.value; }
   if(t.dataset.qf&&['q','e','bulk'].includes(t.dataset.qf)){ const qf=qfInit(); qf[t.dataset.qf]=t.value; if(t.dataset.qf==='bulk') qf.parsed=null; }
   if(t.dataset.qfo!==undefined){ qfInit().o[+t.dataset.qfo]=t.value; }
@@ -2856,6 +3048,7 @@ app.addEventListener('input',e=>{
 });
 app.addEventListener('change',e=>{
   const t=e.target;
+  if(t.dataset.pcf==='enforce'){ pcInit().enforce=t.checked; return; }
   if(t.dataset.pdffile){ const f=t.files&&t.files[0]; t.value=''; if(f) uploadPdf(t.dataset.pdffile,f); return; }
   if(t.dataset.rf==='week'&&t.value){ const rf=rfInit(); rf.week=isoD(weekStartOf(parseD(t.value))); rf.vals=null; pendingRender=false; render(); }
   if(t.dataset.when){ const st=stFor(t.dataset.when); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
