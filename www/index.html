@@ -520,6 +520,11 @@ select.input{appearance:auto}
 .prow-hint{margin:-4px 0 0;font-size:12.5px;color:var(--muted);text-align:right}
 .cbanner.free{background:linear-gradient(125deg,#064e3b,#0f8a5f,#22c55e,#14b8a6,#0f766e,#064e3b);background-size:320% 320%}
 .cbanner.free .cb-badge{color:#0f8a5f}
+.free-exam{display:flex;flex-direction:column;gap:10px;border:2px solid #22c55e;border-radius:20px;padding:12px;background:linear-gradient(180deg,#e9fbf0,transparent 70%)}
+:root[data-theme="dark"] .free-exam{background:linear-gradient(180deg,#0f2a1c,transparent 70%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .free-exam{background:linear-gradient(180deg,#0f2a1c,transparent 70%)}}
+.fx-head{display:flex;gap:10px;align-items:center}.fx-head>span{font-size:30px}
+.fx-head b{display:block;font-size:18px}.fx-head small{display:block;font-size:13px;color:var(--muted)}
 .free-sec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px 10px 10px;display:flex;flex-direction:column;gap:8px}
 .free-head{display:flex;align-items:center;gap:10px;border:0;background:none;color:var(--fg);font:inherit;text-align:left;min-height:56px;cursor:pointer;padding:4px 2px}
 .free-head b{display:block;font-size:16.5px}.free-head small{display:block;font-size:13px;color:var(--muted)}
@@ -871,12 +876,12 @@ function vHome(){
     </section>`).join('')}
   </div>`;
 }
-/* সাপ্তাহিক ফ্রী পরীক্ষা: প্রতি শুক্রবার, সবার জন্য */
+/* সাপ্তাহিক পরীক্ষা: প্রতি শুক্রবার, পেইড কোর্সের শিক্ষার্থীদের জন্য */
 function weeklyBtn(cid){
   const o=COURSES[cid].offer, live=RSTATE==='ready'&&examsFor(cid).some(e=>e.kind==='friday'&&e.date===todayISO()&&!S.exams[examKey(e)]&&examPool(e).length);
   return `<button class="wk-free" data-weekly="${cid}">${live?'<span class="live-badge"><i></i>লাইভ</span>':''}
-    <span class="wk-gift" aria-hidden="true">🎁</span>
-    <span style="flex:1;min-width:0"><b>সাপ্তাহিক ফ্রী পরীক্ষা</b><small>প্রতি শুক্রবার · ${bn(o.friday.marks)} নম্বর · ${bn(o.friday.mins)} মিনিট · সবার জন্য ফ্রী</small></span>
+    <span class="wk-gift" aria-hidden="true">🏆</span>
+    <span style="flex:1;min-width:0"><b>সাপ্তাহিক পরীক্ষা</b><small>প্রতি শুক্রবার · ${bn(o.friday.marks)} নম্বর · ${bn(o.friday.mins)} মিনিট · আগের ৬ দিনের সিলেবাস</small></span>
     <span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>`;
 }
 function vWeekly(){
@@ -884,9 +889,9 @@ function vWeekly(){
   const fr=msg?[]:examsFor(cid).filter(e=>e.kind==='friday');
   const cur=fr.filter(e=>e.date>=today).sort((a,b)=>a.date<b.date?-1:1);
   const past=fr.filter(e=>e.date<today).sort((a,b)=>a.date<b.date?1:-1);
-  return `<div class="screen">${hubTop('সাপ্তাহিক ফ্রী পরীক্ষা')}
+  return `<div class="screen">${hubTop('সাপ্তাহিক পরীক্ষা')}
     <div class="wk-info"><b>${c.name} ${c.subj||''}</b>
-      <ul><li>প্রতি শুক্রবার, সারাদিন খোলা</li><li>${bn(o.friday.marks)} নম্বর · ${bn(o.friday.mins)} মিনিট</li><li>সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</li><li>প্যাকেজ ছাড়াই সবাই দিতে পারবে, মেধাতালিকা সবাই দেখবে</li></ul></div>
+      <ul><li>প্রতি শুক্রবার, সারাদিন খোলা</li><li>${bn(o.friday.marks)} নম্বর · ${bn(o.friday.mins)} মিনিট</li><li>সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</li><li>মাসিক কোর্সের শিক্ষার্থীদের জন্য, মেধাতালিকা সবাই দেখবে</li></ul></div>
     ${msg||(cur.length?`<h2 class="xa-h">এই সপ্তাহের পরীক্ষা</h2>${cur.slice(0,2).map(e=>xaCard(e,false)).join('')}`:`<div class="empty">এই সপ্তাহের রুটিন এখনো প্রকাশ হয়নি। প্রকাশ হলে শুক্রবারের পরীক্ষা এখানে আসবে।</div>`)}
     ${past.length?`<h2 class="xa-h">আগের সাপ্তাহিক পরীক্ষা</h2>${past.slice(0,S.wkAll?99:3).map(e=>xaCard(e,false)).join('')}${past.length>3&&!S.wkAll?`<button class="btn ghost" data-wkall>সব দেখাও (${bn(past.length)}টি)</button>`:''}`:''}
   </div>`;
@@ -946,7 +951,7 @@ function courseFeatures(id){
   const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0), nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
   return [
     ['#e0457b','calendar','ডেইলি লাইভ MCQ এক্সাম',`শনি থেকে বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`],
-    ['#f08c1a','exam','সাপ্তাহিক ফ্রী পরীক্ষা',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের পরীক্ষা, সময় ${bn(o.friday.mins)} মিনিট। সিলেবাস আগের ৬ দিনের পরীক্ষার সিলেবাস। প্যাকেজ ছাড়াই সবাই দিতে পারে।`],
+    ['#f08c1a','exam','সাপ্তাহিক পরীক্ষা',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের পরীক্ষা, সময় ${bn(o.friday.mins)} মিনিট। সিলেবাস আগের ৬ দিনের পরীক্ষার সিলেবাস, সাথে সাপ্তাহিক মেধাতালিকা।`],
     ['#e53935','report','মাসিক পরীক্ষা ও মডেল টেস্ট','রুটিনের বাইরে মাসিক পরীক্ষা ও মডেল টেস্ট। নম্বর, সময় ও সিলেবাস প্রতিবার আলাদাভাবে ঘোষণা করা হয়।'],
     ['#8e44ef','openbook','লেকচার শিট ও স্টাডি ম্যাটেরিয়াল',`অধ্যায় ও অনুশীলনীভিত্তিক নোট ও PDF। প্রতিটি পরীক্ষার সিলেবাস অনুযায়ী PDF নিজে থেকে "স্টাডি ম্যাটেরিয়াল"-এ চলে আসে, পরীক্ষা দাও বোতামের ঠিক উপরে।`],
     ['#1e88e5','pencil',`${bn(nq)}+ প্রশ্নের প্রশ্নব্যাংক`,`${bn(c.chapters.length)}টি অধ্যায় ও ${bn(nex)}টি অনুশীলনী জুড়ে সহজ, মধ্যম ও কঠিন প্রশ্ন। প্রতিটি শিক্ষার্থী এলোমেলোভাবে আলাদা প্রশ্ন পায়, তাই দেখাদেখির সুযোগ কম।`],
@@ -1022,8 +1027,19 @@ function freeBanner(cid,size){
     <span class="cb-badge">${esc(b.badge)}</span><span class="cb-main">${esc(b.main)}</span><span class="cb-sub">${esc(b.sub)}</span>
     <span class="cb-chip"><i></i>সাজেশন · NCTB বই · টেস্ট পরীক্ষা</span><span class="cb-shine"></span></div>`;
 }
+function freeExamSection(cid){
+  if(RSTATE!=='ready') return '';
+  const today=todayISO(), all=freeExams(cid);
+  const cur=all.filter(e=>e.date>=today&&!(e.date===today&&S.exams[examKey(e)])&&(!e.pending||CAN_EDIT)).sort((a,b)=>a.date<b.date?-1:1);
+  const past=all.filter(e=>e.date<today||(e.date===today&&S.exams[examKey(e)])).sort((a,b)=>a.date<b.date?1:-1);
+  return `<section class="free-exam"><div class="fx-head"><span aria-hidden="true">🎁</span><div><b>সাপ্তাহিক ফ্রী পরীক্ষা</b><small>প্রতি সপ্তাহে একটি পরীক্ষা · সবার জন্য ফ্রী · মেধাতালিকা সবাই দেখবে</small></div></div>
+    ${cur.length?cur.slice(0,2).map(e=>xaCard(e,false)).join(''):`<div class="empty" style="padding:12px">এই সপ্তাহের ফ্রী পরীক্ষা শীঘ্রই ঘোষণা করা হবে।</div>`}
+    ${past.length?`<button class="link" data-fxpast style="align-self:center">${S.fxPast?'আগের ফ্রী পরীক্ষা লুকাও':`আগের ফ্রী পরীক্ষা (${bn(past.length)}টি)`}</button>${S.fxPast?past.map(e=>xaCard(e,false)).join(''):''}`:''}
+  </section>`;
+}
+const freeLive=cid=>RSTATE==='ready'&&freeExams(cid).some(e=>e.date===todayISO()&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
 function freeCard(cid){
-  return `<article class="pcard"><button class="pc-img" data-free="${cid}" aria-label="${esc(FREE_BATCH[cid].title)}">${freeBanner(cid,'sm')}</button>
+  return `<article class="pcard">${freeLive(cid)?'<span class="live-badge"><i></i>লাইভ</span>':''}<button class="pc-img" data-free="${cid}" aria-label="${esc(FREE_BATCH[cid].title)}">${freeBanner(cid,'sm')}</button>
     <b class="pc-title">${esc(FREE_BATCH[cid].title)}</b><button class="pc-more" data-free="${cid}">বিস্তারিত দেখো</button></article>`;
 }
 function vFree(){
@@ -1031,10 +1047,10 @@ function vFree(){
   return `<div class="screen">${backTop(fb.title,S.freeFrom||'play')}
     ${freeBanner(cid,'big')}
     <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। এসএসসি পরীক্ষার প্রস্তুতির জন্য সাজেশন, বোর্ডের বই আর টেস্ট পরীক্ষার প্রশ্নের সমাধান এক জায়গায়।</p></div>
+    ${freeExamSection(cid)}
     ${FREE_CATS.map(([k,l,ic,d])=>{ const a=items[k]||[], on=open===k;
       return `<section class="free-sec ${on?'open':''}"><button class="free-head" data-freecat="${k}" aria-expanded="${on}"><span class="free-ic">${ic}</span><span style="flex:1;min-width:0"><b>${l}</b><small>${d}</small></span><span class="free-n">${a.length?bn(a.length)+'টি':'শীঘ্রই'}</span><span class="free-ch">${on?'▾':'›'}</span></button>
         ${on?(a.length?pdfList(a):`<div class="empty" style="padding:12px">শীঘ্রই এখানে যোগ হবে।</div>`):''}</section>`; }).join('')}
-    ${COURSES[cid]&&COURSES[cid].offer?weeklyBtn(cid):''}
     ${COURSES[cid]&&COURSES[cid].offer?`<article class="pcard"><b class="pc-title">প্রতিদিন লাইভ পরীক্ষা দিয়ে পুরো প্রস্তুতি নিতে চাও?</b><button class="btn" data-course="${cid}">${esc(ptitle(COURSES[cid]))} দেখো</button></article>`:''}
   </div>`;
 }
@@ -1410,14 +1426,16 @@ function pdfEditor(key,files){
   </div>`;
 }
 function pdfTarget(key){ if(key.indexOf('fr|')===0){ const fr=frInit(); fr.dirty=true; const k=key.split('|')[1]; return fr.items[k]=fr.items[k]||[]; } if(key==='cf'){ const cf=cfInit(); cf.dirty=true; cf.vals.files=cf.vals.files||[]; return cf.vals.files; } if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
-function specialExams(cid){
-  return Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid&&typeof r.date==='string'&&canSee(r)).map(r=>({
-    xid:String(r.id).split('_').pop(), id:r.id, pending:!isLive(r), publishAt:r.publishAt, course:cid, date:r.date, kind:'special',
+function freeExams(cid){ return specialExams(cid,true); }
+function specialExams(cid,free){
+  return Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid&&typeof r.date==='string'&&canSee(r)&&!!r.free===!!free).map(r=>({
+    kind:free?'free':'special',
+    xid:String(r.id).split('_').pop(), id:r.id, pending:!isLive(r), publishAt:r.publishAt, course:cid, date:r.date,
     title:String(r.title||'বিশেষ পরীক্ষা'), syllabus:String(r.syllabus||''), units:unitsOf(r), files:filesOf(r),
     marks:Math.min(100,Math.max(1,Math.round(+r.marks)||20)), mins:Math.min(300,Math.max(1,Math.round(+r.mins)||15))}));
 }
-const kindName=e=>e.kind==='friday'?'সাপ্তাহিক লাইভ পরীক্ষা':e.kind==='special'?(e.title||'বিশেষ পরীক্ষা'):'দৈনিক লাইভ পরীক্ষা';
-const kindShort=e=>e.kind==='friday'?'সাপ্তাহিক':e.kind==='special'?(e.title||'বিশেষ পরীক্ষা'):'দৈনিক';
+const kindName=e=>e.kind==='friday'?'সাপ্তাহিক লাইভ পরীক্ষা':e.kind==='special'?(e.title||'বিশেষ পরীক্ষা'):e.kind==='free'?(e.title||'সাপ্তাহিক ফ্রী পরীক্ষা'):'দৈনিক লাইভ পরীক্ষা';
+const kindShort=e=>e.kind==='friday'?'সাপ্তাহিক':e.kind==='special'?(e.title||'বিশেষ পরীক্ষা'):e.kind==='free'?'ফ্রী ব্যাচ':'দৈনিক';
 const keyParts=k=>{ const p=String(k||'').split('_'); return {course:p[0],date:p[1]||''}; };
 function examCard(e,showCourse){
   const d=parseD(e.date), isToday=e.date===todayISO(), fri=e.kind==='friday', sp=e.kind==='special';
@@ -1464,7 +1482,7 @@ function examAction(e){
   const nRes=leaderRows(k).length;
   return `<button class="btn" data-exstart="${k}">${e.date===today?'লাইভ পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'} · ${n}টি প্রশ্ন · ${e.mins} মিনিট</button>`;
 }
-function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id)).find(e=>examKey(e)===k); }
+function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id).concat(freeExams(id))).find(e=>examKey(e)===k); }
 function startExam(k,again){
   const e=findExam(k); if(!e||(S.exams[k]&&!again)||(again&&!S.exams[k])) return;
   if(!S.student){ return go('student',{pendingExam:k}); }
@@ -1588,7 +1606,7 @@ function xaCard(e,showCourse){
   return `<article class="xa-card">
     <div class="xa-top"><span class="xa-date">${bnD(d)}</span><span class="xa-chips"><span class="xa-pill st-${sk}">${sl}</span>
       <button class="heart ${fav?'on':''}" data-favx="${k}" aria-pressed="${fav}" aria-label="${fav?'প্রিয় থেকে সরাও':'প্রিয় পরীক্ষায় রাখো'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></div>
-    <h3 class="xa-title">${esc(kindName(e))}${e.kind==='friday'?' <span class="free-tag">ফ্রী</span>':''}</h3>
+    <h3 class="xa-title">${esc(kindName(e))}${e.kind==='free'?' <span class="free-tag">ফ্রী</span>':''}</h3>
     <div class="xa-line"><span class="chip">${esc(c.name)}${showCourse?' '+esc(c.subj||''):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
     ${units.length?`<div class="xa-line">বিষয়: ${shown.map(u=>`<span class="chip">${esc(unitChipLabel(e.course,u))}</span>`).join(' ')}${units.length>2||(e.kind==='friday'&&e.items.length)?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</div>`:''}
     ${note?`<p class="xa-note"><span aria-hidden="true">📝</span> ${esc(note)}</p>`:''}
@@ -1823,7 +1841,7 @@ function vStudent(){
 }
 
 function resultsPanel(){
-  const all=OFFER_IDS().flatMap(id=>examsFor(id)), keys=new Set(all.map(examKey));
+  const all=OFFER_IDS().flatMap(id=>examsFor(id).concat(freeExams(id))), keys=new Set(all.map(examKey));
   Object.values(RES).forEach(r=>{ if(r.examKey&&!keys.has(r.examKey)){ keys.add(r.examKey); all.push({key:r.examKey,course:r.course,date:r.date,kind:r.kind,title:'বিশেষ পরীক্ষা',marks:r.total}); } });
   const list=all.sort((a,b)=>a.date<b.date?1:-1);
   const cnt=k=>Object.values(RES).filter(r=>r.examKey===k).length;
@@ -2341,6 +2359,9 @@ function examPanel(){
     <p class="muted" style="margin:4px 0 0;font-size:14px">দৈনিক ও শুক্রবারের রুটিনের বাইরে আলাদা পরীক্ষা (যেমন মাসিক, মডেল টেস্ট) দিন। যে অধ্যায়/অনুশীলনী যোগ করবেন, সেগুলোর প্রশ্নব্যাংক থেকে প্রতিটি শিক্ষার্থী এলোমেলো প্রশ্ন পাবে। পরীক্ষার দিন সারাদিন খোলা থাকবে, মেধাতালিকা সবাই দেখবে।</p></div>
     ${OFFER_IDS().length>1?`<div class="field"><label for="xfCourse">কোর্স</label><select class="input" id="xfCourse" data-xf="course">${OFFER_IDS().map(k=>`<option value="${k}" ${k===cid?'selected':''}>${COURSES[k].name} ${COURSES[k].subj||''}</option>`).join('')}</select></div>`
       :`<p style="margin:0;font-weight:600">${COURSES[cid].name} (${COURSES[cid].sub}) · ${COURSES[cid].subj}</p>`}
+    <fieldset class="when"><legend>কাদের জন্য</legend><div class="seg">
+      <label class="seg-opt"><input type="radio" name="xf_aud" value="paid" data-xfaud="1" ${xf.aud!=='free'?'checked':''}><span>মাসিক কোর্স</span></label>
+      <label class="seg-opt"><input type="radio" name="xf_aud" value="free" data-xfaud="1" ${xf.aud==='free'?'checked':''}><span>ফ্রী ব্যাচ (সাপ্তাহিক ফ্রী পরীক্ষা)</span></label></div></fieldset>
     <div class="field"><label for="xfTitle">পরীক্ষার নাম</label><input class="input" id="xfTitle" data-xf="title" maxlength="60" placeholder="যেমন: মাসিক পরীক্ষা – নভেম্বর" value="${esc(xf.title)}"></div>
     <div class="field"><label for="xfDate">পরীক্ষার তারিখ</label><input class="input" type="date" id="xfDate" data-xf="date" value="${esc(xf.date)}"></div>
     <div class="xf-grid">
@@ -2358,7 +2379,7 @@ function examPanel(){
     <button class="btn" data-xpublish style="width:100%" ${S.xpublishing?'disabled':''}>${S.xpublishing?'প্রকাশ হচ্ছে…':'পরীক্ষা প্রকাশ কর'}</button>
   </section>
   <section class="section"><h2>যোগ করা পরীক্ষা</h2>
-    ${list.length?`<div class="xlist">${list.map(r=>`<div class="xitem"><div><b>${esc(r.title||'বিশেষ পরীক্ষা')}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':` · প্রকাশ ${fmtDT(r.publishAt)}`}</span><span class="muted">${esc(unitsOf(r).map(u=>unitLabel(cid,u)).join(', '))}${filesOf(r).length?` · ${filesOf(r).length}টি PDF`:''}</span></div>
+    ${list.length?`<div class="xlist">${list.map(r=>`<div class="xitem"><div><b>${esc(r.title||'বিশেষ পরীক্ষা')}${r.free?' <span class="free-tag">ফ্রী ব্যাচ</span>':''}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':` · প্রকাশ ${fmtDT(r.publishAt)}`}</span><span class="muted">${esc(unitsOf(r).map(u=>unitLabel(cid,u)).join(', '))}${filesOf(r).length?` · ${filesOf(r).length}টি PDF`:''}</span></div>
       <button class="link del" data-xdel="${esc(r.id)}">${xf.armed===r.id?'নিশ্চিত?':'মুছুন'}</button></div>`).join('')}</div>`:`<div class="empty">এখনো কোনো আলাদা পরীক্ষা যোগ করা হয়নি।</div>`}
   </section>`;
 }
@@ -2378,7 +2399,7 @@ async function publishSpecial(){
   const id=`exam_${cid}_${Date.now().toString(36)}`;
   S.xpublishing=true; xf.err=''; render();
   try{
-    await DB.collection('syllabus').doc(id).set({type:'exam',course:cid,title,date:xf.date,marks,mins,units,files:(xf.files||[]).slice(0,10),syllabus:syl,publishAt:w.iso,createdAt:new Date().toISOString()});
+    await DB.collection('syllabus').doc(id).set({type:'exam',course:cid,free:xf.aud==='free',title,date:xf.date,marks,mins,units,files:(xf.files||[]).slice(0,10),syllabus:syl,publishAt:w.iso,createdAt:new Date().toISOString()});
     const later=xf.when==='later';
     S.xpublishing=false; S.xf=null; xfInit().course=cid; render(); toast(later?'পরীক্ষা নির্ধারিত সময়ে প্রকাশ হবে':'পরীক্ষা প্রকাশ হয়েছে');
   }catch(e){
@@ -2580,6 +2601,7 @@ app.addEventListener('click',e=>{
     if(!S.stuOutArmed){ S.stuOutArmed=true; render(); setTimeout(()=>{ if(S.stuOutArmed){ S.stuOutArmed=false; render(); } },5000); return; }
     S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
     persist(); go('home'); toast('লগ আউট হয়েছে'); return; }
+  if(t.hasAttribute('data-fxpast')){ S.fxPast=!S.fxPast; render(); return; }
   if(t.dataset.free){ S.freeCid=t.dataset.free; S.freeFrom=S.view==='play'?'play':'home'; S.freeOpen=undefined; return go('free'); }
   if(t.dataset.freecat){ const k=t.dataset.freecat; S.freeOpen=(S.freeOpen===undefined?'sugg':S.freeOpen)===k?'':k; render(); return; }
   if(t.hasAttribute('data-frpublish')){ if(!S.frBusy) publishFree(); return; }
@@ -2706,6 +2728,7 @@ app.addEventListener('change',e=>{
   if(t.dataset.qfmode){ qfInit().mode=t.dataset.qfmode; pendingRender=false; render(); }
   if(t.dataset.rfadd!==undefined&&t.value){ const rf=rfInit(), k=t.dataset.rfadd; rf.chs=rf.chs||{}; const a=rf.chs[k]=rf.chs[k]||[]; if(!a.includes(t.value)) a.push(t.value); pendingRender=false; render(); }
   if(t.dataset.xfadd&&t.value){ const xf=xfInit(); if(!xf.units.includes(t.value)) xf.units.push(t.value); pendingRender=false; render(); }
+  if(t.dataset.xfaud){ const xf=xfInit(); xf.aud=t.value; if(t.value==='free'&&!xf.title) xf.title='সাপ্তাহিক ফ্রী পরীক্ষা'; pendingRender=false; render(); }
   if(t.dataset.xkind){ S.xfilter=t.value; S.xpage=1; pendingRender=false; render(); }
   if(t.dataset.xstat){ S.xstat=t.value; S.xpage=1; pendingRender=false; render(); }
   if(t.dataset.xgo){ S.xgo=t.value; S.xpage=1; pendingRender=false; render(); }
