@@ -356,6 +356,8 @@ select.input{appearance:auto}
 .xa-pager select{width:auto;min-height:44px;padding:0 10px}
 .xa-pager .iconbtn{font-size:26px}
 .xa-pager .iconbtn[disabled]{opacity:.35}
+.xa-study{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg)}
+.xa-study>b{font-size:15.5px}
 .xa-pdfs{display:flex;flex-direction:column;gap:6px}
 .pdf-row,.pdf-item{display:flex;align-items:center;gap:10px;min-height:46px;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--fg);text-decoration:none}
 .pdf-t{flex:1;min-width:0;font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
@@ -400,6 +402,7 @@ select.input{appearance:auto}
 .free-tag{display:inline-block;vertical-align:middle;font-size:12.5px;font-weight:700;color:#fff;background:#2e9e5b;border-radius:999px;padding:1px 9px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wk-free{background:linear-gradient(135deg,#3a2a12,#4a3416);color:#ffe2b8}:root:not([data-theme="light"]) .wk-free small{color:#f3c98a}}
 :root[data-theme="dark"] .wk-free{background:linear-gradient(135deg,#3a2a12,#4a3416);color:#ffe2b8}:root[data-theme="dark"] .wk-free small{color:#f3c98a}
+.hub-wide{grid-column:1/-1;display:grid}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -830,7 +833,8 @@ function vPlay(){
       return `<section class="zone ${zone[si]||'z2'}"><h2>${sec.title} স্তর</h2>
         ${list.length?list.map(k=>{ const c=COURSES[k], n=c.chapters.filter((_,i)=>chDoc(k,i)).length;
           return `<button class="ctile wide t-${c.t} ch-entry" data-course="${k}">${liveToday(k)?'<span class="live-badge"><i></i>লাইভ</span>':''}${art(c.art)}<span style="flex:1;min-width:0"><b>${c.name}${c.sub?' ('+c.sub+')':''}</b><span class="subj">${c.subj||''}</span><small>মাসিক কোর্স${c.offer?' · ৳'+bn(c.offer.price):''} · ${bn(c.chapters.length)}টি অধ্যায়${n?' · '+bn(n)+'টিতে নোট':''}</small></span>${chev}</button>
-            ${c.content?`<button class="btn ghost" data-chlist="${k}" style="width:100%">${c.name} ${c.subj||''}: অধ্যায় ও নোট</button>`:''}`; }).join('')
+            <button class="btn ghost" data-course="${k}" style="width:100%">বিস্তারিত দেখ</button>
+            ${S.enrolled&&S.enrolled[k]?`<div class="enrolled">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ নেওয়া হয়েছে</div>`:`<button class="btn" data-enroll="${k}" style="width:100%">প্যাকেজ নাও · ৳${bn(c.offer.price)}/মাস</button>`}`; }).join('')
           :`<div class="empty soon-empty">কোর্স চালু নেই, শীঘ্রই চালু হবে।</div>`}
       </section>`; }).join('')}
   </div>`;
@@ -1000,7 +1004,7 @@ function pdfEditor(key,files){
       <button type="button" class="btn ghost" data-pdfadd="${key}">+ PDF যোগ</button></div>
   </div>`;
 }
-function pdfTarget(key){ if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
+function pdfTarget(key){ if(key==='cf'){ const cf=cfInit(); cf.dirty=true; cf.vals.files=cf.vals.files||[]; return cf.vals.files; } if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
 function specialExams(cid){
   return Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid&&typeof r.date==='string'&&canSee(r)).map(r=>({
     xid:String(r.id).split('_').pop(), id:r.id, pending:!isLive(r), publishAt:r.publishAt, course:cid, date:r.date, kind:'special',
@@ -1137,6 +1141,16 @@ function xaMaterials(e){
   });
   return out;
 }
+/* পরীক্ষার PDF: পরীক্ষার সাথে দেওয়া PDF + সিলেবাসের প্রতিটি অধ্যায়/অনুশীলনীর PDF লাইব্রেরি (অ্যাডমিন → অধ্যায় ট্যাব) থেকে স্বয়ংক্রিয়ভাবে */
+function examPdfs(e){
+  const out=[], seen=new Set(), add=f=>{ if(f&&f.u&&!seen.has(f.u)){ seen.add(f.u); out.push(f); } };
+  (e.files||[]).forEach(add);
+  examChapters(e).forEach(u=>{
+    if(u.ex){ const r=exDoc(e.course,u.ex); if(r){ filesOf(r).forEach(add); const l=safeLink(r.link); if(l) add({t:`অনুশীলনী ${u.ex}: লিংক`,u:l}); } }
+    const r=chDoc(e.course,u.ch-1); if(r){ filesOf(r).forEach(add); const l=safeLink(r.link); if(l) add({t:`অধ্যায় ${u.ch}: লিংক`,u:l}); }
+  });
+  return out;
+}
 function xaFiltered(){
   const ids=[hubCourse()], f=S.xfilter||'all', st=S.xstat||'all', q=String(S.xq||'').trim().toLowerCase(), gd=S.xgo||'';
   const today=todayISO();
@@ -1155,7 +1169,7 @@ function xaCard(e,showCourse){
   const k=examKey(e), d=parseD(e.date), [sk,sl]=xaStatus(e), done=S.exams[k], today=todayISO(), c=COURSES[e.course];
   const units=examChapters(e), open=S.xmore===k, shown=open?units:units.slice(0,2);
   const note=e.kind==='friday'?(e.items.length?(open?e.items.map(it=>`${it.day}: ${it.text}`).join(' · '):'আগের ৬ দিনের পরীক্ষার সিলেবাস'):'আগের ৬ দিনের পরীক্ষার সিলেবাস'):(e.syllabus&&e.syllabus!==autoSyl(e.course,units)?e.syllabus:'');
-  const mats=xaMaterials(e), files=e.files||[], nMat=mats.length+files.length, matOpen=S.xmat===k;
+  const mats=xaMaterials(e), files=examPdfs(e), nMat=mats.length+files.length, matOpen=S.xmat===k;
   const fav=!!(S.favx&&S.favx[k]);
   const running=S.examRun&&!S.examRun.done&&S.examRun.key===k, pool=examPool(e).length;
   let left='', right='', three=false;
@@ -1173,8 +1187,10 @@ function xaCard(e,showCourse){
     <div class="xa-line"><span class="chip">${esc(c.name)}${showCourse?' '+esc(c.subj||''):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
     ${units.length?`<div class="xa-line">বিষয়: ${shown.map(u=>`<span class="chip">${esc(unitChipLabel(e.course,u))}</span>`).join(' ')}${units.length>2||(e.kind==='friday'&&e.items.length)?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</div>`:''}
     ${note?`<p class="xa-note"><span aria-hidden="true">📝</span> ${esc(note)}</p>`:''}
-    ${nMat?`<button class="xa-mat" data-xmat="${k}" aria-expanded="${matOpen}"><span aria-hidden="true">📚</span> স্টাডি ম্যাটেরিয়াল (${bn(nMat)}) ${matOpen?'▾':'›'}</button>
-      ${matOpen?`<div class="xa-mats">${pdfList(files)}${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}`:''}
+    ${nMat?`<section class="xa-study" aria-label="স্টাডি ম্যাটেরিয়াল"><b><span aria-hidden="true">📚</span> স্টাডি ম্যাটেরিয়াল (${bn(nMat)})</b>
+      ${pdfList(matOpen?files:files.slice(0,3))}
+      ${matOpen||!files.length?`<div class="xa-mats">${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}
+      ${files.length>3||(files.length&&mats.length)?`<button class="link" data-xmat="${k}" style="align-self:flex-start">${matOpen?'কম দেখাও':`সব দেখাও (${bn(nMat)})`}</button>`:''}</section>`:''}
     <div class="xa-act ${three?'three':left?'':'one'}">${left}${right}</div>
     ${e.date>today&&!e.pending&&!done?`<span class="muted xa-opens">পরীক্ষার দিন (${bnD(d)}) খুলবে, সারাদিন খোলা থাকবে</span>`:''}
     ${done&&!running&&S.retakes[k]?`<span class="muted" style="font-size:13px">আবার দিয়েছ ${bn(S.retakes[k].count)} বার · সেরা ${S.retakes[k].best}/${S.retakes[k].total} (মেধাতালিকায় প্রথমবারের নম্বর)</span>`:''}
@@ -1223,7 +1239,7 @@ function examTiles(cid){
     ${t('routine','calendar','রুটিন')}${t('xresults','check','ফলাফল',nRes)}
     ${t('xarchive','archive','আর্কাইভ')}${t('xfav','star','প্রিয়',nF+Object.keys(S.favx||{}).filter(k=>keyParts(k).course===cid).length)}
     ${t('xsyl','syl','সিলেবাস')}${t('xmerit','medal','মেধাতালিকা')}
-    ${t('xwrong','xcircle','ভুল ও উত্তরহীন',nW)}${t('xnotes','files','নোট ও PDF')}
+    <span class="hub-wide">${t('xwrong','xcircle','ভুল ও উত্তরহীন',nW)}</span>
   </div>`;
 }
 function vExams(){
@@ -1785,6 +1801,7 @@ function vExercise(){
         ${!isLive(r)?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(r.publishAt)} থেকে</span>`:''}
         ${r.note?`<p class="syl-text">${esc(r.note)}</p>`:''}
         ${link?`<a class="btn ghost linkbtn" href="${esc(link)}" target="_blank" rel="noopener">${svg('play')}<span>ভিডিও / লিংক খুলুন</span></a>`:''}
+        ${pdfList(filesOf(r))}
         <span class="muted" style="font-size:12.5px">প্রকাশ: ${fmtDT(r.publishAt||r.updatedAt)}</span>
       </section>`:`<div class="empty">এই অনুশীলনীর নোট এখনো প্রকাশ হয়নি।</div>`}
     ${CAN_EDIT?(b.length?mcqBox(cid,exDom(ex),b,`অনুশীলনী ${ex}-এর MCQ`):`<div class="empty" style="padding:12px">এই অনুশীলনীর MCQ এখনো যোগ হয়নি।</div>`):''}
@@ -1838,6 +1855,7 @@ function vChapter(){
         ${r.pending||!isLive(r)?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(r.publishAt)} থেকে</span>`:''}
         ${r.note?`<p class="syl-text">${esc(r.note)}</p>`:''}
         ${link?`<a class="btn ghost linkbtn" href="${esc(link)}" target="_blank" rel="noopener">${svg('play')}<span>ভিডিও / লিংক খুলুন</span></a>`:''}
+        ${pdfList(filesOf(r))}
         <span class="muted" style="font-size:12.5px">প্রকাশ: ${fmtDT(r.publishAt||r.updatedAt)}</span>
       </section>`
       :(chFiles(cid,i).length&&CAN_EDIT?'':`<div class="empty">এই অধ্যায়ের নোট এখনো প্রকাশ হয়নি।<br>প্রকাশ হলে এখানেই দেখা যাবে।</div>`)}
@@ -1856,7 +1874,7 @@ const cfDocId=cf=>cf.ex?exNoteId(cf.course,cf.ex):chId(cf.course,cf.no);
 function cfInit(){
   if(!S.cf) S.cf={course:CH_COURSES()[0], no:0, ex:'', when:'now', at:'', vals:null, armed:false, dirty:false};
   if(!S.cf.vals){ const r=SYL[cfDocId(S.cf)];
-    S.cf.vals={title:r&&r.title?String(r.title):(S.cf.ex?'অনুশীলনী '+S.cf.ex:COURSES[S.cf.course].chapters[S.cf.no]), note:r?String(r.note||''):'', link:r?String(r.link||''):''}; }
+    S.cf.vals={title:r&&r.title?String(r.title):(S.cf.ex?'অনুশীলনী '+S.cf.ex:COURSES[S.cf.course].chapters[S.cf.no]), note:r?String(r.note||''):'', link:r?String(r.link||''):'', files:r?filesOf(r):[]}; }
   return S.cf;
 }
 function chapterPanel(){
@@ -1875,6 +1893,8 @@ function chapterPanel(){
       <textarea class="input area" id="cfNote" data-cfv="note" maxlength="5000" rows="8" placeholder="যেমন: মূল সূত্র, গুরুত্বপূর্ণ উদাহরণ, কোন অনুশীলনী করতে হবে">${esc(cf.vals.note)}</textarea></div>
     <div class="field"><label for="cfLink">ভিডিও বা ফাইলের লিংক (ঐচ্ছিক)</label>
       <input class="input" id="cfLink" data-cfv="link" type="url" inputmode="url" placeholder="https://youtube.com/..." value="${esc(cf.vals.link)}"></div>
+    <div class="field"><label>এই ${cf.ex?'অনুশীলনীর':'অধ্যায়ের'} PDF (স্টাডি ম্যাটেরিয়াল)</label>${pdfEditor('cf',cf.vals.files)}
+      <span class="muted" style="font-size:13px">এখানে একবার PDF দিলে যে পরীক্ষার সিলেবাসে এই ${cf.ex?'অনুশীলনী':'অধ্যায়'} থাকবে, সেই পরীক্ষার "স্টাডি ম্যাটেরিয়াল"-এ PDF নিজে থেকে চলে যাবে।</span></div>
     ${whenUI('cf',cf)}
     <div class="error" id="cfErr" role="alert"></div>
     <button class="btn" data-cpublish style="width:100%" ${S.cpublishing?'disabled':''}>${S.cpublishing?'প্রকাশ হচ্ছে…':cf.ex?'অনুশীলনী '+cf.ex+'-এর নোট প্রকাশ কর':'অধ্যায়ের নোট প্রকাশ কর'}</button>
@@ -1886,13 +1906,14 @@ function chapterPanel(){
 async function publishChapter(){
   const cf=cfInit(), el=()=>document.getElementById('cfErr'), w=whenISO(cf);
   const title=cf.vals.title.trim(), note=cf.vals.note.trim(), link=cf.vals.link.trim();
-  if(!note&&!link){ el().textContent='নোট অথবা লিংক, অন্তত একটি দিন।'; return; }
+  const files=(cf.vals.files||[]).slice(0,10);
+  if(!note&&!link&&!files.length){ el().textContent='নোট, লিংক বা PDF — অন্তত একটি দিন।'; return; }
   if(link&&!safeLink(link)){ el().textContent='লিংকটি https:// দিয়ে শুরু হতে হবে।'; return; }
   if(w.err){ el().textContent=w.err; return; }
   S.cpublishing=true; render();
   try{
-    await DB.collection('syllabus').doc(cfDocId(cf)).set(cf.ex?{type:'exnote',course:cf.course,no:cf.no+1,ex:cf.ex,title:title||'অনুশীলনী '+cf.ex,note,link,publishAt:w.iso,updatedAt:new Date().toISOString()}
-      :{type:'chapter',course:cf.course,no:cf.no+1,title:title||COURSES[cf.course].chapters[cf.no],note,link,publishAt:w.iso,updatedAt:new Date().toISOString()});
+    await DB.collection('syllabus').doc(cfDocId(cf)).set(cf.ex?{type:'exnote',course:cf.course,no:cf.no+1,ex:cf.ex,title:title||'অনুশীলনী '+cf.ex,note,link,files,publishAt:w.iso,updatedAt:new Date().toISOString()}
+      :{type:'chapter',course:cf.course,no:cf.no+1,title:title||COURSES[cf.course].chapters[cf.no],note,link,files,publishAt:w.iso,updatedAt:new Date().toISOString()});
     S.cpublishing=false; cf.vals=null; cf.dirty=false; const later=cf.when==='later'; cf.when='now'; cf.at=''; render();
     toast(later?'নোট নির্ধারিত সময়ে প্রকাশ হবে':'অধ্যায়ের নোট প্রকাশ হয়েছে');
   }catch(e){
