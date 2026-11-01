@@ -520,6 +520,14 @@ select.input{appearance:auto}
 .prow-hint{margin:-4px 0 0;font-size:12.5px;color:var(--muted);text-align:right}
 .cbanner.free{background:linear-gradient(125deg,#064e3b,#0f8a5f,#22c55e,#14b8a6,#0f766e,#064e3b);background-size:320% 320%}
 .cbanner.free .cb-badge{color:#0f8a5f}
+.fr-row{display:flex;gap:12px;align-items:center;border-top:1px solid var(--line);padding:8px 2px}
+.fr-row.today{background:var(--accent-soft);border-radius:10px;border-top-color:transparent}
+.fr-d{width:54px;flex-shrink:0;text-align:center;font-size:12px;color:var(--muted);line-height:1.2}
+.fr-d b{display:block;font-size:20px;color:var(--fg)}.fr-d small{display:block}
+.fr-t{flex:1;min-width:0;font-size:14.5px;line-height:1.5}
+.fr-k{display:inline-block;font-size:11.5px;font-weight:700;color:#fff;background:var(--k);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:middle}
+.fr-adm{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:16px;padding:12px}
+.fr-adm h3{margin:0;font-size:17px}
 .free-exam{display:flex;flex-direction:column;gap:10px;border:2px solid #22c55e;border-radius:20px;padding:12px;background:linear-gradient(180deg,#e9fbf0,transparent 70%)}
 :root[data-theme="dark"] .free-exam{background:linear-gradient(180deg,#0f2a1c,transparent 70%)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .free-exam{background:linear-gradient(180deg,#0f2a1c,transparent 70%)}}
@@ -1014,12 +1022,27 @@ function vCourse(){
 /* দশম শ্রেণি ফ্রী ব্যাচ: সাজেশন PDF, NCTB বই, টেস্ট পরীক্ষার প্রশ্ন সমাধান (অ্যাডমিন → ফ্রী ব্যাচ ট্যাব থেকে দেওয়া) */
 const FREE_BATCH={c10:{title:'দশম শ্রেণি ফ্রী ব্যাচ',banner:{badge:'ফ্রী',main:'দশম শ্রেণি',sub:'ফ্রী ব্যাচ'}}};
 const FREE_CATS=[['sugg','ফ্রী সাজেশন PDF','📄','গুরুত্বপূর্ণ অধ্যায় ও প্রশ্নের সাজেশন'],['nctb','NCTB বই','📚','বোর্ডের পাঠ্যবই (অনলাইন সংস্করণ)'],['test','টেস্ট পরীক্ষার প্রশ্ন সমাধান','✅','বিভিন্ন স্কুলের টেস্ট পরীক্ষার প্রশ্ন ও সমাধান']];
-const FREE_DEFAULT={nctb:[{t:'NCTB পাঠ্যপুস্তক (অনলাইন সংস্করণ)',u:'https://nctb.gov.bd/'}]};
+const NCTB_MATH={t:'নবম-দশম শ্রেণি গণিত বই ২০২৬ (NCTB অফিসিয়াল)',u:'https://nctb.gov.bd/pages/static-pages/695b99afc4774958d7b70612'};
+const FREE_DEFAULT={nctb:[NCTB_MATH]};
 const freeId=cid=>`freebatch_${cid}`;
 function freeItems(cid){
   const r=SYL[freeId(cid)], out={};
   FREE_CATS.forEach(([k])=>{ const a=r&&r.items&&Array.isArray(r.items[k])?r.items[k].filter(f=>f&&safeLink(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:safeLink(f.u)})):null; out[k]=a&&a.length?a:(r&&r.items&&Array.isArray(r.items[k])?[]:(FREE_DEFAULT[k]||[])); });
   return out;
+}
+const FR_TYPES={exam:['পরীক্ষা','#e53935'],study:['পড়া','#1e88e5'],pdf:['সাজেশন/PDF','#2e9e5b']};
+function freeRoutine(cid){
+  const r=SYL[freeId(cid)], rows=(r&&Array.isArray(r.routine)?r.routine:[]).filter(x=>x&&/^\d{4}-\d{2}-\d{2}$/.test(x.d)).map(x=>({d:x.d,t:String(x.t||'').slice(0,120),k:FR_TYPES[x.k]?x.k:'study'}));
+  if(RSTATE==='ready') freeExams(cid).filter(e=>!e.pending||CAN_EDIT).forEach(e=>{ if(!rows.some(x=>x.d===e.date&&x.k==='exam')) rows.push({d:e.date,t:`${e.title} · ${bn(e.marks)} নম্বর · ${bn(e.mins)} মিনিট${examChapters(e).length?' · '+examChapters(e).map(u=>unitLabel(cid,u)).join(', '):''}`,k:'exam',auto:true}); });
+  return rows.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);
+}
+function freeRoutineSection(cid){
+  const today=todayISO(), rows=freeRoutine(cid), up=rows.filter(x=>x.d>=today), past=rows.filter(x=>x.d<today).reverse();
+  const row=x=>{ const d=parseD(x.d); return `<div class="fr-row ${x.d===today?'today':''}"><span class="fr-d"><b>${bn(d.getDate())}</b>${MONN[d.getMonth()].slice(0,3)}<small>${DAYN[d.getDay()].replace('বার','')}</small></span>
+    <span class="fr-t"><span class="fr-k" style="--k:${FR_TYPES[x.k][1]}">${FR_TYPES[x.k][0]}</span>${esc(x.t)}</span></div>`; };
+  return `<section class="free-sec open fr-box"><div class="free-head" style="cursor:default"><span class="free-ic">🗓️</span><span style="flex:1;min-width:0"><b>ফ্রী ব্যাচ রুটিন</b><small>কবে কী পড়বে, কবে ফ্রী পরীক্ষা</small></span></div>
+    ${up.length?up.map(row).join(''):`<div class="empty" style="padding:12px">নতুন রুটিন শীঘ্রই প্রকাশ হবে।</div>`}
+    ${past.length?`<button class="link" data-frpast style="align-self:center">${S.frPast?'আগের রুটিন লুকাও':`আগের রুটিন (${bn(past.length)}টি)`}</button>${S.frPast?past.map(row).join(''):''}`:''}</section>`;
 }
 function freeBanner(cid,size){
   const b=FREE_BATCH[cid].banner, sym=['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
@@ -1048,6 +1071,7 @@ function vFree(){
     ${freeBanner(cid,'big')}
     <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। এসএসসি পরীক্ষার প্রস্তুতির জন্য সাজেশন, বোর্ডের বই আর টেস্ট পরীক্ষার প্রশ্নের সমাধান এক জায়গায়।</p></div>
     ${freeExamSection(cid)}
+    ${freeRoutineSection(cid)}
     ${FREE_CATS.map(([k,l,ic,d])=>{ const a=items[k]||[], on=open===k;
       return `<section class="free-sec ${on?'open':''}"><button class="free-head" data-freecat="${k}" aria-expanded="${on}"><span class="free-ic">${ic}</span><span style="flex:1;min-width:0"><b>${l}</b><small>${d}</small></span><span class="free-n">${a.length?bn(a.length)+'টি':'শীঘ্রই'}</span><span class="free-ch">${on?'▾':'›'}</span></button>
         ${on?(a.length?pdfList(a):`<div class="empty" style="padding:12px">শীঘ্রই এখানে যোগ হবে।</div>`):''}</section>`; }).join('')}
@@ -1056,21 +1080,33 @@ function vFree(){
 }
 /* অ্যাডমিন: ফ্রী ব্যাচের PDF */
 function frInit(){
-  if(!S.fr){ const it=freeItems('c10'); S.fr={cid:'c10',items:{sugg:it.sugg.slice(),nctb:it.nctb.slice(),test:it.test.slice()},dirty:false}; }
+  if(!S.fr){ const it=freeItems('c10'), r=SYL[freeId('c10')]; S.fr={cid:'c10',items:{sugg:it.sugg.slice(),nctb:it.nctb.slice(),test:it.test.slice()},routine:(r&&Array.isArray(r.routine)?r.routine:[]).map(x=>({d:x.d,t:x.t,k:x.k})),rd:{d:todayISO(),t:'',k:'study'},dirty:false}; }
   return S.fr;
 }
 function freePanel(){
   const fr=frInit();
   return `<section class="admin" aria-label="ফ্রী ব্যাচ"><div><span class="offer-tag">সবার জন্য ফ্রী</span><h2 class="display" style="font-size:22px;margin-top:6px">${esc(FREE_BATCH[fr.cid].title)}</h2>
     <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → দশম শ্রেণি ফ্রী ব্যাচ থেকে দেখবে। PDF Google Drive-এ রেখে "Anyone with the link" করে লিংক দিন।</p></div>
+    <section class="fr-adm"><h3>🎁 সাপ্তাহিক ফ্রী পরীক্ষা</h3>
+      ${(()=>{ const fx=Object.values(SYL).filter(r=>r.type==='exam'&&r.free&&r.course===fr.cid).sort((a,b)=>a.date<b.date?1:-1);
+        return fx.length?`<div class="xlist">${fx.slice(0,5).map(r=>`<div class="xitem"><div><b>${esc(r.title)}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':' · প্রকাশ '+fmtDT(r.publishAt)}</span></div><button class="link del" data-xdel="${esc(r.id)}">মুছুন</button></div>`).join('')}</div>`:'<p class="muted" style="margin:0">এখনো কোনো ফ্রী পরীক্ষা নেই।</p>'; })()}
+      <button class="btn" data-newfree style="width:100%">+ নতুন ফ্রী পরীক্ষা যোগ কর</button></section>
+    <section class="fr-adm"><h3>🗓️ ফ্রী ব্যাচ রুটিন</h3>
+      <p class="muted" style="margin:0;font-size:13px">ফ্রী পরীক্ষাগুলো রুটিনে নিজে থেকে দেখায়। এখানে পড়ার দিন বা সাজেশন দেওয়ার দিনও যোগ করতে পারেন।</p>
+      ${fr.routine.slice().sort((a,b)=>a.d<b.d?-1:1).map((x,i)=>`<div class="pdf-item"><span class="fr-k" style="--k:${(FR_TYPES[x.k]||FR_TYPES.study)[1]}">${(FR_TYPES[x.k]||FR_TYPES.study)[0]}</span><span class="pdf-t">${fmtD(parseD(x.d))} · ${esc(x.t)}</span><button type="button" class="link del" data-frrm="${esc(x.d+'|'+x.t)}">বাদ</button></div>`).join('')}
+      <div class="xf-grid"><input class="input" type="date" data-frd="d" value="${esc(fr.rd.d)}" aria-label="তারিখ"><select class="input" data-frd="k" aria-label="ধরন">${Object.entries(FR_TYPES).map(([k,[l]])=>`<option value="${k}" ${fr.rd.k===k?'selected':''}>${l}</option>`).join('')}</select></div>
+      <input class="input" data-frd="t" maxlength="120" placeholder="যেমন: অধ্যায় ৩ — বীজগাণিতিক রাশি (অনুশীলনী 3.1, 3.2)" value="${esc(fr.rd.t)}">
+      <button type="button" class="btn ghost" data-fradd>+ রুটিনে যোগ</button></section>
+    <section class="fr-adm"><h3>📚 PDF ও বই</h3>
     ${FREE_CATS.map(([k,l,ic])=>`<div class="field"><label>${ic} ${l}</label>${pdfEditor('fr|'+k,fr.items[k])}</div>`).join('')}
+    ${fr.items.nctb.some(f=>f.u===NCTB_MATH.u)?'':`<button type="button" class="link" data-nctbmath style="align-self:flex-start">+ NCTB গণিত বই (অফিসিয়াল) যোগ করো</button>`}</section>
     <div class="error" id="frErr" role="alert"></div>
-    <button class="btn" data-frpublish style="width:100%" ${S.frBusy?'disabled':''}>${S.frBusy?'প্রকাশ হচ্ছে…':'ফ্রী ব্যাচ প্রকাশ কর'}</button>
+    <button class="btn" data-frpublish style="width:100%" ${S.frBusy?'disabled':''}>${S.frBusy?'প্রকাশ হচ্ছে…':'ফ্রী ব্যাচ (রুটিন ও PDF) প্রকাশ কর'}</button>
   </section>`;
 }
 async function publishFree(){
   const fr=frInit(); S.frBusy=true; render();
-  try{ await DB.collection('syllabus').doc(freeId(fr.cid)).set({type:'freebatch',course:fr.cid,items:{sugg:fr.items.sugg.slice(0,30),nctb:fr.items.nctb.slice(0,30),test:fr.items.test.slice(0,30)},updatedAt:new Date().toISOString()});
+  try{ await DB.collection('syllabus').doc(freeId(fr.cid)).set({type:'freebatch',course:fr.cid,items:{sugg:fr.items.sugg.slice(0,30),nctb:fr.items.nctb.slice(0,30),test:fr.items.test.slice(0,30)},routine:fr.routine.slice(0,100),updatedAt:new Date().toISOString()});
     S.frBusy=false; S.fr=null; render(); toast('ফ্রী ব্যাচ প্রকাশ হয়েছে'); }
   catch(e){ S.frBusy=false; render(); const el=document.getElementById('frErr'); if(el) el.textContent=e&&e.code==='permission_denied'?'প্রকাশের অনুমতি নেই। আবার অ্যাডমিন লগইন করুন।':'প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
 }
@@ -2601,6 +2637,12 @@ app.addEventListener('click',e=>{
     if(!S.stuOutArmed){ S.stuOutArmed=true; render(); setTimeout(()=>{ if(S.stuOutArmed){ S.stuOutArmed=false; render(); } },5000); return; }
     S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
     persist(); go('home'); toast('লগ আউট হয়েছে'); return; }
+  if(t.hasAttribute('data-frpast')){ S.frPast=!S.frPast; render(); return; }
+  if(t.hasAttribute('data-newfree')){ S.xf=null; const xf=xfInit(); xf.aud='free'; xf.title='সাপ্তাহিক ফ্রী পরীক্ষা'; S.atab='exam'; render(); window.scrollTo(0,0); return; }
+  if(t.hasAttribute('data-nctbmath')){ const fr=frInit(); fr.items.nctb.unshift(Object.assign({},NCTB_MATH)); fr.dirty=true; render(); return; }
+  if(t.hasAttribute('data-fradd')){ const fr=frInit(), x=fr.rd; if(!/^\d{4}-\d{2}-\d{2}$/.test(x.d||'')){ toast('তারিখ দিন'); return; } if(String(x.t||'').trim().length<2){ toast('বিষয় লিখুন'); return; }
+    fr.routine.push({d:x.d,t:String(x.t).trim().slice(0,120),k:x.k||'study'}); fr.rd={d:x.d,t:'',k:x.k}; fr.dirty=true; render(); toast('রুটিনে যোগ হয়েছে · প্রকাশ চাপলে সংরক্ষণ হবে'); return; }
+  if(t.dataset.frrm){ const fr=frInit(), [d,...tt]=t.dataset.frrm.split('|'), txt=tt.join('|'); const i=fr.routine.findIndex(x=>x.d===d&&x.t===txt); if(i>=0) fr.routine.splice(i,1); fr.dirty=true; render(); return; }
   if(t.hasAttribute('data-fxpast')){ S.fxPast=!S.fxPast; render(); return; }
   if(t.dataset.free){ S.freeCid=t.dataset.free; S.freeFrom=S.view==='play'?'play':'home'; S.freeOpen=undefined; return go('free'); }
   if(t.dataset.freecat){ const k=t.dataset.freecat; S.freeOpen=(S.freeOpen===undefined?'sugg':S.freeOpen)===k?'':k; render(); return; }
@@ -2709,6 +2751,7 @@ app.addEventListener('input',e=>{
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
   if(t.dataset.xf&&t.dataset.xf!=='course'){ xfInit()[t.dataset.xf]=t.value; }
   if(t.dataset.pdft!==undefined||t.dataset.pdfu!==undefined){ const key=t.dataset.pdft||t.dataset.pdfu; S.pdfDraft=S.pdfDraft||{}; const d=S.pdfDraft[key]=S.pdfDraft[key]||{t:'',u:''}; if(t.dataset.pdft!==undefined) d.t=t.value; else d.u=t.value; }
+  if(t.dataset.frd){ const fr=frInit(); fr.rd[t.dataset.frd]=t.value; }
   if(t.dataset.fbf){ const f=fbInit(); f[t.dataset.fbf]=t.value; if(t.dataset.fbf==='text'){ const c=document.getElementById('fbCount'); if(c) c.textContent=bn(t.value.length)+'/১০০০'; } }
   if(t.dataset.xq){ S.xq=t.value; S.xpage=1; const el=document.getElementById('xaList'); if(el&&!routineStateMsg()) el.innerHTML=xaListHTML(); }
 });
