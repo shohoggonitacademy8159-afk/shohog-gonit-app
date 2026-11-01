@@ -420,6 +420,53 @@ select.input{appearance:auto}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wk-free{background:linear-gradient(135deg,#3a2a12,#4a3416);color:#ffe2b8}:root:not([data-theme="light"]) .wk-free small{color:#f3c98a}}
 :root[data-theme="dark"] .wk-free{background:linear-gradient(135deg,#3a2a12,#4a3416);color:#ffe2b8}:root[data-theme="dark"] .wk-free small{color:#f3c98a}
 .hub-wide{grid-column:1/-1;display:grid}
+.cbanner{position:relative;overflow:hidden;border-radius:18px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;
+  background:linear-gradient(125deg,#5c0a17,#b3152f,#e4322b,#ff6a3d,#c41d3a,#5c0a17);background-size:320% 320%;animation:cbg 10s ease-in-out infinite;isolation:isolate}
+.cbanner.big{min-height:200px;padding:22px 14px}
+.cbanner.sm{min-height:150px;padding:16px 10px}
+.cb-badge{background:#fff;color:#c4142f;font-weight:800;font-size:20px;letter-spacing:.02em;border-radius:8px;padding:2px 12px;box-shadow:0 4px 14px rgba(0,0,0,.25);animation:cbp 2.6s ease-in-out infinite;font-family:system-ui,sans-serif}
+.cb-main{font-size:30px;font-weight:800;line-height:1.15;text-shadow:0 3px 12px rgba(0,0,0,.3)}
+.cbanner.sm .cb-main{font-size:24px}
+.cb-sub{font-size:18px;font-weight:700;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:1px 14px}
+.cbanner.sm .cb-sub{font-size:15px}
+.cb-chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;margin-top:4px;color:#ffe9c9}
+.cb-chip i{width:8px;height:8px;border-radius:50%;background:#ffd34d;box-shadow:0 0 0 0 rgba(255,211,77,.8);animation:cbdot 1.6s infinite}
+.cb-sym{position:absolute;z-index:-1;font-weight:800;color:rgba(255,255,255,.16);font-size:calc(18px + (var(--i) * 3px % 22px));left:calc(var(--i) * 10% + 2%);bottom:-30px;animation:cbfloat calc(7s + var(--i) * .6s) linear infinite;animation-delay:calc(var(--i) * -1.3s)}
+.cb-shine{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);transform:translateX(-120%);animation:cbshine 4.5s ease-in-out infinite}
+@keyframes cbg{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes cbp{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes cbdot{0%{box-shadow:0 0 0 0 rgba(255,211,77,.8)}70%{box-shadow:0 0 0 8px rgba(255,211,77,0)}100%{box-shadow:0 0 0 0 rgba(255,211,77,0)}}
+@keyframes cbfloat{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(-260px) rotate(200deg);opacity:0}}
+@keyframes cbshine{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
+@media (prefers-reduced-motion:reduce){.cbanner,.cb-badge,.cb-chip i,.cb-sym,.cb-shine{animation:none}.cb-shine{display:none}}
+.pcard{position:relative;display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.pcard .live-badge{top:4px;right:4px;z-index:3}
+.pc-img{border:0;padding:0;background:none;cursor:pointer;border-radius:18px;transition:transform .2s}
+.pc-img:active{transform:scale(.98)}
+.pc-title{font-size:18px;line-height:1.45;padding:0 4px}
+.pc-more{align-self:flex-start;border:0;background:none;color:#1f9d55;font:inherit;font-size:18px;font-weight:600;padding:2px 4px 6px;cursor:pointer}
+.cd-top{font-size:17px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.cd-title{margin:0;font-size:22px;line-height:1.4}
+.cd-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.cd-stats div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 4px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.cd-stats b{font-size:18px;color:var(--accent)}.cd-stats span{font-size:12px;color:var(--muted)}
+.feat-list{background:#121a2b;border-radius:18px;padding:8px;display:flex;flex-direction:column}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;border:0;background:none;color:#eef2fa;font:inherit;padding:10px 8px;border-radius:12px;cursor:pointer;animation:featin .45s ease both;animation-delay:calc(var(--d) * 45ms)}
+.feat:hover{background:rgba(255,255,255,.04)}
+.feat-ic{width:38px;height:38px;border-radius:50%;background:var(--fc);display:grid;place-items:center;flex-shrink:0;box-shadow:0 0 0 4px color-mix(in srgb,var(--fc) 22%,transparent)}
+.feat-ic svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.feat-t{min-width:0;display:flex;flex-direction:column;gap:2px}
+.feat-t b{font-size:16px}
+.feat-t span{font-size:14px;color:#aab4c8;line-height:1.5;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.feat.open .feat-t span{-webkit-line-clamp:unset;display:block}
+@keyframes featin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.feat{animation:none}}
+.cd-week{display:flex;flex-direction:column;gap:8px}
+.cdet{padding-bottom:180px}
+.buybar{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:6;display:flex;align-items:center;gap:12px;max-width:460px;margin:0 auto;padding:10px 16px;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.08)}
+.bb-price{flex:1;display:flex;flex-direction:column;line-height:1.2}
+.bb-price span{font-size:13px;color:var(--muted)}.bb-price b{font-size:24px;color:var(--fg)}
+.bb-btn{background:#1f9d55!important;color:#fff!important;min-height:52px;padding:0 22px;font-size:17px;box-shadow:0 4px 0 #157a40}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -609,6 +656,7 @@ const COURSES = {
   h12:{name:'দ্বাদশ শ্রেণি', sub:'এইচএসসি ২৭', subj:'উচ্চতর গণিত ২য় পত্র', art:'gradF', t:'sky', chapters:['বাস্তব সংখ্যা ও অসমতা','যোগাশ্রয়ী প্রোগ্রাম','জটিল সংখ্যা','বহুপদী ও বহুপদী সমীকরণ','দ্বিপদী বিস্তৃতি','কণিক','বিপরীত ত্রিকোণমিতিক ফাংশন','স্থিতিবিদ্যা','সমতলে বস্তুকণার গতি','বিস্তার পরিমাপ ও সম্ভাবনা']},
   adm:{name:'এডমিশন কেয়ার', subj:'উচ্চতর গণিত (১ম ও ২য় পত্র)', art:'signpost', t:'green', chapters:['১ম পত্র: পূর্ণ রিভিশন','২য় পত্র: পূর্ণ রিভিশন','প্রকৌশল ভর্তি গণিত','ঢাবি ক-ইউনিট প্রস্তুতি','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট']}
 };
+Object.assign(COURSES.c10,{ptitle:'এসএসসি ২০২৭ সাধারণ গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'সাধারণ গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 const SECTIONS = [
   {title:'প্রাথমিক', art:'boy', rows:[{kind:'primary'}]},
   {title:'মাধ্যমিক', art:'cap', rows:[{cls:'g4', kind:'stack', ids:['c6','c7','c8','jb']},{cls:'g2', kind:'stack', ids:['c9','c9h']},{cls:'g2', kind:'stack', ids:['c10','c10h']}]},
@@ -816,7 +864,60 @@ function offerCard(id,o){
     ${examTiles(id)}
   </section>`;
 }
+const ptitle=c=>c.ptitle||`${c.name} ${c.subj||''}`;
+function courseBanner(id,size){
+  const c=COURSES[id], b=c.banner||{badge:c.sub||'', main:c.subj||c.name, sub:c.name};
+  const sym=['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
+  return `<div class="cbanner ${size||''}" aria-hidden="true">
+    ${sym.map((x,i)=>`<span class="cb-sym" style="--i:${i}">${x}</span>`).join('')}
+    <span class="cb-badge">${esc(b.badge)}</span>
+    <span class="cb-main">${esc(b.main)}</span>
+    <span class="cb-sub">${esc(b.sub)}</span>
+    <span class="cb-chip"><i></i>প্রতিদিন লাইভ পরীক্ষা</span>
+    <span class="cb-shine"></span>
+  </div>`;
+}
+function courseFeatures(id){
+  const c=COURSES[id], o=c.offer;
+  const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0), nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
+  return [
+    ['#e0457b','calendar','ডেইলি লাইভ MCQ এক্সাম',`শনি থেকে বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`],
+    ['#f08c1a','exam','সাপ্তাহিক ফ্রী পরীক্ষা',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের পরীক্ষা, সময় ${bn(o.friday.mins)} মিনিট। সিলেবাস আগের ৬ দিনের পরীক্ষার সিলেবাস। প্যাকেজ ছাড়াই সবাই দিতে পারে।`],
+    ['#e53935','report','মাসিক পরীক্ষা ও মডেল টেস্ট','রুটিনের বাইরে মাসিক পরীক্ষা ও মডেল টেস্ট। নম্বর, সময় ও সিলেবাস প্রতিবার আলাদাভাবে ঘোষণা করা হয়।'],
+    ['#8e44ef','openbook','লেকচার শিট ও স্টাডি ম্যাটেরিয়াল',`অধ্যায় ও অনুশীলনীভিত্তিক নোট ও PDF। প্রতিটি পরীক্ষার সিলেবাস অনুযায়ী PDF নিজে থেকে "স্টাডি ম্যাটেরিয়াল"-এ চলে আসে, পরীক্ষা দাও বোতামের ঠিক উপরে।`],
+    ['#1e88e5','pencil',`${bn(nq)}+ প্রশ্নের প্রশ্নব্যাংক`,`${bn(c.chapters.length)}টি অধ্যায় ও ${bn(nex)}টি অনুশীলনী জুড়ে সহজ, মধ্যম ও কঠিন প্রশ্ন। প্রতিটি শিক্ষার্থী এলোমেলোভাবে আলাদা প্রশ্ন পায়, তাই দেখাদেখির সুযোগ কম।`],
+    ['#2e9e5b','check','তাৎক্ষণিক ফলাফল ও ব্যাখ্যা','খাতা জমা দিলেই নম্বর, প্রতিটি প্রশ্নের সঠিক উত্তর ও ব্যাখ্যা। উত্তর একবার দিলে আর বদলানো যায় না, তাই আসল পরীক্ষার অভ্যাস তৈরি হয়।'],
+    ['#f2b705','medal','মেধাতালিকা','প্রতিটি পরীক্ষার মেধাতালিকা সবাই দেখতে পারে। প্রথমবার দেওয়া নম্বরে মেধাক্রম, সমান নম্বর হলে যে আগে জমা দিয়েছে সে উপরে।'],
+    ['#e0457b','xcircle','ভুল ও উত্তরহীন প্রশ্নের রিভিশন','নিজের ভুল করা আর উত্তর না দেওয়া প্রশ্নগুলো আলাদা করে সঠিক উত্তর ও ব্যাখ্যাসহ আবার দেখা যায়।'],
+    ['#8e44ef','star','আবার পরীক্ষা ও প্রিয় প্রশ্ন','যেকোনো পরীক্ষা অনুশীলনের জন্য আবার দেওয়া যায় (মেধাতালিকায় যায় না)। দরকারি প্রশ্ন ☆ দিয়ে প্রিয়তে জমা রাখা যায়।'],
+    ['#1e88e5','chart','লার্নিং রিপোর্ট','কয়টি পরীক্ষা দিয়েছ, গড় ও সর্বোচ্চ নম্বর আর অগ্রগতি এক জায়গায়।'],
+    ['#e53935','calendar','ফুল রিভিশন ও ফুল সিলেবাস মডেল টেস্ট','এসএসসি ২০২৭ বোর্ড পরীক্ষার আগে পুরো সিলেবাসে রিভিশন পরীক্ষা ও ফুল সিলেবাস মডেল টেস্ট।'],
+  ];
+}
+function vCourseOffer(){
+  const id=S.course, c=COURSES[id], o=c.offer, enrolled=!!(S.enrolled&&S.enrolled[id]);
+  const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0), nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
+  const f=courseFeatures(id), open=S.featOpen;
+  return `<div class="screen cdet">
+    <div class="topbar"><button class="iconbtn" data-go="${S.courseFrom||'home'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1 class="cd-top">${esc(ptitle(c))}</h1><span style="width:44px"></span></div>
+    ${courseBanner(id,'big')}
+    <div><h2 class="cd-title">${esc(ptitle(c))}</h2>
+      <p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">এসএসসি ২০২৭ পরীক্ষার্থীদের জন্য ${c.name} ${c.subj}-এর পুরো সিলেবাসে প্রতিদিনের লাইভ পরীক্ষা, সাপ্তাহিক পরীক্ষা ও মডেল টেস্ট।</p></div>
+    <div class="cd-stats"><div><b>${bn(c.chapters.length)}</b><span>অধ্যায়</span></div><div><b>${bn(nex)}</b><span>অনুশীলনী</span></div><div><b>${bn(nq)}+</b><span>প্রশ্ন</span></div><div><b>${bn(6)}</b><span>দিন লাইভ পরীক্ষা</span></div></div>
+    <h2 class="xa-h">কোর্সটি যেভাবে সাজানো হয়েছে</h2>
+    <div class="feat-list">${f.map(([col,ic,t,d],i)=>`<button class="feat ${open===i?'open':''}" data-feat="${i}" aria-expanded="${open===i}" style="--fc:${col};--d:${i}">
+      <span class="feat-ic">${svg(ic)}</span><span class="feat-t"><b>${esc(t)}:</b><span>${esc(d)}</span></span></button>`).join('')}</div>
+    ${weeklyBtn(id)}
+    <section class="cd-week"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:17px">এই সপ্তাহের রুটিন</b><button class="link" data-go="routine">পুরো রুটিন</button></div>${weekPreview(id)}</section>
+    ${examTiles(id)}
+    ${sylCard(id)}
+    <div class="buybar">${enrolled
+      ?`<div class="enrolled" style="flex:1">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ নেওয়া হয়েছে</div>`
+      :`<div class="bb-price"><span>মাসিক ফি</span><b>৳${bn(o.price)}</b></div><button class="btn bb-btn" data-enroll="${id}">প্যাকেজ নাও</button>`}</div>
+  </div>`;
+}
 function vCourse(){
+  if(COURSES[S.course]&&COURSES[S.course].offer) return vCourseOffer();
   const id=S.course, c=COURSES[id];
   const doneCount=c.chapters.filter((_,i)=>S.done[id+':'+i]).length;
   return `<div class="screen">
@@ -851,9 +952,10 @@ function vPlay(){
     ${SECTIONS.map((sec,si)=>{ const list=ids(sec);
       return `<section class="zone ${zone[si]||'z2'}"><h2>${sec.title} স্তর</h2>
         ${list.length?list.map(k=>{ const c=COURSES[k], n=c.chapters.filter((_,i)=>chDoc(k,i)).length;
-          return `<button class="ctile wide t-${c.t} ch-entry" data-course="${k}">${liveToday(k)?'<span class="live-badge"><i></i>লাইভ</span>':''}${art(c.art)}<span style="flex:1;min-width:0"><b>${c.name}${c.sub?' ('+c.sub+')':''}</b><span class="subj">${c.subj||''}</span><small>মাসিক কোর্স${c.offer?' · ৳'+bn(c.offer.price):''} · ${bn(c.chapters.length)}টি অধ্যায়${n?' · '+bn(n)+'টিতে নোট':''}</small></span>${chev}</button>
-            <button class="btn ghost" data-course="${k}" style="width:100%">বিস্তারিত দেখ</button>
-            ${S.enrolled&&S.enrolled[k]?`<div class="enrolled">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ নেওয়া হয়েছে</div>`:`<button class="btn" data-enroll="${k}" style="width:100%">প্যাকেজ নাও · ৳${bn(c.offer.price)}/মাস</button>`}`; }).join('')
+          return `<article class="pcard">${liveToday(k)?'<span class="live-badge"><i></i>লাইভ</span>':''}
+            <button class="pc-img" data-course="${k}" aria-label="${esc(ptitle(c))}">${courseBanner(k,'sm')}</button>
+            <b class="pc-title">${esc(ptitle(c))}</b>
+            <button class="pc-more" data-course="${k}">বিস্তারিত দেখো</button></article>`; }).join('')
           :`<div class="empty soon-empty">কোর্স চালু নেই, শীঘ্রই চালু হবে।</div>`}
       </section>`; }).join('')}
   </div>`;
@@ -2101,7 +2203,7 @@ setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 
 const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','লার্নিং রিপোর্ট','report'],['profile','আরো','grid']];
 function renderTabs(){
-  const active = S.view==='course'?'home':S.view;
+  const active = S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view;
   const live=OFFER_IDS().some(liveToday);
   tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}</span>${l}</button>`).join('');
 }
@@ -2200,6 +2302,7 @@ app.addEventListener('click',e=>{
   if(t.dataset.pdfrm){ const parts=t.dataset.pdfrm.split('|'), i=+parts.pop(), key=parts.join('|'); pdfTarget(key).splice(i,1); render(); return; }
   if(t.dataset.weekly){ S.hubCourse=t.dataset.weekly; S.hubFrom=S.view==='course'?'course':S.view==='exams'?'exams':'home'; S.wkAll=false; return go('weekly'); }
   if(t.hasAttribute('data-wkall')){ S.wkAll=true; render(); return; }
+  if(t.dataset.feat!==undefined){ const i=+t.dataset.feat; S.featOpen=S.featOpen===i?null:i; render(); return; }
   if(t.dataset.hub){ S.hubCourse=t.dataset.hubc||hubCourse(); S.hubFrom=S.view==='course'?'course':S.view==='routine'?'routine':'exams'; if(t.dataset.hub==='routine') return go('routine'); S.wlim=20; return go(t.dataset.hub); }
   if(t.dataset.hubcourse){ S.hubCourse=t.dataset.hubcourse; render(); return; }
   if(t.dataset.hubch){ const [c,i]=t.dataset.hubch.split('|'); S.course=c; S.chFrom='play'; return go('chapter',{chIdx:+i}); }
@@ -2258,7 +2361,7 @@ app.addEventListener('click',e=>{
     return go('course',{course:'p5'});
   }
   if(t.hasAttribute('data-join')){ S.joined=true; persist(); render(); toast('ফ্রী ক্লাসে জয়েন হয়েছে'); return; }
-  if(t.dataset.course) return go('course',{course:t.dataset.course});
+  if(t.dataset.course) return go('course',{course:t.dataset.course,courseFrom:S.view==='play'?'play':'home',featOpen:null});
   if(t.dataset.quiz) return startQuiz(t.dataset.quiz);
   if(t.dataset.chapter!==undefined){
     const k=S.course+':'+t.dataset.chapter;
