@@ -358,6 +358,8 @@ select.input{appearance:auto}
 .xa-pager .iconbtn[disabled]{opacity:.35}
 .xa-study{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg)}
 .xa-study>b{font-size:15.5px}
+.xa-st-btn{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;color:var(--fg);font:inherit;font-weight:700;font-size:15.5px;text-align:left;cursor:pointer;min-height:40px;padding:0}
+.xa-st-ch{color:var(--accent);font-size:18px}
 .xa-pdfs{display:flex;flex-direction:column;gap:6px}
 .pdf-row,.pdf-item{display:flex;align-items:center;gap:10px;min-height:46px;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--fg);text-decoration:none}
 .pdf-t{flex:1;min-width:0;font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
@@ -1917,10 +1919,8 @@ function xaCard(e,showCourse){
     <div class="xa-line"><span class="chip">${esc(c.name)}${c.subj?' · '+esc(c.subj):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
     ${units.length?`<div class="xa-line">বিষয়: ${shown.map(u=>`<span class="chip">${esc(unitChipLabel(e.course,u))}</span>`).join(' ')}${units.length>2||(e.kind==='friday'&&e.items.length)?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</div>`:''}
     ${note?`<p class="xa-note"><span aria-hidden="true">📝</span> ${esc(note)}</p>`:''}
-    ${nMat?`<section class="xa-study" aria-label="স্টাডি ম্যাটেরিয়াল"><b><span aria-hidden="true">📚</span> স্টাডি ম্যাটেরিয়াল (${bn(nMat)})</b>
-      ${pdfList(matOpen?files:files.slice(0,3))}
-      ${matOpen||!files.length?`<div class="xa-mats">${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}
-      ${files.length>3||(files.length&&mats.length)?`<button class="link" data-xmat="${k}" style="align-self:flex-start">${matOpen?'কম দেখাও':`সব দেখাও (${bn(nMat)})`}</button>`:''}</section>`:''}
+    ${nMat?`<section class="xa-study ${matOpen?'open':''}" aria-label="স্টাডি ম্যাটেরিয়াল"><button type="button" class="xa-st-btn" data-xmat="${k}" aria-expanded="${matOpen}"><span aria-hidden="true">📚</span><span style="flex:1">স্টাডি ম্যাটেরিয়াল (${bn(nMat)})</span><span class="xa-st-ch" aria-hidden="true">${matOpen?'▴':'▾'}</span></button>
+      ${matOpen?`${pdfList(files)}${mats.length?`<div class="xa-mats">${mats.map(m=>`<button class="link" ${m.ex?`data-xgoex="${e.course}|${m.ex}"`:`data-xgoch="${e.course}|${m.ch}"`}>${esc(m.t)}</button>`).join('')}</div>`:''}`:''}</section>`:''}
     <div class="xa-act ${three?'three':left?'':'one'}">${left}${right}</div>
     ${e.date>today&&!e.pending&&!done?`<span class="muted xa-opens">পরীক্ষার দিন (${bnD(d)}) খুলবে, সারাদিন খোলা থাকবে</span>`:''}
     ${done&&!running&&S.retakes[k]?`<span class="muted" style="font-size:13px">আবার দিয়েছ ${bn(S.retakes[k].count)} বার · সেরা ${S.retakes[k].best}/${S.retakes[k].total} (মেধাতালিকায় প্রথমবারের নম্বর)</span>`:''}
