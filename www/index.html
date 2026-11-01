@@ -527,6 +527,7 @@ button.pdf-row{width:100%;font:inherit;text-align:left;cursor:pointer}
 .prow{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -14px;padding:2px 14px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .prow::-webkit-scrollbar{display:none}
 .prow .pcard{flex:0 0 84%;scroll-snap-align:start}
+.prow-h{margin:6px 0 -4px;font-size:16px;font-weight:700}
 .prow-hint{margin:-4px 0 0;font-size:12.5px;color:var(--muted);text-align:right}
 .cbanner.free{background:linear-gradient(125deg,#064e3b,#0f8a5f,#22c55e,#14b8a6,#0f766e,#064e3b);background-size:320% 320%}
 .cbanner.free .cb-badge{color:#0f8a5f}
@@ -1125,11 +1126,12 @@ function vPlay(){
     <p class="muted" style="margin:0">যেসব কোর্স এখন চলছে, সেগুলো এখানে। কোর্সে চাপ দিলে বিস্তারিত, রুটিন ও পরীক্ষা দেখা যাবে।</p>
     ${SECTIONS.map((sec,si)=>{ const list=ids(sec);
       return `<section class="zone ${zone[si]||'z2'}"><h2>${sec.title} স্তর</h2>
-        ${list.length?`<div class="prow">${list.map(k=>{ const c=COURSES[k], n=c.chapters.filter((_,i)=>chDoc(k,i)).length;
+        ${list.length?[...new Set(list.map(k=>COURSES[k].subj||''))].map((sj,gi,all)=>{ const gl=list.filter(k=>(COURSES[k].subj||'')===sj);
+          return `${all.length>1&&sj?`<h3 class="prow-h">${esc(sj)}</h3>`:''}<div class="prow">${gl.map(k=>{ const c=COURSES[k];
           return `<article class="pcard">${liveToday(k)?'<span class="live-badge"><i></i>লাইভ</span>':''}
             <button class="pc-img" data-course="${k}" aria-label="${esc(ptitle(c))}">${courseBanner(k,'sm')}</button>
             <b class="pc-title">${esc(ptitle(c))}</b>
-            <button class="pc-more" data-course="${k}">বিস্তারিত দেখো</button></article>`+(FREE_BATCH[k]?freeCard(k):''); }).join('')}</div>${list.some(k=>FREE_BATCH[k])?'<p class="prow-hint">ডানে সরিয়ে আরও দেখো →</p>':''}`
+            <button class="pc-more" data-course="${k}">বিস্তারিত দেখো</button></article>`+(FREE_BATCH[k]?freeCard(k):''); }).join('')}</div>${gl.some(k=>FREE_BATCH[k])?'<p class="prow-hint">ডানে সরিয়ে আরও দেখো →</p>':''}`; }).join('')
           :`<div class="empty soon-empty">কোর্স চালু নেই, শীঘ্রই চালু হবে।</div>`}
       </section>`; }).join('')}
   </div>`;
