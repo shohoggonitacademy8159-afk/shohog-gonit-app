@@ -746,10 +746,11 @@ const COURSES = {
   c9h:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'উচ্চতর গণিত', art:'hmCompass', t:'purple', chapters:['সেট ও ফাংশন','বীজগাণিতিক রাশি','জ্যামিতি','জ্যামিতিক অঙ্কন','সমীকরণ','অসমতা','অসীম ধারা']},
   c10h:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', exs:{1:['1.1','1.2'],3:['3.1','3.2'],5:['5.1','5.2','5.3','5.4','5.5','5.6','5.7'],6:['6.1','6.2','6.3'],8:['8.1','8.2','8.3'],9:['9.1','9.2'],10:['10.1','10.2'],11:['11.1','11.2','11.3','11.4']}, content:true, subj:'উচ্চতর গণিত', art:'hmGraph', t:'orange', chapters:['সেট ও ফাংশন','বীজগাণিতিক রাশি','জ্যামিতি','জ্যামিতিক অঙ্কন','সমীকরণ','অসমতা','অসীম ধারা','ত্রিকোণমিতি','সূচকীয় ও লগারিদমীয় ফাংশন','দ্বিপদী বিস্তৃতি','স্থানাঙ্ক জ্যামিতি','সমতলীয় ভেক্টর','ঘন জ্যামিতি','সম্ভাবনা']},
   jb:{name:'জুনিয়র বৃত্তি গণিত', sub:'স্পেশাল ব্যাচ', art:'target', t:'yellow', chapters:['বৃত্তি পরীক্ষার সিলেবাস','অধ্যায়ভিত্তিক অনুশীলন','মানসাঙ্ক ও শর্টকাট','মডেল টেস্ট','বিগত বছরের প্রশ্ন']},
-  h11:{name:'একাদশ শ্রেণি', sub:'এইচএসসি ২৮', subj:'উচ্চতর গণিত ১ম পত্র', art:'gradM', t:'purple', chapters:['ম্যাট্রিক্স ও নির্ণায়ক','ভেক্টর','সরলরেখা','বৃত্ত','বিন্যাস ও সমাবেশ','ত্রিকোণমিতিক অনুপাত','সংযুক্ত ও যৌগিক কোণ','ফাংশন ও লেখচিত্র','অন্তরীকরণ','যোগজীকরণ']},
+  h11:{name:'একাদশ শ্রেণি', sub:'এইচএসসি ২৮', exs:{1:['1.A','1.B'],2:['2.A','2.B','2.C'],3:['3.A','3.B','3.C','3.D','3.E','3.F','3.G'],4:['4.A','4.B'],5:['5.A','5.B'],6:['6.A','6.B','6.C'],7:['7.A','7.B','7.C','7.D','7.E','7.F','7.G'],9:['9.A','9.B','9.C','9.D','9.E','9.F','9.G','9.H','9.I'],10:['10.A','10.B','10.C','10.D','10.E','10.F','10.G']}, content:true, subj:'উচ্চতর গণিত ১ম পত্র', art:'gradM', t:'purple', chapters:['ম্যাট্রিক্স ও নির্ণায়ক','ভেক্টর','সরলরেখা','বৃত্ত','বিন্যাস ও সমাবেশ','ত্রিকোণমিতিক অনুপাত','সংযুক্ত ও যৌগিক কোণ','ফাংশন ও লেখচিত্র','অন্তরীকরণ','যোগজীকরণ']},
   h12:{name:'দ্বাদশ শ্রেণি', sub:'এইচএসসি ২৭', subj:'উচ্চতর গণিত ২য় পত্র', art:'gradF', t:'sky', chapters:['বাস্তব সংখ্যা ও অসমতা','যোগাশ্রয়ী প্রোগ্রাম','জটিল সংখ্যা','বহুপদী ও বহুপদী সমীকরণ','দ্বিপদী বিস্তৃতি','কণিক','বিপরীত ত্রিকোণমিতিক ফাংশন','স্থিতিবিদ্যা','সমতলে বস্তুকণার গতি','বিস্তার পরিমাপ ও সম্ভাবনা']},
   adm:{name:'এডমিশন কেয়ার', subj:'উচ্চতর গণিত (১ম ও ২য় পত্র)', art:'signpost', t:'green', chapters:['১ম পত্র: পূর্ণ রিভিশন','২য় পত্র: পূর্ণ রিভিশন','প্রকৌশল ভর্তি গণিত','ঢাবি ক-ইউনিট প্রস্তুতি','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট']}
 };
+Object.assign(COURSES.h11,{offer:{price:120, perMonth:15, daily:{marks:25, mins:20}, friday:null}, exam:'এইচএসসি ২০২৮', ptitle:'এইচএসসি ২০২৮ উচ্চতর গণিত ১ম পত্র', banner:{badge:'HSC 28', main:'উচ্চতর গণিত', sub:'১ম পত্র · মাসে ১৫ পরীক্ষা'}});
 Object.assign(COURSES.c10h,{offer:{price:199, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, ptitle:'এসএসসি ২০২৭ উচ্চতর গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'উচ্চতর গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 Object.assign(COURSES.c10,{ptitle:'এসএসসি ২০২৭ সাধারণ গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'সাধারণ গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 const SECTIONS = [
@@ -906,6 +907,7 @@ function vHome(){
 }
 /* সাপ্তাহিক পরীক্ষা: প্রতি শুক্রবার, পেইড কোর্সের শিক্ষার্থীদের জন্য */
 function weeklyBtn(cid){
+  if(!COURSES[cid].offer||!COURSES[cid].offer.friday) return '';
   const o=COURSES[cid].offer, live=RSTATE==='ready'&&examsFor(cid).some(e=>e.kind==='friday'&&e.date===todayISO()&&!S.exams[examKey(e)]&&examPool(e).length);
   return `<button class="wk-free" data-weekly="${cid}">${live?'<span class="live-badge"><i></i>লাইভ</span>':''}
     <span class="wk-gift" aria-hidden="true">🏆</span>
@@ -929,14 +931,14 @@ function offerCard(id,o){
   const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0);
   const nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
   const perks=[
-    ['calendar',`শনি – বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা (${bn(o.daily.mins)} মিনিট)`],
-    ['calendar',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের সাপ্তাহিক পরীক্ষা (${bn(o.friday.mins)} মিনিট), সিলেবাস আগের ৬ দিনের`],
+    ['calendar',o.perMonth?`মাসে ${bn(o.perMonth)}টি লাইভ পরীক্ষা (${bn(o.daily.marks)} নম্বর, ${bn(o.daily.mins)} মিনিট), রুটিন অনুযায়ী`:`শনি – বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা (${bn(o.daily.mins)} মিনিট)`],
+    ['calendar',!o.friday?'':`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের সাপ্তাহিক পরীক্ষা (${bn(o.friday.mins)} মিনিট), সিলেবাস আগের ৬ দিনের`],
     ['exam','মাসিক পরীক্ষা ও মডেল টেস্ট (বিশেষ পরীক্ষা)'],
     ['book',`${bn(c.chapters.length)}টি অধ্যায়${nex?`, ${bn(nex)}টি অনুশীলনী`:''} — অধ্যায় ও অনুশীলনীভিত্তিক নোট`],
     ['pencil',`${nq?bn(nq)+'+':'হাজারো'} প্রশ্নের ব্যাংক থেকে প্রত্যেককে আলাদা এলোমেলো প্রশ্ন`],
     ['check','পরীক্ষার পরপরই নম্বর, সঠিক উত্তর ও ব্যাখ্যা'],
     ['chart','মেধাতালিকায় নিজের অবস্থান ও লার্নিং রিপোর্টে অগ্রগতি'],
-  ];
+  ].filter(x=>x&&x[1]);
   return `<section class="offer" aria-label="মাসিক কোর্স">
     <div class="pk-block">
       <span class="offer-tag">কোর্স</span>
@@ -970,7 +972,7 @@ function courseBanner(id,size){
     <span class="cb-badge">${esc(b.badge)}</span>
     <span class="cb-main">${esc(b.main)}</span>
     <span class="cb-sub">${esc(b.sub)}</span>
-    <span class="cb-chip"><i></i>প্রতিদিন লাইভ পরীক্ষা</span>
+    <span class="cb-chip"><i></i>${c.offer&&c.offer.perMonth?`মাসে ${bn(c.offer.perMonth)}টি লাইভ পরীক্ষা`:'প্রতিদিন লাইভ পরীক্ষা'}</span>
     <span class="cb-shine"></span>
   </div>`;
 }
@@ -978,8 +980,8 @@ function courseFeatures(id){
   const c=COURSES[id], o=c.offer;
   const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0), nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
   return [
-    ['#e0457b','calendar','ডেইলি লাইভ MCQ এক্সাম',`শনি থেকে বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`],
-    ['#f08c1a','exam','সাপ্তাহিক পরীক্ষা',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের পরীক্ষা, সময় ${bn(o.friday.mins)} মিনিট। সিলেবাস আগের ৬ দিনের পরীক্ষার সিলেবাস, সাথে সাপ্তাহিক মেধাতালিকা।`],
+    o.perMonth?['#e0457b','calendar',`মাসে ${bn(o.perMonth)}টি লাইভ MCQ এক্সাম`,`মাসে ${bn(o.perMonth)}টি লাইভ পরীক্ষা (মোটামুটি একদিন পরপর), প্রতিটি ${bn(o.daily.marks)} নম্বর, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`]:['#e0457b','calendar','ডেইলি লাইভ MCQ এক্সাম',`শনি থেকে বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`],
+    !o.friday?null:['#f08c1a','exam','সাপ্তাহিক পরীক্ষা',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের পরীক্ষা, সময় ${bn(o.friday.mins)} মিনিট। সিলেবাস আগের ৬ দিনের পরীক্ষার সিলেবাস, সাথে সাপ্তাহিক মেধাতালিকা।`],
     ['#e53935','report','মাসিক পরীক্ষা ও মডেল টেস্ট','রুটিনের বাইরে মাসিক পরীক্ষা ও মডেল টেস্ট। নম্বর, সময় ও সিলেবাস প্রতিবার আলাদাভাবে ঘোষণা করা হয়।'],
     ['#8e44ef','openbook','লেকচার শিট ও স্টাডি ম্যাটেরিয়াল',`অধ্যায় ও অনুশীলনীভিত্তিক নোট। প্রতিটি পরীক্ষার সিলেবাস অনুযায়ী নোট নিজে থেকে "স্টাডি ম্যাটেরিয়াল"-এ চলে আসে, পরীক্ষা দাও বোতামের ঠিক উপরে।`],
     ['#1e88e5','pencil',`${bn(nq)}+ প্রশ্নের প্রশ্নব্যাংক`,`${bn(c.chapters.length)}টি অধ্যায় ও ${bn(nex)}টি অনুশীলনী জুড়ে সহজ, মধ্যম ও কঠিন প্রশ্ন। প্রতিটি শিক্ষার্থী এলোমেলোভাবে আলাদা প্রশ্ন পায়, তাই দেখাদেখির সুযোগ কম।`],
@@ -988,8 +990,8 @@ function courseFeatures(id){
     ['#e0457b','xcircle','ভুল ও উত্তরহীন প্রশ্নের রিভিশন','নিজের ভুল করা আর উত্তর না দেওয়া প্রশ্নগুলো আলাদা করে সঠিক উত্তর ও ব্যাখ্যাসহ আবার দেখা যায়।'],
     ['#8e44ef','star','আবার পরীক্ষা ও প্রিয় প্রশ্ন','যেকোনো পরীক্ষা অনুশীলনের জন্য আবার দেওয়া যায় (মেধাতালিকায় যায় না)। দরকারি প্রশ্ন ☆ দিয়ে প্রিয়তে জমা রাখা যায়।'],
     ['#1e88e5','chart','লার্নিং রিপোর্ট','কয়টি পরীক্ষা দিয়েছ, গড় ও সর্বোচ্চ নম্বর আর অগ্রগতি এক জায়গায়।'],
-    ['#e53935','calendar','ফুল রিভিশন ও ফুল সিলেবাস মডেল টেস্ট','এসএসসি ২০২৭ বোর্ড পরীক্ষার আগে পুরো সিলেবাসে রিভিশন পরীক্ষা ও ফুল সিলেবাস মডেল টেস্ট।'],
-  ];
+    ['#e53935','calendar','ফুল রিভিশন ও ফুল সিলেবাস মডেল টেস্ট',`${c.exam||'এসএসসি ২০২৭'} বোর্ড পরীক্ষার আগে পুরো সিলেবাসে রিভিশন পরীক্ষা ও ফুল সিলেবাস মডেল টেস্ট।`],
+  ].filter(Boolean);
 }
 function vCourseOffer(){
   const id=S.course, c=COURSES[id], o=c.offer, enrolled=!!(S.enrolled&&S.enrolled[id]);
@@ -999,8 +1001,8 @@ function vCourseOffer(){
     <div class="topbar"><button class="iconbtn" data-go="${S.courseFrom||'home'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1 class="cd-top">${esc(ptitle(c))}</h1><span style="width:44px"></span></div>
     ${courseBanner(id,'big')}
     <div><h2 class="cd-title">${esc(ptitle(c))}</h2>
-      <p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">এসএসসি ২০২৭ পরীক্ষার্থীদের জন্য ${c.name} ${c.subj}-এর পুরো সিলেবাসে প্রতিদিনের লাইভ পরীক্ষা, সাপ্তাহিক পরীক্ষা ও মডেল টেস্ট।</p></div>
-    <div class="cd-stats"><div><b>${bn(c.chapters.length)}</b><span>অধ্যায়</span></div><div><b>${bn(nex)}</b><span>অনুশীলনী</span></div><div><b>${bn(nq)}+</b><span>প্রশ্ন</span></div><div><b>${bn(6)}</b><span>দিন লাইভ পরীক্ষা</span></div></div>
+      <p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">${c.exam||'এসএসসি ২০২৭'} পরীক্ষার্থীদের জন্য ${c.name} ${c.subj}-এর পুরো সিলেবাসে ${o.perMonth?`মাসে ${bn(o.perMonth)}টি লাইভ পরীক্ষা`:'প্রতিদিনের লাইভ পরীক্ষা, সাপ্তাহিক পরীক্ষা'} ও মডেল টেস্ট।</p></div>
+    <div class="cd-stats"><div><b>${bn(c.chapters.length)}</b><span>অধ্যায়</span></div><div><b>${bn(nex)}</b><span>অনুশীলনী</span></div><div><b>${bn(nq)}+</b><span>প্রশ্ন</span></div><div><b>${bn(o.perMonth||6)}</b><span>${o.perMonth?'মাসিক লাইভ পরীক্ষা':'দিন লাইভ পরীক্ষা'}</span></div></div>
     <h2 class="xa-h">কোর্সটি যেভাবে সাজানো হয়েছে</h2>
     <div class="feat-list">${f.map(([col,ic,t,d],i)=>`<button class="feat ${open===i?'open':''}" data-feat="${i}" aria-expanded="${open===i}" style="--fc:${col};--d:${i}">
       <span class="feat-ic">${svg(ic)}</span><span class="feat-t"><b>${esc(t)}:</b><span>${esc(d)}</span></span></button>`).join('')}</div>
@@ -1040,7 +1042,7 @@ function vCourse(){
   </div>`;
 }
 /* দশম শ্রেণি ফ্রী ব্যাচ: সাজেশন PDF, NCTB বই, টেস্ট পরীক্ষার প্রশ্ন সমাধান (অ্যাডমিন → ফ্রী ব্যাচ ট্যাব থেকে দেওয়া) */
-const FREE_BATCH={c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}}};
+const FREE_BATCH={c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},h11:{title:'একাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · একাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'১ম পত্র · ফ্রী ব্যাচ'}}};
 const FREE_CATS=[['sugg','ফ্রী সাজেশন PDF','📄','গুরুত্বপূর্ণ অধ্যায় ও প্রশ্নের সাজেশন'],['nctb','NCTB বই','📚','বোর্ডের পাঠ্যবই (অনলাইন সংস্করণ)'],['test','টেস্ট পরীক্ষার প্রশ্ন সমাধান','✅','বিভিন্ন স্কুলের টেস্ট পরীক্ষার প্রশ্ন ও সমাধান']];
 const NCTB_MATH={t:'নবম-দশম শ্রেণি গণিত বই ২০২৬ (NCTB অফিসিয়াল)',u:'https://nctb.gov.bd/pages/static-pages/695b99afc4774958d7b70612'};
 const FREE_DEFAULT={nctb:[NCTB_MATH]};
@@ -1089,10 +1091,10 @@ function vFree(){
   const cid=S.freeCid||'c10', fb=FREE_BATCH[cid], items=freeItems(cid), open=S.freeOpen===undefined?'sugg':S.freeOpen;
   return `<div class="screen">${backTop(fb.title,S.freeFrom||'play')}
     ${freeBanner(cid,'big')}
-    <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। প্রতি সপ্তাহে একটি ফ্রী পরীক্ষা আর পড়ার রুটিন দিয়ে এসএসসির প্রস্তুতি।</p></div>
+    <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। প্রতি সপ্তাহে একটি ফ্রী পরীক্ষা আর পড়ার রুটিন দিয়ে বোর্ড পরীক্ষার প্রস্তুতি।</p></div>
     ${freeExamSection(cid)}
     ${freeRoutineSection(cid)}
-    ${COURSES[cid]&&COURSES[cid].offer?`<article class="pcard"><b class="pc-title">প্রতিদিন লাইভ পরীক্ষা দিয়ে পুরো প্রস্তুতি নিতে চাও?</b><button class="btn" data-course="${cid}">${esc(ptitle(COURSES[cid]))} দেখো</button></article>`:''}
+    ${COURSES[cid]&&COURSES[cid].offer?`<article class="pcard"><b class="pc-title">নিয়মিত লাইভ পরীক্ষা দিয়ে পুরো প্রস্তুতি নিতে চাও?</b><button class="btn" data-course="${cid}">${esc(ptitle(COURSES[cid]))} দেখো</button></article>`:''}
   </div>`;
 }
 /* অ্যাডমিন: ফ্রী ব্যাচের PDF */
@@ -1562,7 +1564,7 @@ function examsFor(cid){
   const byDate={}; daily.forEach(r=>byDate[r.date]=r);
   const weeks=new Set(daily.map(r=>isoD(weekStartOf(parseD(r.date)))));
   const out=daily.map(r=>({pending:!isLive(r),publishAt:r.publishAt,id:r.id,course:cid,date:r.date,kind:'daily',chapter:r.chapter||null,ex:r.ex||null,units:unitsOf(r),files:filesOf(r),syllabus:String(r.syllabus||''),marks:o.daily.marks,mins:o.daily.mins}));
-  weeks.forEach(ws=>{
+  if(o.friday) weeks.forEach(ws=>{
     const s=parseD(ws), items=[], chs=[], files=[];
     for(let i=0;i<6;i++){ const d=addD(s,i), r=byDate[isoD(d)]; if(r&&r.syllabus) items.push({day:DAYN[d.getDay()],text:String(r.syllabus)}); if(r&&canSee(r)){ unitsOf(r).forEach(v=>{ if(!chs.some(u=>u.ch===v.ch&&u.ex===v.ex)) chs.push(v); }); filesOf(r).forEach(f=>{ if(!files.some(x=>x.u===f.u)) files.push(f); }); } }
     out.push({course:cid,date:isoD(addD(s,6)),kind:'friday',items,chapters:chs,files,marks:o.friday.marks,mins:o.friday.mins});
@@ -1602,13 +1604,13 @@ const PDF_MAX=8*1024*1024, PDF_CHUNK=600*1024, PDF_CACHE={};
 const fsize=n=>n>=1048576?`${bn((n/1048576).toFixed(1))} MB`:`${bn(Math.max(1,Math.round(n/1024)))} KB`;
 function filesOf(r){ return Array.isArray(r&&r.files)?r.files.filter(f=>f&&fileUrl(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:fileUrl(f.u),s:+f.s||0})).slice(0,10):[]; }
 /* স্টাডি ম্যাটেরিয়াল PDF: প্রতিটি অনুশীলনী/অধ্যায় থেকে ৪০টি MCQ (src/mcq/make_study_pdfs.js থেকে তৈরি, অ্যাপের ভিতরেই থাকে) */
-const STUDY_PDFS=/*STUDY*/{"c10":{"ch1":{"f":"c10-ch1.pdf","n":40,"kb":248},"2.1":{"f":"c10-2-1.pdf","n":40,"kb":216},"2.2":{"f":"c10-2-2.pdf","n":40,"kb":242},"3.1":{"f":"c10-3-1.pdf","n":40,"kb":156},"3.2":{"f":"c10-3-2.pdf","n":40,"kb":164},"3.3":{"f":"c10-3-3.pdf","n":40,"kb":156},"3.4":{"f":"c10-3-4.pdf","n":40,"kb":175},"3.5":{"f":"c10-3-5.pdf","n":40,"kb":251},"4.1":{"f":"c10-4-1.pdf","n":40,"kb":141},"4.2":{"f":"c10-4-2.pdf","n":40,"kb":182},"4.3":{"f":"c10-4-3.pdf","n":40,"kb":204},"5.1":{"f":"c10-5-1.pdf","n":40,"kb":224},"5.2":{"f":"c10-5-2.pdf","n":40,"kb":222},"6.1":{"f":"c10-6-1.pdf","n":40,"kb":222},"6.2":{"f":"c10-6-2.pdf","n":40,"kb":226},"6.3":{"f":"c10-6-3.pdf","n":40,"kb":247},"7.1":{"f":"c10-7-1.pdf","n":40,"kb":270},"7.2":{"f":"c10-7-2.pdf","n":40,"kb":231},"8.1":{"f":"c10-8-1.pdf","n":40,"kb":241},"8.2":{"f":"c10-8-2.pdf","n":40,"kb":222},"8.3":{"f":"c10-8-3.pdf","n":40,"kb":212},"8.4":{"f":"c10-8-4.pdf","n":40,"kb":253},"8.5":{"f":"c10-8-5.pdf","n":40,"kb":237},"9.1":{"f":"c10-9-1.pdf","n":40,"kb":169},"9.2":{"f":"c10-9-2.pdf","n":40,"kb":182},"ch10":{"f":"c10-ch10.pdf","n":40,"kb":248},"11.1":{"f":"c10-11-1.pdf","n":40,"kb":207},"11.2":{"f":"c10-11-2.pdf","n":40,"kb":200},"12.1":{"f":"c10-12-1.pdf","n":40,"kb":214},"12.2":{"f":"c10-12-2.pdf","n":40,"kb":183},"12.3":{"f":"c10-12-3.pdf","n":40,"kb":228},"12.4":{"f":"c10-12-4.pdf","n":40,"kb":252},"13.1":{"f":"c10-13-1.pdf","n":40,"kb":184},"13.2":{"f":"c10-13-2.pdf","n":40,"kb":180},"14.1":{"f":"c10-14-1.pdf","n":40,"kb":224},"14.2":{"f":"c10-14-2.pdf","n":40,"kb":220},"14.3":{"f":"c10-14-3.pdf","n":40,"kb":224},"ch15":{"f":"c10-ch15.pdf","n":40,"kb":248},"16.1":{"f":"c10-16-1.pdf","n":40,"kb":205},"16.2":{"f":"c10-16-2.pdf","n":40,"kb":237},"16.3":{"f":"c10-16-3.pdf","n":40,"kb":201},"16.4":{"f":"c10-16-4.pdf","n":40,"kb":219},"ch17":{"f":"c10-ch17.pdf","n":40,"kb":240}},"c10h":{"1.1":{"f":"c10h-1-1.pdf","n":40,"kb":239},"1.2":{"f":"c10h-1-2.pdf","n":40,"kb":201},"ch2":{"f":"c10h-ch2.pdf","n":40,"kb":197},"3.1":{"f":"c10h-3-1.pdf","n":40,"kb":225},"3.2":{"f":"c10h-3-2.pdf","n":40,"kb":241},"ch4":{"f":"c10h-ch4.pdf","n":40,"kb":277},"5.1":{"f":"c10h-5-1.pdf","n":40,"kb":205},"5.2":{"f":"c10h-5-2.pdf","n":40,"kb":187},"5.3":{"f":"c10h-5-3.pdf","n":40,"kb":186},"5.4":{"f":"c10h-5-4.pdf","n":40,"kb":161},"5.5":{"f":"c10h-5-5.pdf","n":40,"kb":167},"5.6":{"f":"c10h-5-6.pdf","n":40,"kb":159},"5.7":{"f":"c10h-5-7.pdf","n":40,"kb":263},"6.1":{"f":"c10h-6-1.pdf","n":40,"kb":228},"6.2":{"f":"c10h-6-2.pdf","n":40,"kb":180},"6.3":{"f":"c10h-6-3.pdf","n":40,"kb":241},"ch7":{"f":"c10h-ch7.pdf","n":40,"kb":211},"8.1":{"f":"c10h-8-1.pdf","n":40,"kb":239},"8.2":{"f":"c10h-8-2.pdf","n":40,"kb":197},"8.3":{"f":"c10h-8-3.pdf","n":40,"kb":176},"9.1":{"f":"c10h-9-1.pdf","n":40,"kb":171},"9.2":{"f":"c10h-9-2.pdf","n":40,"kb":181},"10.1":{"f":"c10h-10-1.pdf","n":40,"kb":201},"10.2":{"f":"c10h-10-2.pdf","n":40,"kb":197},"11.1":{"f":"c10h-11-1.pdf","n":40,"kb":232},"11.2":{"f":"c10h-11-2.pdf","n":40,"kb":227},"11.3":{"f":"c10h-11-3.pdf","n":40,"kb":220},"11.4":{"f":"c10h-11-4.pdf","n":40,"kb":225},"ch12":{"f":"c10h-ch12.pdf","n":40,"kb":212},"ch13":{"f":"c10h-ch13.pdf","n":40,"kb":246},"ch14":{"f":"c10h-ch14.pdf","n":40,"kb":243}}}/*END*/;
+const STUDY_PDFS=/*STUDY*/{"c10":{"ch1":{"f":"c10-ch1.pdf","n":40,"kb":248},"2.1":{"f":"c10-2-1.pdf","n":40,"kb":216},"2.2":{"f":"c10-2-2.pdf","n":40,"kb":242},"3.1":{"f":"c10-3-1.pdf","n":40,"kb":156},"3.2":{"f":"c10-3-2.pdf","n":40,"kb":164},"3.3":{"f":"c10-3-3.pdf","n":40,"kb":156},"3.4":{"f":"c10-3-4.pdf","n":40,"kb":175},"3.5":{"f":"c10-3-5.pdf","n":40,"kb":251},"4.1":{"f":"c10-4-1.pdf","n":40,"kb":141},"4.2":{"f":"c10-4-2.pdf","n":40,"kb":182},"4.3":{"f":"c10-4-3.pdf","n":40,"kb":204},"5.1":{"f":"c10-5-1.pdf","n":40,"kb":224},"5.2":{"f":"c10-5-2.pdf","n":40,"kb":222},"6.1":{"f":"c10-6-1.pdf","n":40,"kb":222},"6.2":{"f":"c10-6-2.pdf","n":40,"kb":226},"6.3":{"f":"c10-6-3.pdf","n":40,"kb":247},"7.1":{"f":"c10-7-1.pdf","n":40,"kb":270},"7.2":{"f":"c10-7-2.pdf","n":40,"kb":231},"8.1":{"f":"c10-8-1.pdf","n":40,"kb":241},"8.2":{"f":"c10-8-2.pdf","n":40,"kb":222},"8.3":{"f":"c10-8-3.pdf","n":40,"kb":212},"8.4":{"f":"c10-8-4.pdf","n":40,"kb":253},"8.5":{"f":"c10-8-5.pdf","n":40,"kb":237},"9.1":{"f":"c10-9-1.pdf","n":40,"kb":169},"9.2":{"f":"c10-9-2.pdf","n":40,"kb":182},"ch10":{"f":"c10-ch10.pdf","n":40,"kb":248},"11.1":{"f":"c10-11-1.pdf","n":40,"kb":207},"11.2":{"f":"c10-11-2.pdf","n":40,"kb":200},"12.1":{"f":"c10-12-1.pdf","n":40,"kb":214},"12.2":{"f":"c10-12-2.pdf","n":40,"kb":183},"12.3":{"f":"c10-12-3.pdf","n":40,"kb":228},"12.4":{"f":"c10-12-4.pdf","n":40,"kb":252},"13.1":{"f":"c10-13-1.pdf","n":40,"kb":184},"13.2":{"f":"c10-13-2.pdf","n":40,"kb":180},"14.1":{"f":"c10-14-1.pdf","n":40,"kb":224},"14.2":{"f":"c10-14-2.pdf","n":40,"kb":220},"14.3":{"f":"c10-14-3.pdf","n":40,"kb":224},"ch15":{"f":"c10-ch15.pdf","n":40,"kb":248},"16.1":{"f":"c10-16-1.pdf","n":40,"kb":205},"16.2":{"f":"c10-16-2.pdf","n":40,"kb":237},"16.3":{"f":"c10-16-3.pdf","n":40,"kb":201},"16.4":{"f":"c10-16-4.pdf","n":40,"kb":219},"ch17":{"f":"c10-ch17.pdf","n":40,"kb":240}},"c10h":{"1.1":{"f":"c10h-1-1.pdf","n":40,"kb":239},"1.2":{"f":"c10h-1-2.pdf","n":40,"kb":201},"ch2":{"f":"c10h-ch2.pdf","n":40,"kb":197},"3.1":{"f":"c10h-3-1.pdf","n":40,"kb":225},"3.2":{"f":"c10h-3-2.pdf","n":40,"kb":241},"ch4":{"f":"c10h-ch4.pdf","n":40,"kb":277},"5.1":{"f":"c10h-5-1.pdf","n":40,"kb":205},"5.2":{"f":"c10h-5-2.pdf","n":40,"kb":187},"5.3":{"f":"c10h-5-3.pdf","n":40,"kb":186},"5.4":{"f":"c10h-5-4.pdf","n":40,"kb":161},"5.5":{"f":"c10h-5-5.pdf","n":40,"kb":167},"5.6":{"f":"c10h-5-6.pdf","n":40,"kb":159},"5.7":{"f":"c10h-5-7.pdf","n":40,"kb":263},"6.1":{"f":"c10h-6-1.pdf","n":40,"kb":228},"6.2":{"f":"c10h-6-2.pdf","n":40,"kb":180},"6.3":{"f":"c10h-6-3.pdf","n":40,"kb":241},"ch7":{"f":"c10h-ch7.pdf","n":40,"kb":211},"8.1":{"f":"c10h-8-1.pdf","n":40,"kb":239},"8.2":{"f":"c10h-8-2.pdf","n":40,"kb":197},"8.3":{"f":"c10h-8-3.pdf","n":40,"kb":176},"9.1":{"f":"c10h-9-1.pdf","n":40,"kb":171},"9.2":{"f":"c10h-9-2.pdf","n":40,"kb":181},"10.1":{"f":"c10h-10-1.pdf","n":40,"kb":201},"10.2":{"f":"c10h-10-2.pdf","n":40,"kb":197},"11.1":{"f":"c10h-11-1.pdf","n":40,"kb":232},"11.2":{"f":"c10h-11-2.pdf","n":40,"kb":227},"11.3":{"f":"c10h-11-3.pdf","n":40,"kb":220},"11.4":{"f":"c10h-11-4.pdf","n":40,"kb":225},"ch12":{"f":"c10h-ch12.pdf","n":40,"kb":212},"ch13":{"f":"c10h-ch13.pdf","n":40,"kb":246},"ch14":{"f":"c10h-ch14.pdf","n":40,"kb":243}},"h11":{"1.A":{"f":"h11-1-A.pdf","n":40,"kb":191},"1.B":{"f":"h11-1-B.pdf","n":40,"kb":182},"2.A":{"f":"h11-2-A.pdf","n":40,"kb":214},"2.B":{"f":"h11-2-B.pdf","n":40,"kb":228},"2.C":{"f":"h11-2-C.pdf","n":40,"kb":230},"3.A":{"f":"h11-3-A.pdf","n":40,"kb":226},"3.B":{"f":"h11-3-B.pdf","n":40,"kb":226},"3.C":{"f":"h11-3-C.pdf","n":40,"kb":227},"3.D":{"f":"h11-3-D.pdf","n":40,"kb":228},"3.E":{"f":"h11-3-E.pdf","n":40,"kb":232},"3.F":{"f":"h11-3-F.pdf","n":40,"kb":218},"3.G":{"f":"h11-3-G.pdf","n":40,"kb":217},"4.A":{"f":"h11-4-A.pdf","n":40,"kb":234},"4.B":{"f":"h11-4-B.pdf","n":40,"kb":223},"5.A":{"f":"h11-5-A.pdf","n":40,"kb":213},"5.B":{"f":"h11-5-B.pdf","n":40,"kb":220},"6.A":{"f":"h11-6-A.pdf","n":40,"kb":231},"6.B":{"f":"h11-6-B.pdf","n":40,"kb":157},"6.C":{"f":"h11-6-C.pdf","n":40,"kb":178},"7.A":{"f":"h11-7-A.pdf","n":40,"kb":156},"7.B":{"f":"h11-7-B.pdf","n":40,"kb":160},"7.C":{"f":"h11-7-C.pdf","n":40,"kb":170},"7.D":{"f":"h11-7-D.pdf","n":40,"kb":176},"7.E":{"f":"h11-7-E.pdf","n":40,"kb":180},"7.F":{"f":"h11-7-F.pdf","n":40,"kb":200},"7.G":{"f":"h11-7-G.pdf","n":40,"kb":169},"ch8":{"f":"h11-ch8.pdf","n":40,"kb":199},"9.A":{"f":"h11-9-A.pdf","n":40,"kb":141},"9.B":{"f":"h11-9-B.pdf","n":40,"kb":184},"9.C":{"f":"h11-9-C.pdf","n":40,"kb":145},"9.D":{"f":"h11-9-D.pdf","n":40,"kb":148},"9.E":{"f":"h11-9-E.pdf","n":40,"kb":145},"9.F":{"f":"h11-9-F.pdf","n":40,"kb":151},"9.G":{"f":"h11-9-G.pdf","n":40,"kb":153},"9.H":{"f":"h11-9-H.pdf","n":40,"kb":155},"9.I":{"f":"h11-9-I.pdf","n":40,"kb":231},"10.A":{"f":"h11-10-A.pdf","n":40,"kb":144},"10.B":{"f":"h11-10-B.pdf","n":40,"kb":144},"10.C":{"f":"h11-10-C.pdf","n":40,"kb":146},"10.D":{"f":"h11-10-D.pdf","n":40,"kb":162},"10.E":{"f":"h11-10-E.pdf","n":40,"kb":144},"10.F":{"f":"h11-10-F.pdf","n":40,"kb":159},"10.G":{"f":"h11-10-G.pdf","n":40,"kb":209}}}/*END*/;
 function studyPdfs(cid,units){
   const idx=STUDY_PDFS[cid]||{}, out=[], seen=new Set();
   const add=(k,t)=>{ const r=idx[k]; if(r&&!seen.has(k)){ seen.add(k); out.push({t,u:'study:'+r.f,s:r.kb*1024,n:r.n}); } };
   (units||[]).forEach(u=>{
-    if(u.ex) add(u.ex,`অনুশীলনী ${u.ex} · ${bn(idx[u.ex]?idx[u.ex].n:40)}টি MCQ`);
-    else{ const xs=exList(cid,u.ch); if(xs.length) xs.forEach(x=>add(x,`অনুশীলনী ${x} · ${bn(idx[x]?idx[x].n:40)}টি MCQ`)); else add('ch'+u.ch,`অধ্যায় ${bn(u.ch)}: ${chTitle(cid,u.ch-1)} · ${bn(idx['ch'+u.ch]?idx['ch'+u.ch].n:40)}টি MCQ`); }
+    if(u.ex) add(u.ex,`অনুশীলনী ${exName(u.ex)} · ${bn(idx[u.ex]?idx[u.ex].n:40)}টি MCQ`);
+    else{ const xs=exList(cid,u.ch); if(xs.length) xs.forEach(x=>add(x,`অনুশীলনী ${exName(x)} · ${bn(idx[x]?idx[x].n:40)}টি MCQ`)); else add('ch'+u.ch,`অধ্যায় ${bn(u.ch)}: ${chTitle(cid,u.ch-1)} · ${bn(idx['ch'+u.ch]?idx['ch'+u.ch].n:40)}টি MCQ`); }
   });
   return out;
 }
@@ -1834,7 +1836,7 @@ function xaStatus(e){
 function xaMaterials(e){
   const out=[], seen=new Set();
   examChapters(e).forEach(u=>{
-    if(u.ex&&exDoc(e.course,u.ex)&&!seen.has('x'+u.ex)){ seen.add('x'+u.ex); out.push({t:`অনুশীলনী ${u.ex}-এর নোট`,ex:u.ex}); }
+    if(u.ex&&exDoc(e.course,u.ex)&&!seen.has('x'+u.ex)){ seen.add('x'+u.ex); out.push({t:`অনুশীলনী ${exName(u.ex)}-এর নোট`,ex:u.ex}); }
     if(chDoc(e.course,u.ch-1)&&!seen.has('c'+u.ch)){ seen.add('c'+u.ch); out.push({t:`অধ্যায় ${u.ch}: ${chTitle(e.course,u.ch-1)}`,ch:u.ch}); }
   });
   return out;
@@ -1845,7 +1847,7 @@ function examPdfs(e){
   const out=[], seen=new Set(), add=f=>{ if(f&&f.u&&!seen.has(f.u)){ seen.add(f.u); out.push(f); } };
   (e.files||[]).forEach(add);
   examChapters(e).forEach(u=>{
-    if(u.ex){ const r=exDoc(e.course,u.ex); if(r){ filesOf(r).forEach(add); const l=safeLink(r.link); if(l) add({t:`অনুশীলনী ${u.ex}: লিংক`,u:l}); } }
+    if(u.ex){ const r=exDoc(e.course,u.ex); if(r){ filesOf(r).forEach(add); const l=safeLink(r.link); if(l) add({t:`অনুশীলনী ${exName(u.ex)}: লিংক`,u:l}); } }
     const r=chDoc(e.course,u.ch-1); if(r){ filesOf(r).forEach(add); const l=safeLink(r.link); if(l) add({t:`অধ্যায় ${u.ch}: লিংক`,u:l}); }
   });
   return out;
@@ -1863,7 +1865,7 @@ function xaFiltered(){
   }).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(a.kind==='special'?1:0)-(b.kind==='special'?1:0));
 }
 const bnD=d=>`${bn(d.getDate())} ${MONN[d.getMonth()]} ${bn(d.getFullYear())}, ${DAYN[d.getDay()]}`;
-const unitChipLabel=(cid,u)=>u.ex?`অনুশীলনী ${u.ex}`:`অধ্যায় ${u.ch} · ${COURSES[cid].chapters[u.ch-1]||''}`;
+const unitChipLabel=(cid,u)=>u.ex?`অনুশীলনী ${exName(u.ex)}`:`অধ্যায় ${u.ch} · ${COURSES[cid].chapters[u.ch-1]||''}`;
 function xaCard(e,showCourse){
   const k=examKey(e), d=parseD(e.date), [sk,sl]=xaStatus(e), done=S.exams[k], today=todayISO(), c=COURSES[e.course];
   const units=examChapters(e), open=S.xmore===k, shown=open?units:units.slice(0,2);
@@ -1949,7 +1951,7 @@ function vExams(){
   return `<div class="screen xa">
     <div class="topbar"><span style="width:44px"></span><h1>লাইভ পরীক্ষা</h1><span style="width:44px"></span></div>
     <p style="margin:-8px 0 0;text-align:center;font-weight:600;color:var(--accent)">${c.name}${c.sub?' ('+c.sub+')':''} · ${c.subj||''}</p>
-    ${ids.length>1?`<div class="seg" style="grid-template-columns:repeat(${ids.length},minmax(0,1fr))">${ids.map(k=>`<button class="seg-btn" aria-selected="${k===cid}" data-hubcourse="${k}">${ids.every(x=>COURSES[x].name===COURSES[ids[0]].name)?(COURSES[k].subj||COURSES[k].name):COURSES[k].name}</button>`).join('')}</div>`:''}
+    ${ids.length>1?`<div class="seg" style="grid-template-columns:repeat(${ids.length},minmax(0,1fr))">${ids.map(k=>`<button class="seg-btn" aria-selected="${k===cid}" data-hubcourse="${k}">${ids.every(x=>COURSES[x].name===COURSES[ids[0]].name)?(COURSES[k].subj||COURSES[k].name):`${COURSES[k].name.replace(' শ্রেণি','')} · ${String(COURSES[k].subj||'').replace(' গণিত','').replace(' ১ম পত্র',' ১ম')}`}</button>`).join('')}</div>`:''}
     ${CAN_EDIT?`<div class="hub-admin"><button class="adminbar" data-goadmin="exam">${svg('pencil')}<span>নতুন পরীক্ষা যোগ কর</span></button><button class="adminbar" data-goadmin="routine">${svg('calendar')}<span>রুটিন প্রকাশ কর</span></button></div>`:''}
     ${msg||banner}
     ${weeklyBtn(cid)}
@@ -2194,9 +2196,9 @@ function weekPreview(cid){
   const s=weekStartOf(new Date()), all=examsFor(cid);
   const rows=[];
   for(let i=0;i<7;i++){
-    const d=addD(s,i), k=isoD(d), e=all.find(x=>x.date===k&&x.kind!=='special'), fri=i===6;
+    const hasF=!!COURSES[cid].offer.friday, d=addD(s,i), k=isoD(d), e=all.find(x=>x.date===k&&x.kind!=='special'), fri=hasF&&i===6;
     const txt = fri ? (e&&e.items.length?'আগের ৬ দিনের সিলেবাস':'আগের ৬ দিনের সিলেবাস') : (e?esc(e.syllabus):'<span class="muted">প্রকাশ হয়নি</span>');
-    rows.push(`<div class="wk-row ${fri?'fri':''} ${k===todayISO()?'today':''}"><span class="wk-day">${DAYN[d.getDay()].replace('বার','')}<small>${fmtD(d)}</small></span><span class="wk-syl">${txt}</span><span class="wk-m">${bn(fri?COURSES[cid].offer.friday.marks:COURSES[cid].offer.daily.marks)}</span></div>`);
+    rows.push(`<div class="wk-row ${fri?'fri':''} ${k===todayISO()?'today':''}"><span class="wk-day">${DAYN[d.getDay()].replace('বার','')}<small>${fmtD(d)}</small></span><span class="wk-syl">${txt}</span><span class="wk-m">${fri?bn(COURSES[cid].offer.friday.marks):(e||hasF)?bn(COURSES[cid].offer.daily.marks):'—'}</span></div>`);
   }
   return `<div class="wk">${rows.join('')}</div>`;
 }
@@ -2212,8 +2214,8 @@ function rfInit(){
 }
 function autoSyl(cid,units){
   if(!units.length) return '';
-  if(units.length===1){ const u=units[0]; return u.ex?`অনুশীলনী ${u.ex} (${COURSES[cid].chapters[u.ch-1]})`:`অধ্যায় ${u.ch}: ${COURSES[cid].chapters[u.ch-1]}`; }
-  return units.map(u=>u.ex?`অনুশীলনী ${u.ex}`:`অধ্যায় ${u.ch}`).join(', ');
+  if(units.length===1){ const u=units[0]; return u.ex?`অনুশীলনী ${exName(u.ex)} (${COURSES[cid].chapters[u.ch-1]})`:`অধ্যায় ${u.ch}: ${COURSES[cid].chapters[u.ch-1]}`; }
+  return units.map(u=>u.ex?`অনুশীলনী ${exName(u.ex)}`:`অধ্যায় ${u.ch}`).join(', ');
 }
 function unitChips(cid,vals,attr,key){
   vals=vals||[]; if(!vals.length) return '';
@@ -2408,7 +2410,7 @@ function qbankPanel(){
     ${CH_COURSES().length>1?`<div class="field"><label for="qfCourse">শ্রেণি</label><select class="input" id="qfCourse" data-qf="course">${CH_COURSES().map(k=>`<option value="${k}" ${k===qf.course?'selected':''}>${COURSES[k].name} (${COURSES[k].sub}) ${COURSES[k].subj}</option>`).join('')}</select></div>`:''}
     <div class="field"><label for="qfCh">অধ্যায় (${c.name} ${c.subj||''})</label>
       <select class="input" id="qfCh" data-qf="ch">${c.chapters.map((n,j)=>{const t=(((window.SOHOG_MCQ||{})[qf.course]||{})[String(j+1)]||[]).length+customQs(qf.course,j+1).length;return `<option value="${j+1}" ${j+1===+qf.ch?'selected':''}>${j+1}. ${esc(n)} (${t}টি প্রশ্ন)</option>`;}).join('')}</select></div>
-    ${exList(qf.course,qf.ch).length?`<div class="field"><label for="qfEx">অনুশীলনী (ঐচ্ছিক)</label><select class="input" id="qfEx" data-qf="ex"><option value="">নির্দিষ্ট অনুশীলনী নয় (পুরো অধ্যায়)</option>${exList(qf.course,qf.ch).map(x=>`<option value="${x}" ${x===qf.ex?'selected':''}>অনুশীলনী ${x} (${exBank(qf.course,x).length}টি প্রশ্ন)</option>`).join('')}</select></div>`:''}
+    ${exList(qf.course,qf.ch).length?`<div class="field"><label for="qfEx">অনুশীলনী (ঐচ্ছিক)</label><select class="input" id="qfEx" data-qf="ex"><option value="">নির্দিষ্ট অনুশীলনী নয় (পুরো অধ্যায়)</option>${exList(qf.course,qf.ch).map(x=>`<option value="${x}" ${x===qf.ex?'selected':''}>অনুশীলনী ${exName(x)} (${exBank(qf.course,x).length}টি প্রশ্ন)</option>`).join('')}</select></div>`:''}
     <div class="qcount"><span>আগে থেকে আছে: <b>${built.length}</b></span><span>আপনি যোগ করেছেন: <b>${mine.length}</b></span><span>মোট: <b>${built.length+mine.length}</b></span></div>
     <div class="seg" role="tablist"><label class="seg-opt"><input type="radio" name="qfmode" value="one" data-qfmode="one" ${qf.mode==='one'?'checked':''}><span>একটি করে</span></label>
       <label class="seg-opt"><input type="radio" name="qfmode" value="bulk" data-qfmode="bulk" ${qf.mode==='bulk'?'checked':''}><span>একসাথে অনেক</span></label></div>
@@ -2448,7 +2450,7 @@ const mcqBank=(cid,i)=>{ const b=bankFor(cid,i+1); return b.length?b:null; };
 const MCQ_LV={easy:'সহজ',mid:'মধ্যম',hard:'কঠিন',mix:'মিশ্র'};
 (function(){ Object.keys(COURSES).filter(k=>COURSES[k].content).forEach(cid=>COURSES[cid].chapters.forEach((_,j)=>Object.keys(MCQ_LV).forEach(lv=>{
   QUIZZES[`mcq_${cid}_${j+1}_${lv}`]={title:`অধ্যায় ${j+1} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:(((window.SOHOG_MCQ||{})[cid]||{})[String(j+1)]||[]).slice(0,MCQ_N)};
-  (((COURSES[cid].exs)||{})[j+1]||[]).forEach(ex=>{ QUIZZES[`mcq_${cid}_${ex.replace('.','-')}_${lv}`]={title:`অনুশীলনী ${ex} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:[]}; });
+  (((COURSES[cid].exs)||{})[j+1]||[]).forEach(ex=>{ QUIZZES[`mcq_${cid}_${ex.replace('.','-')}_${lv}`]={title:`অনুশীলনী ${exName(ex)} · ${MCQ_LV[lv]} MCQ`, skill:'MCQ', qs:[]}; });
 })));})();
 function fillMcq(id){
   const m=id.match(/^mcq_(\w+?)_(\d+)(?:-(\d+))?_(easy|mid|hard|mix)$/); if(!m) return;
@@ -2463,6 +2465,7 @@ function mcqSection(cid,i){ return mcqBox(cid,String(i+1),mcqBank(cid,i)); }
 /* ---------- অনুশীলনী (যেমন 2.1, 3.4) ---------- */
 const exList=(cid,no)=>((COURSES[cid]&&COURSES[cid].exs)||{})[no]||[];
 const exCh=ex=>+String(ex).split('.')[0];
+function exName(ex){ return String(ex).replace(/^(\d+)\.([A-Z])$/,'$1($2)'); }
 const exNoteId=(cid,ex)=>`ex_${cid}_${String(ex).replace('.','_')}`;
 const exDom=ex=>String(ex).replace('.','-');
 function exDoc(cid,ex){ const r=SYL[exNoteId(cid,ex)]; return r&&canSee(r)?r:null; }
@@ -2490,7 +2493,7 @@ function vExercise(){
   const cid=S.course||'c10', ex=S.exKey, no=exCh(ex), c=COURSES[cid], list=exList(cid,no), idx=list.indexOf(ex);
   const r=exDoc(cid,ex), link=r?safeLink(r.link):'', k=`${cid}:ex:${ex}`, d=!!S.done[k], b=exBank(cid,ex);
   return `<div class="screen">
-    <div class="topbar"><button class="iconbtn" data-opench="${no-1}" aria-label="অধ্যায়ে ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অনুশীলনী ${ex}</h1><span style="width:44px"></span></div>
+    <div class="topbar"><button class="iconbtn" data-opench="${no-1}" aria-label="অধ্যায়ে ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>অনুশীলনী ${exName(ex)}</h1><span style="width:44px"></span></div>
     <div><span class="offer-tag">${c.name} · ${c.subj||''} · অধ্যায় ${no}</span>
       <h2 class="display" style="font-size:24px;margin-top:8px;overflow-wrap:anywhere">${esc(r&&r.title?r.title:'অনুশীলনী '+ex)}</h2>
       <span class="muted">${esc(chTitle(cid,no-1))}</span></div>
@@ -2500,21 +2503,21 @@ function vExercise(){
         ${link?`<a class="btn ghost linkbtn" href="${esc(link)}" target="_blank" rel="noopener">${svg('play')}<span>ভিডিও / লিংক খুলুন</span></a>`:''}
         <span class="muted" style="font-size:12.5px">প্রকাশ: ${fmtDT(r.publishAt||r.updatedAt)}</span>
       </section>`:`<div class="empty">এই অনুশীলনীর নোট এখনো প্রকাশ হয়নি।</div>`}
-    ${CAN_EDIT?(b.length?mcqBox(cid,exDom(ex),b,`অনুশীলনী ${ex}-এর MCQ`):`<div class="empty" style="padding:12px">এই অনুশীলনীর MCQ এখনো যোগ হয়নি।</div>`):''}
+    ${CAN_EDIT?(b.length?mcqBox(cid,exDom(ex),b,`অনুশীলনী ${exName(ex)}-এর MCQ`):`<div class="empty" style="padding:12px">এই অনুশীলনীর MCQ এখনো যোগ হয়নি।</div>`):''}
     <button class="btn ${d?'ghost':''}" data-exdone style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>
     <div style="display:flex;gap:10px">
-      ${idx>0?`<button class="btn ghost" style="flex:1" data-openex="${list[idx-1]}">অনুশীলনী ${list[idx-1]}</button>`:''}
-      ${idx<list.length-1?`<button class="btn ghost" style="flex:1" data-openex="${list[idx+1]}">অনুশীলনী ${list[idx+1]}</button>`:''}
+      ${idx>0?`<button class="btn ghost" style="flex:1" data-openex="${list[idx-1]}">অনুশীলনী ${exName(list[idx-1])}</button>`:''}
+      ${idx<list.length-1?`<button class="btn ghost" style="flex:1" data-openex="${list[idx+1]}">অনুশীলনী ${exName(list[idx+1])}</button>`:''}
     </div>
   </div>`;
 }
 // রুটিন ও পরীক্ষা: একটি দিনে পুরো অধ্যায় বা নির্দিষ্ট অনুশীলনী
 function unitPool(cid,u){ return (u.ex?exBank(cid,u.ex):bankFor(cid,u.ch)).map(x=>({ch:u.ch,n:x.n})); }
-function unitLabel(cid,u){ return u.ex?`অনুশীলনী ${u.ex}`:`অধ্যায় ${u.ch}`; }
+function unitLabel(cid,u){ return u.ex?`অনুশীলনী ${exName(u.ex)}`:`অধ্যায় ${u.ch}`; }
 function unitOptions(cid,sel){
   return COURSES[cid].chapters.map((c,j)=>{ const no=j+1, nb=bankFor(cid,no).length;
     return `<option value="${no}" ${String(no)===sel?'selected':''}>${no}. ${esc(c)}${nb?' ('+nb+' MCQ)':''}</option>`+
-      exList(cid,no).map(ex=>{ const n=exBank(cid,ex).length; return `<option value="${ex}" ${ex===sel?'selected':''}>   ↳ অনুশীলনী ${ex}${n?' ('+n+' MCQ)':''}</option>`; }).join('');
+      exList(cid,no).map(ex=>{ const n=exBank(cid,ex).length; return `<option value="${ex}" ${ex===sel?'selected':''}>   ↳ অনুশীলনী ${exName(ex)}${n?' ('+n+' MCQ)':''}</option>`; }).join('');
   }).join('');
 }
 
@@ -2581,7 +2584,7 @@ function chapterPanel(){
     ${CH_COURSES().length>1?`<div class="field"><label for="cfCourse">শ্রেণি</label><select class="input" id="cfCourse" data-cf="course">${CH_COURSES().map(k=>`<option value="${k}" ${k===cf.course?'selected':''}>${COURSES[k].name} (${COURSES[k].sub}) ${COURSES[k].subj}</option>`).join('')}</select></div>`:''}
     <div class="field"><label for="cfNo">অধ্যায়</label>
       <select class="input" id="cfNo" data-cf="no">${c.chapters.map((_,i)=>`<option value="${i}" ${i===cf.no?'selected':''}>${bn(i+1)}. ${esc(chTitle(cf.course,i))}${SYL[chId(cf.course,i)]?' ✓':''}</option>`).join('')}</select></div>
-    ${exs.length?`<div class="field"><label for="cfEx">অনুশীলনী</label><select class="input" id="cfEx" data-cf="ex"><option value="">পুরো অধ্যায়ের নোট</option>${exs.map(x=>`<option value="${x}" ${x===cf.ex?'selected':''}>অনুশীলনী ${x}${SYL[exNoteId(cf.course,x)]?' ✓':''}</option>`).join('')}</select></div>`:''}
+    ${exs.length?`<div class="field"><label for="cfEx">অনুশীলনী</label><select class="input" id="cfEx" data-cf="ex"><option value="">পুরো অধ্যায়ের নোট</option>${exs.map(x=>`<option value="${x}" ${x===cf.ex?'selected':''}>অনুশীলনী ${exName(x)}${SYL[exNoteId(cf.course,x)]?' ✓':''}</option>`).join('')}</select></div>`:''}
     <div class="field"><label for="cfTitle">${cf.ex?'অনুশীলনীর শিরোনাম':'অধ্যায়ের নাম'}</label>
       <input class="input" id="cfTitle" data-cfv="title" maxlength="80" value="${esc(cf.vals.title)}"></div>
     <div class="field"><label for="cfNote">নোট / পড়ার নির্দেশনা</label>
@@ -2664,7 +2667,7 @@ async function publishSpecial(){
   if(!xPoolSize(cid,xf.units)) return fail('বেছে নেওয়া অংশে এখনো কোনো প্রশ্ন নেই।');
   if(w.err) return fail(w.err);
   const units=xf.units.map(valUnit);
-  const syl=String(xf.syllabus||'').trim()||units.map(u=>u.ex?`অনুশীলনী ${u.ex}`:`অধ্যায় ${u.ch}`).join(', ');
+  const syl=String(xf.syllabus||'').trim()||units.map(u=>u.ex?`অনুশীলনী ${exName(u.ex)}`:`অধ্যায় ${u.ch}`).join(', ');
   const id=`exam_${cid}_${Date.now().toString(36)}`;
   S.xpublishing=true; xf.err=''; render();
   try{

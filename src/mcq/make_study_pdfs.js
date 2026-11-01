@@ -14,7 +14,10 @@ function course(cid) {
   const m = line.match(/exs:(\{[^}]*\})/);
   return { chapters, exs: m ? eval('(' + m[1] + ')') : {}, subj: eval(line.match(/subj:('[^']*')/)[1]) };
 }
-const COURSES = { c10: course('c10'), c10h: course('c10h') };
+const COURSES = { c10: course('c10'), c10h: course('c10h'), h11: course('h11') };
+const CLS = { c10: 'দশম শ্রেণি (এসএসসি ২৭)', c10h: 'দশম শ্রেণি (এসএসসি ২৭)', h11: 'একাদশ শ্রেণি (এইচএসসি ২৮)' };
+const exName = ex => String(ex).replace(/^(\d+)\.([A-Z])$/, '$1($2)');
+const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const BN = s => String(s).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
 // নির্ধারিত ক্রম (প্রতিবার একই প্রশ্ন)
 function rng(seed) { let x = seed >>> 0 || 1; return () => (x = (x * 1103515245 + 12345) >>> 0) / 4294967296; }
@@ -56,7 +59,7 @@ table.key td b{color:#1F5FBF}
 .ex{break-inside:avoid;margin:0 0 5px;font-size:9.5pt}
 .ex b{color:#1F5FBF}
 </style></head><body>
-<div class="head"><div><h1>সহগ গণিত একাডেমি</h1><p>দশম শ্রেণি (এসএসসি ২৭) · ${esc(c.subj)} · ${esc(title)}</p><p style="font-size:9.5pt;color:#4A5B73">${esc(sub)}</p></div>
+<div class="head"><div><h1>সহগ গণিত একাডেমি</h1><p>${CLS[cid]} · ${esc(c.subj)} · ${esc(title)}</p><p style="font-size:9.5pt;color:#4A5B73">${esc(sub)}</p></div>
 <div class="r">স্টাডি ম্যাটেরিয়াল<br>${BN(data.length)}টি MCQ · উত্তর ও ব্যাখ্যাসহ</div></div>
 <div class="info"><span>প্রতিটি প্রশ্নের মান ১</span><span>সহজ ${BN(12)} · মধ্যম ${BN(20)} · কঠিন ${BN(8)}</span><span>উত্তরমালা ও ব্যাখ্যা শেষে</span></div>
 <div class="cols">${data.map((q, i) => `<div class="q"><div class="t">${BN(i + 1)}. ${esc(q.q)} <span class="lv">(${q.lv})</span></div>
@@ -77,7 +80,7 @@ table.key td b{color:#1F5FBF}
       const qs = (bank[cid] || {})[String(ch)] || [];
       if (!qs.length) continue;
       const exs = c.exs[ch] || [];
-      const units = exs.length ? exs.map(ex => [ex, qs.filter(q => q.ex === ex), `অনুশীলনী ${ex}`]) : [['ch' + ch, qs.filter(q => !q.ex).length ? qs.filter(q => !q.ex) : qs, `অধ্যায় ${ch}`]];
+      const units = exs.length ? exs.map(ex => [ex, qs.filter(q => q.ex === ex), `অনুশীলনী ${exName(ex)}`]) : [['ch' + ch, qs.filter(q => !q.ex).length ? qs.filter(q => !q.ex) : qs, `অধ্যায় ${ch}`]];
       for (const [key, pool, title] of units) {
         if (pool.length < 10) continue;
         const data = pick(pool, cid + key);
@@ -85,7 +88,7 @@ table.key td b{color:#1F5FBF}
         await p.setContent(html(c, cid, `${title}: ${c.chapters[ch - 1]}`, `অধ্যায় ${BN(ch)}: ${c.chapters[ch - 1]}`, data));
         await p.evaluate(() => document.fonts.ready);
         await p.pdf({ path: path.join(outDir, file), format: 'A4', printBackground: true, displayHeaderFooter: true, headerTemplate: '<span></span>',
-          footerTemplate: `<div style="font-size:8px;width:100%;text-align:center;color:#4A5B73">Sohog Ganit Academy · ${cid === 'c10h' ? 'Higher Math' : 'General Math'} · ${key.replace('ch', 'Chapter ')} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`,
+          footerTemplate: `<div style="font-size:8px;width:100%;text-align:center;color:#4A5B73">Sohog Ganit Academy · ${cid === 'c10h' ? 'Higher Math' : cid === 'h11' ? 'HSC Higher Math 1st Paper' : 'General Math'} · ${key.replace('ch', 'Chapter ')} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`,
           margin: { top: '14mm', bottom: '16mm', left: '13mm', right: '13mm' } });
         const kb = Math.round(fs.statSync(path.join(outDir, file)).size / 1024);
         index[cid][key] = { f: file, n: data.length, kb };
