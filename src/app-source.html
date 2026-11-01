@@ -389,6 +389,7 @@ select.input{appearance:auto}
 .xc ul{margin:0;padding-left:20px;font-size:14px;color:var(--muted);line-height:1.6}
 .xc-act{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:4px}
 .xc-act .btn{min-height:50px;width:100%}
+.soon-empty{padding:18px 12px;font-weight:600}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -788,22 +789,19 @@ function vCourse(){
   </div>`;
 }
 function vPlay(){
-  const hex=(k,lbl,quiz,color)=>`<button class="hex" data-quiz="${quiz}" style="color:var(--${color})">${svg(k)}<span style="color:var(--fg)">${lbl}</span></button>`;
+  const chev='<span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>';
+  const ids=sec=>sec.rows.flatMap(r=>r.kind==='primary'?['p5']:(r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer);
+  const zone=['z1','z2','z3'];
   return `<div class="screen">
-    <div class="topbar"><span style="width:44px"></span><h1>গণিত খেলাঘর</h1><span style="width:44px"></span></div>
-    <p class="muted" style="margin:0">একটি ঘর বেছে নিন, ছোট ছোট প্রশ্নের খেলা শুরু হবে।</p>
-    <section class="zone z1"><h2>প্রাথমিক স্তর</h2><div class="grid g3">
-      ${hex('shapes','প্যাটার্ন<br>ধাঁধা','daily','good')}${hex('search','সংখ্যা<br>শিকার','daily','good')}${hex('castle','জ্যামিতি<br>বালুঘর','geometry','good')}
-    </div></section>
-    <section class="zone z2"><h2>মাধ্যমিক স্তর</h2><div class="grid g3">
-      ${hex('bridge','বীজগণিতের<br>সেতু','algebra','accent')}${hex('coord','স্থানাঙ্ক<br>দ্বীপ','geometry','accent')}${hex('dice','সম্ভাবনার<br>চত্বর','probability','accent')}
-    </div>
-    ${CH_COURSES().map(k=>{const c=COURSES[k];const n=c.chapters.filter((_,i)=>chDoc(k,i)).length;return `<button class="ctile wide t-${c.t} ch-entry" data-chlist="${k}">${art(c.art)}<span style="flex:1;min-width:0"><b>${c.name} (${c.sub})</b><span class="subj">${c.subj}</span><small>${bn(c.chapters.length)}টি অধ্যায়${n?' · '+bn(n)+'টিতে নোট':''}</small></span><span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>`}).join('')}
-    </section>
-    <section class="zone z3"><h2>উচ্চ মাধ্যমিক স্তর</h2><div class="grid g2">
-      <button class="tile row" data-quiz="calculus"><span class="ic c-violet">${svg('peak')}</span><span>ক্যালকুলাস চূড়া</span></button>
-      <button class="tile row" data-quiz="algebra"><span class="ic c-violet">${svg('cube')}</span><span>ভেক্টর ও ম্যাট্রিক্স<br><span class="muted" style="font-weight:400;font-size:12px">শিগগিরই আসছে; আপাতত বীজগণিত</span></span></button>
-    </div></section>
+    <div class="topbar"><span style="width:44px"></span><h1>এক্সপ্লোর</h1><span style="width:44px"></span></div>
+    <p class="muted" style="margin:0">যেসব কোর্স এখন চলছে, সেগুলো এখানে। কোর্সে চাপ দিলে বিস্তারিত, রুটিন ও পরীক্ষা দেখা যাবে।</p>
+    ${SECTIONS.map((sec,si)=>{ const list=ids(sec);
+      return `<section class="zone ${zone[si]||'z2'}"><h2>${sec.title} স্তর</h2>
+        ${list.length?list.map(k=>{ const c=COURSES[k], n=c.chapters.filter((_,i)=>chDoc(k,i)).length;
+          return `<button class="ctile wide t-${c.t} ch-entry" data-course="${k}">${liveToday(k)?'<span class="live-badge"><i></i>লাইভ</span>':''}${art(c.art)}<span style="flex:1;min-width:0"><b>${c.name}${c.sub?' ('+c.sub+')':''}</b><span class="subj">${c.subj||''}</span><small>মাসিক কোর্স${c.offer?' · ৳'+bn(c.offer.price):''} · ${bn(c.chapters.length)}টি অধ্যায়${n?' · '+bn(n)+'টিতে নোট':''}</small></span>${chev}</button>
+            ${c.content?`<button class="btn ghost" data-chlist="${k}" style="width:100%">${c.name} ${c.subj||''}: অধ্যায় ও নোট</button>`:''}`; }).join('')
+          :`<div class="empty soon-empty">কোর্স চালু নেই, শীঘ্রই চালু হবে।</div>`}
+      </section>`; }).join('')}
   </div>`;
 }
 function vQuiz(){
@@ -1110,7 +1108,9 @@ function xaMaterials(e){
 }
 function xaFiltered(){
   const ids=[hubCourse()], f=S.xfilter||'all', st=S.xstat||'all', q=String(S.xq||'').trim().toLowerCase(), gd=S.xgo||'';
+  const today=todayISO();
   return ids.flatMap(id=>examsFor(id)).filter(e=>{
+    if(!(S.exams[examKey(e)]||e.date<today)) return false;   // লাইভ ও সামনের পরীক্ষা "পরীক্ষা" পাতায়
     if(f!=='all'&&e.kind!==f) return false;
     if(gd&&e.date>gd) return false;
     if(st!=='all'&&xaStatus(e)[0]!==st&&!(st==='soon'&&xaStatus(e)[0]==='live')) return false;
@@ -1159,7 +1159,7 @@ function xaListHTML(){
   const ids=[hubCourse()], all=xaFiltered(), pages=Math.max(1,Math.ceil(all.length/XA_PER));
   if(S.xpage>pages||!S.xpage) S.xpage=1;
   const list=all.slice((S.xpage-1)*XA_PER,S.xpage*XA_PER);
-  if(!all.length) return `<div class="empty">${S.xq||S.xgo||(S.xfilter&&S.xfilter!=='all')||(S.xstat&&S.xstat!=='all')?'এই খোঁজে কোনো পরীক্ষা পাওয়া যায়নি।':'এখনো কোনো পরীক্ষা প্রকাশ হয়নি।'}</div>`;
+  if(!all.length) return `<div class="empty">${S.xq||S.xgo||(S.xfilter&&S.xfilter!=='all')||(S.xstat&&S.xstat!=='all')?'এই খোঁজে কোনো পরীক্ষা পাওয়া যায়নি।':'আর্কাইভে এখনো কোনো পরীক্ষা নেই। পরীক্ষা দিলে বা পরীক্ষার দিন পেরিয়ে গেলে এখানে আসবে।'}</div>`;
   let prev='', html='';
   list.forEach((e,i)=>{ if(i>0&&e.date!==prev) html+=`<div class="xa-sep"><span>${longD(parseD(e.date))}</span></div>`; prev=e.date; html+=xaCard(e,ids.length>1); });
   if(pages===1) return html;
@@ -1199,15 +1199,18 @@ function vExams(){
   const ids=OFFER_IDS(), cid=hubCourse(), c=COURSES[cid], msg=routineStateMsg(), today=todayISO();
   const all=msg?[]:examsFor(cid), tod=all.filter(e=>e.date===today&&!e.pending), next=all.filter(e=>e.date>today&&!e.pending).sort((a,b)=>a.date<b.date?-1:1)[0];
   const doneToday=tod.filter(e=>S.exams[examKey(e)]);
-  const banner=msg?'':tod.length&&doneToday.length<tod.length?todayExamBanner():tod.length?`<div class="hub-banner ok">আজকের লাইভ পরীক্ষা দিয়েছ। ফলাফল ও উত্তর দেখতে "ফলাফল"-এ যাও।</div>`:`<div class="hub-banner">আজ লাইভ পরীক্ষা নেই।<br>আগের প্রশ্নসমূহ দেখতে আর্কাইভ-এ যাও।</div>`;
+  const banner=msg?'':tod.length&&doneToday.length<tod.length?'':tod.length?`<div class="hub-banner ok">আজকের লাইভ পরীক্ষা দিয়েছ। পরীক্ষাটি এখন আর্কাইভ ও ফলাফলে আছে।</div>`:`<div class="hub-banner">আজ লাইভ পরীক্ষা নেই।<br>আগের প্রশ্নসমূহ দেখতে আর্কাইভ-এ যাও।</div>`;
   return `<div class="screen xa">
     <div class="topbar"><span style="width:44px"></span><h1>লাইভ পরীক্ষা</h1><span style="width:44px"></span></div>
     <p style="margin:-8px 0 0;text-align:center;font-weight:600;color:var(--accent)">${c.name}${c.sub?' ('+c.sub+')':''} · ${c.subj||''}</p>
     ${ids.length>1?`<div class="seg" style="grid-template-columns:repeat(${ids.length},minmax(0,1fr))">${ids.map(k=>`<button class="seg-btn" aria-selected="${k===cid}" data-hubcourse="${k}">${COURSES[k].name}</button>`).join('')}</div>`:''}
     ${CAN_EDIT?`<div class="hub-admin"><button class="adminbar" data-goadmin="exam">${svg('pencil')}<span>নতুন পরীক্ষা যোগ কর</span></button><button class="adminbar" data-goadmin="routine">${svg('calendar')}<span>রুটিন প্রকাশ কর</span></button></div>`:''}
     ${msg||banner}
-    ${msg?'':(()=>{ const upc=all.filter(e=>e.date>=today&&(!e.pending||CAN_EDIT)).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).slice(0,5);
-      return upc.length?`<h2 class="xa-h">পরবর্তী পরীক্ষা ও সিলেবাস</h2>${upc.map(e=>xaCard(e,false)).join('')}`:''; })()}
+    ${msg?'':(()=>{ const live=all.filter(e=>e.date===today&&!e.pending&&!S.exams[examKey(e)]);
+      const upc=all.filter(e=>e.date>today&&(!e.pending||CAN_EDIT)).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).slice(0,5);
+      return (live.length?`<h2 class="xa-h">আজকের লাইভ পরীক্ষা</h2>${live.map(e=>xaCard(e,false)).join('')}`:'')
+        +(upc.length?`<h2 class="xa-h">পরবর্তী পরীক্ষা ও সিলেবাস</h2>${upc.map(e=>xaCard(e,false)).join('')}`:'')
+        +`<p class="muted" style="margin:0;font-size:13.5px;text-align:center">দেওয়া হয়ে গেছে বা সময় পেরিয়ে গেছে এমন পরীক্ষা "আর্কাইভ"-এ পাবে।</p>`; })()}
     ${examTiles(cid)}
   </div>`;
 }
@@ -1222,7 +1225,7 @@ function vXArchive(){
     </div>
     <div class="xa-row">
       <label class="xa-go">তারিখে যান <input type="date" data-xgo="1" value="${esc(S.xgo||'')}" aria-label="তারিখে যান"></label>${S.xgo?`<button class="link" data-xgoclr="1">সব তারিখ</button>`:''}
-      <label class="xa-go" style="margin-left:auto">ফিল্টার <select data-xstat="1" aria-label="অবস্থা অনুযায়ী ফিল্টার">${[['all','সব'],['done','দেওয়া হয়েছে'],['miss','দেওয়া হয়নি'],['soon','আজ ও আসন্ন']].map(([v,l])=>`<option value="${v}" ${st===v?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="xa-go" style="margin-left:auto">ফিল্টার <select data-xstat="1" aria-label="অবস্থা অনুযায়ী ফিল্টার">${[['all','সব'],['done','দেওয়া হয়েছে'],['miss','দেওয়া হয়নি']].map(([v,l])=>`<option value="${v}" ${st===v?'selected':''}>${l}</option>`).join('')}</select></label>
     </div>
     <div id="xaList" style="display:flex;flex-direction:column;gap:12px">${msg||xaListHTML()}</div>
   </div>`;
