@@ -407,6 +407,16 @@ select.input{appearance:auto}
 .xc-act{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:4px}
 .xc-act .btn{min-height:50px;width:100%}
 .soon-empty{padding:18px 12px;font-weight:600}
+.wk-free{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:72px;padding:12px 14px;border-radius:18px;border:2px solid #f2a33a;background:linear-gradient(135deg,#fff4e0,#ffe7c2);color:#4a2c00;font:inherit;text-align:left;cursor:pointer}
+.wk-free b{display:block;font-size:18px}
+.wk-free small{display:block;font-size:13px;color:#7a4d10;margin-top:2px}
+.wk-gift{font-size:30px;line-height:1}
+.wk-free .arrow svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4}
+.wk-info{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.wk-info ul{margin:6px 0 0;padding-left:20px;line-height:1.8;font-size:15px}
+.free-tag{display:inline-block;vertical-align:middle;font-size:12.5px;font-weight:700;color:#fff;background:#2e9e5b;border-radius:999px;padding:1px 9px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wk-free{background:linear-gradient(135deg,#3a2a12,#4a3416);color:#ffe2b8}:root:not([data-theme="light"]) .wk-free small{color:#f3c98a}}
+:root[data-theme="dark"] .wk-free{background:linear-gradient(135deg,#3a2a12,#4a3416);color:#ffe2b8}:root[data-theme="dark"] .wk-free small{color:#f3c98a}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -746,6 +756,26 @@ function vHome(){
     </section>`).join('')}
   </div>`;
 }
+/* সাপ্তাহিক ফ্রী পরীক্ষা: প্রতি শুক্রবার, সবার জন্য */
+function weeklyBtn(cid){
+  const o=COURSES[cid].offer, live=RSTATE==='ready'&&examsFor(cid).some(e=>e.kind==='friday'&&e.date===todayISO()&&!S.exams[examKey(e)]&&examPool(e).length);
+  return `<button class="wk-free" data-weekly="${cid}">${live?'<span class="live-badge"><i></i>লাইভ</span>':''}
+    <span class="wk-gift" aria-hidden="true">🎁</span>
+    <span style="flex:1;min-width:0"><b>সাপ্তাহিক ফ্রী পরীক্ষা</b><small>প্রতি শুক্রবার · ${bn(o.friday.marks)} নম্বর · ${bn(o.friday.mins)} মিনিট · সবার জন্য ফ্রী</small></span>
+    <span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>`;
+}
+function vWeekly(){
+  const cid=hubCourse(), c=COURSES[cid], o=c.offer, msg=routineStateMsg(), today=todayISO();
+  const fr=msg?[]:examsFor(cid).filter(e=>e.kind==='friday');
+  const cur=fr.filter(e=>e.date>=today).sort((a,b)=>a.date<b.date?-1:1);
+  const past=fr.filter(e=>e.date<today).sort((a,b)=>a.date<b.date?1:-1);
+  return `<div class="screen">${hubTop('সাপ্তাহিক ফ্রী পরীক্ষা')}
+    <div class="wk-info"><b>${c.name} ${c.subj||''}</b>
+      <ul><li>প্রতি শুক্রবার, সারাদিন খোলা</li><li>${bn(o.friday.marks)} নম্বর · ${bn(o.friday.mins)} মিনিট</li><li>সিলেবাস: আগের ৬ দিনের পরীক্ষার সিলেবাস</li><li>প্যাকেজ ছাড়াই সবাই দিতে পারবে, মেধাতালিকা সবাই দেখবে</li></ul></div>
+    ${msg||(cur.length?`<h2 class="xa-h">এই সপ্তাহের পরীক্ষা</h2>${cur.slice(0,2).map(e=>xaCard(e,false)).join('')}`:`<div class="empty">এই সপ্তাহের রুটিন এখনো প্রকাশ হয়নি। প্রকাশ হলে শুক্রবারের পরীক্ষা এখানে আসবে।</div>`)}
+    ${past.length?`<h2 class="xa-h">আগের সাপ্তাহিক পরীক্ষা</h2>${past.slice(0,S.wkAll?99:3).map(e=>xaCard(e,false)).join('')}${past.length>3&&!S.wkAll?`<button class="btn ghost" data-wkall>সব দেখাও (${bn(past.length)}টি)</button>`:''}`:''}
+  </div>`;
+}
 function offerCard(id,o){
   const c=COURSES[id], enrolled=!!(S.enrolled&&S.enrolled[id]);
   const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0);
@@ -794,6 +824,7 @@ function vCourse(){
       <span class="muted" style="font-size:14px">${bn(c.chapters.length)}টি অধ্যায় · ${bn(doneCount)}টি পড়া শেষ</span></div>
     </div>
     <div class="progress" aria-hidden="true"><i style="width:${Math.round(doneCount/c.chapters.length*100)}%"></i></div>
+    ${c.offer?weeklyBtn(id):''}
     ${c.offer?offerCard(id,c.offer):''}
     ${sylCard(id)}
     ${c.offer?'':`<div class="list" role="list">
@@ -1179,7 +1210,7 @@ function xaCard(e,showCourse){
   return `<article class="xa-card">
     <div class="xa-top"><span class="xa-date">${bnD(d)}</span><span class="xa-chips"><span class="xa-pill st-${sk}">${sl}</span>
       <button class="heart ${fav?'on':''}" data-favx="${k}" aria-pressed="${fav}" aria-label="${fav?'প্রিয় থেকে সরাও':'প্রিয় পরীক্ষায় রাখো'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></div>
-    <h3 class="xa-title">${esc(kindName(e))}</h3>
+    <h3 class="xa-title">${esc(kindName(e))}${e.kind==='friday'?' <span class="free-tag">ফ্রী</span>':''}</h3>
     <div class="xa-line"><span class="chip">${esc(c.name)}${showCourse?' '+esc(c.subj||''):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
     ${units.length?`<div class="xa-line">বিষয়: ${shown.map(u=>`<span class="chip">${esc(unitChipLabel(e.course,u))}</span>`).join(' ')}${units.length>2||(e.kind==='friday'&&e.items.length)?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</div>`:''}
     ${note?`<p class="xa-note"><span aria-hidden="true">📝</span> ${esc(note)}</p>`:''}
@@ -1209,7 +1240,7 @@ function xaListHTML(){
     <span>পাতা</span><select class="input" data-xpgsel="1" aria-label="পাতা নম্বর">${Array.from({length:pages},(_,i)=>`<option value="${i+1}" ${i+1===S.xpage?'selected':''}>${bn(i+1)}</option>`).join('')}</select><span>/ ${bn(pages)}</span>
     <button class="iconbtn" data-xpg="${S.xpage+1}" ${S.xpage>=pages?'disabled':''} aria-label="পরের পাতা">›</button></nav>`;
 }
-const HUBV=['exams','xarchive','xresults','xmerit','xwrong','xfav','xsyl','xnotes','course','routine'];
+const HUBV=['weekly','exams','xarchive','xresults','xmerit','xwrong','xfav','xsyl','xnotes','course','routine'];
 const hubCourse=()=>{ const ids=OFFER_IDS(); return ids.includes(S.hubCourse)?S.hubCourse:ids[0]; };
 const hubTop=(title)=>`<div class="topbar"><button class="iconbtn" data-go="${S.hubFrom||'exams'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>${title}</h1><span style="width:44px"></span></div>`;
 function myFirst(cid){ return Object.entries(S.exams||{}).filter(([k,r])=>r&&r.total&&(r.course||keyParts(k).course)===cid).sort((a,b)=>(b[1].at||0)-(a[1].at||0)); }
@@ -1247,6 +1278,7 @@ function vExams(){
     ${ids.length>1?`<div class="seg" style="grid-template-columns:repeat(${ids.length},minmax(0,1fr))">${ids.map(k=>`<button class="seg-btn" aria-selected="${k===cid}" data-hubcourse="${k}">${COURSES[k].name}</button>`).join('')}</div>`:''}
     ${CAN_EDIT?`<div class="hub-admin"><button class="adminbar" data-goadmin="exam">${svg('pencil')}<span>নতুন পরীক্ষা যোগ কর</span></button><button class="adminbar" data-goadmin="routine">${svg('calendar')}<span>রুটিন প্রকাশ কর</span></button></div>`:''}
     ${msg||banner}
+    ${weeklyBtn(cid)}
     ${msg?'':(()=>{ const live=all.filter(e=>e.date===today&&!e.pending&&!S.exams[examKey(e)]);
       const upc=all.filter(e=>e.date>today&&(!e.pending||CAN_EDIT)).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).slice(0,5);
       return (live.length?`<h2 class="xa-h">আজকের লাইভ পরীক্ষা</h2>${live.map(e=>xaCard(e,false)).join('')}`:'')
@@ -2055,7 +2087,7 @@ function renderTabs(){
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
   if(authed) renderTabs();
@@ -2145,6 +2177,8 @@ app.addEventListener('click',e=>{
     const arr=pdfTarget(key); if(arr.length>=10){ toast('সর্বোচ্চ ১০টি PDF দেওয়া যায়'); return; }
     arr.push({t:tt||'PDF',u}); S.pdfDraft[key]={t:'',u:''}; S.pdfOpen=S.pdfOpen||{}; S.pdfOpen[key]=true; render(); toast('PDF যোগ হয়েছে · প্রকাশ চাপলে সংরক্ষণ হবে'); return; }
   if(t.dataset.pdfrm){ const parts=t.dataset.pdfrm.split('|'), i=+parts.pop(), key=parts.join('|'); pdfTarget(key).splice(i,1); render(); return; }
+  if(t.dataset.weekly){ S.hubCourse=t.dataset.weekly; S.hubFrom=S.view==='course'?'course':S.view==='exams'?'exams':'home'; S.wkAll=false; return go('weekly'); }
+  if(t.hasAttribute('data-wkall')){ S.wkAll=true; render(); return; }
   if(t.dataset.hub){ S.hubCourse=t.dataset.hubc||hubCourse(); S.hubFrom=S.view==='course'?'course':S.view==='routine'?'routine':'exams'; if(t.dataset.hub==='routine') return go('routine'); S.wlim=20; return go(t.dataset.hub); }
   if(t.dataset.hubcourse){ S.hubCourse=t.dataset.hubcourse; render(); return; }
   if(t.dataset.hubch){ const [c,i]=t.dataset.hubch.split('|'); S.course=c; S.chFrom='play'; return go('chapter',{chIdx:+i}); }
