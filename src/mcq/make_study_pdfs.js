@@ -91,7 +91,7 @@ table.key td b{color:#1F5FBF}
           footerTemplate: `<div style="font-size:8px;width:100%;text-align:center;color:#4A5B73">Sohog Ganit Academy · ${cid === 'c10h' ? 'Higher Math' : cid === 'h11' ? 'HSC Higher Math 1st Paper' : 'General Math'} · ${key.replace('ch', 'Chapter ')} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`,
           margin: { top: '14mm', bottom: '16mm', left: '13mm', right: '13mm' } });
         const kb = Math.round(fs.statSync(path.join(outDir, file)).size / 1024);
-        index[cid][key] = { f: file, n: data.length, kb };
+        index[cid][key] = { f: file, n: data.length, kb, ch, q: data.map(x => x.n) };
         process.stdout.write(`${file} ${kb}KB\n`);
       }
     }
