@@ -1,7 +1,13 @@
 package com.sohogganit.academy;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import com.getcapacitor.JSObject;
+import java.io.OutputStream;
 import android.net.Uri;
 import android.util.Base64;
 import com.getcapacitor.JSArray;
@@ -89,6 +95,51 @@ public class SohogFilePlugin extends Plugin {
             call.resolve();
         } catch (Exception e) {
             call.reject("open failed", e);
+        }
+    }
+
+    /** স্টাডি PDF (base64 টুকরো) ফোনের Download/Sohog Ganit ফোল্ডারে সংরক্ষণ */
+    @PluginMethod
+    public void savePdf(PluginCall call) {
+        String name = call.getString("name", "file.pdf").replaceAll("[^A-Za-z0-9._-]", "_");
+        JSArray parts = call.getArray("parts");
+        if (parts == null || parts.length() == 0) {
+            call.reject("empty");
+            return;
+        }
+        try {
+            String where;
+            if (Build.VERSION.SDK_INT >= 29) {
+                ContentValues v = new ContentValues();
+                v.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+                v.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+                v.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Sohog Ganit");
+                Uri uri = getContext().getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                if (uri == null) {
+                    call.reject("insert");
+                    return;
+                }
+                try (OutputStream out = getContext().getContentResolver().openOutputStream(uri)) {
+                    for (int i = 0; i < parts.length(); i++) out.write(Base64.decode(parts.getString(i), Base64.DEFAULT));
+                }
+                where = "Download/Sohog Ganit/" + name;
+            } else {
+                File dir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Sohog Ganit");
+                if (!dir.exists() && !dir.mkdirs()) {
+                    call.reject("folder");
+                    return;
+                }
+                File file = new File(dir, name);
+                try (FileOutputStream out = new FileOutputStream(file)) {
+                    for (int i = 0; i < parts.length(); i++) out.write(Base64.decode(parts.getString(i), Base64.DEFAULT));
+                }
+                where = file.getAbsolutePath();
+            }
+            JSObject ret = new JSObject();
+            ret.put("where", where);
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("save failed", e);
         }
     }
 }

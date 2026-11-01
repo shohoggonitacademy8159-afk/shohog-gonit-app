@@ -225,7 +225,7 @@ def h_sqrt3(b):
     import math as m
     v = m.tan(m.radians(d)) ** 2 + 1
     vv = F(v).limit_denominator(4)
-    b.add(f"tan² {d}° + 1 = কত?", fr(vv), setw(fr(vv), ['4/3', '4', '2', '1', '3']), f"1 + tan²θ = sec²θ; sec {d}° = {'±'}... ⇒ {fr(vv)}।", H)
+    b.add(f"tan² {d}° + 1 = কত?", fr(vv), setw(fr(vv), ['4/3', '4', '2', '1', '3']), f"tan {d}° = {tval('tan', d)}; 1 + tan²θ = sec²θ = {fr(vv)}।", H)
 p82 = run('8.2', R, fx82, [e_val, e_quad, e_sign], [m_find, m_reduce, m_neg, m_big, m_expr], [h_tan_find, h_sum, h_identity, h_complex, h_sqrt3])
 
 # ---------------- 8.3 ত্রিকোণমিতিক সমীকরণ ----------------
