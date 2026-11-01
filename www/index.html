@@ -742,6 +742,7 @@ const COURSES = {
   h12:{name:'দ্বাদশ শ্রেণি', sub:'এইচএসসি ২৭', subj:'উচ্চতর গণিত ২য় পত্র', art:'gradF', t:'sky', chapters:['বাস্তব সংখ্যা ও অসমতা','যোগাশ্রয়ী প্রোগ্রাম','জটিল সংখ্যা','বহুপদী ও বহুপদী সমীকরণ','দ্বিপদী বিস্তৃতি','কণিক','বিপরীত ত্রিকোণমিতিক ফাংশন','স্থিতিবিদ্যা','সমতলে বস্তুকণার গতি','বিস্তার পরিমাপ ও সম্ভাবনা']},
   adm:{name:'এডমিশন কেয়ার', subj:'উচ্চতর গণিত (১ম ও ২য় পত্র)', art:'signpost', t:'green', chapters:['১ম পত্র: পূর্ণ রিভিশন','২য় পত্র: পূর্ণ রিভিশন','প্রকৌশল ভর্তি গণিত','ঢাবি ক-ইউনিট প্রস্তুতি','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট']}
 };
+Object.assign(COURSES.c10h,{offer:{price:199, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, ptitle:'এসএসসি ২০২৭ উচ্চতর গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'উচ্চতর গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 Object.assign(COURSES.c10,{ptitle:'এসএসসি ২০২৭ সাধারণ গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'সাধারণ গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 const SECTIONS = [
   {title:'প্রাথমিক', art:'boy', rows:[{kind:'primary'}]},
@@ -1030,7 +1031,7 @@ function vCourse(){
   </div>`;
 }
 /* দশম শ্রেণি ফ্রী ব্যাচ: সাজেশন PDF, NCTB বই, টেস্ট পরীক্ষার প্রশ্ন সমাধান (অ্যাডমিন → ফ্রী ব্যাচ ট্যাব থেকে দেওয়া) */
-const FREE_BATCH={c10:{title:'দশম শ্রেণি ফ্রী ব্যাচ',banner:{badge:'ফ্রী',main:'দশম শ্রেণি',sub:'ফ্রী ব্যাচ'}}};
+const FREE_BATCH={c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}}};
 const FREE_CATS=[['sugg','ফ্রী সাজেশন PDF','📄','গুরুত্বপূর্ণ অধ্যায় ও প্রশ্নের সাজেশন'],['nctb','NCTB বই','📚','বোর্ডের পাঠ্যবই (অনলাইন সংস্করণ)'],['test','টেস্ট পরীক্ষার প্রশ্ন সমাধান','✅','বিভিন্ন স্কুলের টেস্ট পরীক্ষার প্রশ্ন ও সমাধান']];
 const NCTB_MATH={t:'নবম-দশম শ্রেণি গণিত বই ২০২৬ (NCTB অফিসিয়াল)',u:'https://nctb.gov.bd/pages/static-pages/695b99afc4774958d7b70612'};
 const FREE_DEFAULT={nctb:[NCTB_MATH]};
@@ -1087,13 +1088,14 @@ function vFree(){
 }
 /* অ্যাডমিন: ফ্রী ব্যাচের PDF */
 function frInit(){
-  if(!S.fr){ const it=freeItems('c10'), r=SYL[freeId('c10')]; S.fr={cid:'c10',items:{sugg:it.sugg.slice(),nctb:it.nctb.slice(),test:it.test.slice()},routine:(r&&Array.isArray(r.routine)?r.routine:[]).map(x=>({d:x.d,t:x.t,k:x.k})),rd:{d:todayISO(),t:'',k:'study'},dirty:false}; }
+  if(!S.fr){ const cid=FREE_BATCH[S.frCid]?S.frCid:'c10', it=freeItems(cid), r=SYL[freeId(cid)]; S.fr={cid,items:{sugg:it.sugg.slice(),nctb:it.nctb.slice(),test:it.test.slice()},routine:(r&&Array.isArray(r.routine)?r.routine:[]).map(x=>({d:x.d,t:x.t,k:x.k})),rd:{d:todayISO(),t:'',k:'study'},dirty:false}; }
   return S.fr;
 }
 function freePanel(){
   const fr=frInit();
   return `<section class="admin" aria-label="ফ্রী ব্যাচ"><div><span class="offer-tag">সবার জন্য ফ্রী</span><h2 class="display" style="font-size:22px;margin-top:6px">${esc(FREE_BATCH[fr.cid].title)}</h2>
-    <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → দশম শ্রেণি ফ্রী ব্যাচ থেকে দেখবে।</p></div>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → ${esc(FREE_BATCH[fr.cid].title)} থেকে দেখবে।</p></div>
+    ${Object.keys(FREE_BATCH).length>1?`<div class="seg" style="grid-template-columns:repeat(${Object.keys(FREE_BATCH).length},minmax(0,1fr))">${Object.keys(FREE_BATCH).map(k=>`<button class="seg-btn" aria-selected="${k===fr.cid}" data-frcourse="${k}">${esc(COURSES[k].subj||k)}</button>`).join('')}</div>`:''}
     <section class="fr-adm"><h3>🎁 সাপ্তাহিক ফ্রী পরীক্ষা</h3>
       ${(()=>{ const fx=Object.values(SYL).filter(r=>r.type==='exam'&&r.free&&r.course===fr.cid).sort((a,b)=>a.date<b.date?1:-1);
         return fx.length?`<div class="xlist">${fx.slice(0,5).map(r=>`<div class="xitem"><div><b>${esc(r.title)}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':' · প্রকাশ '+fmtDT(r.publishAt)}</span></div><button class="link del" data-xdel="${esc(r.id)}">মুছুন</button></div>`).join('')}</div>`:'<p class="muted" style="margin:0">এখনো কোনো ফ্রী পরীক্ষা নেই।</p>'; })()}
@@ -1740,7 +1742,7 @@ function xaCard(e,showCourse){
     <div class="xa-top"><span class="xa-date">${bnD(d)}</span><span class="xa-chips"><span class="xa-pill st-${sk}">${sl}</span>
       <button class="heart ${fav?'on':''}" data-favx="${k}" aria-pressed="${fav}" aria-label="${fav?'প্রিয় থেকে সরাও':'প্রিয় পরীক্ষায় রাখো'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></div>
     <h3 class="xa-title">${esc(kindName(e))}${e.kind==='free'?' <span class="free-tag">ফ্রী</span>':''}</h3>
-    <div class="xa-line"><span class="chip">${esc(c.name)}${showCourse?' '+esc(c.subj||''):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
+    <div class="xa-line"><span class="chip">${esc(c.name)}${c.subj?' · '+esc(c.subj):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
     ${units.length?`<div class="xa-line">বিষয়: ${shown.map(u=>`<span class="chip">${esc(unitChipLabel(e.course,u))}</span>`).join(' ')}${units.length>2||(e.kind==='friday'&&e.items.length)?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</div>`:''}
     ${note?`<p class="xa-note"><span aria-hidden="true">📝</span> ${esc(note)}</p>`:''}
     ${nMat?`<section class="xa-study" aria-label="স্টাডি ম্যাটেরিয়াল"><b><span aria-hidden="true">📚</span> স্টাডি ম্যাটেরিয়াল (${bn(nMat)})</b>
@@ -1806,7 +1808,7 @@ function vExams(){
   return `<div class="screen xa">
     <div class="topbar"><span style="width:44px"></span><h1>লাইভ পরীক্ষা</h1><span style="width:44px"></span></div>
     <p style="margin:-8px 0 0;text-align:center;font-weight:600;color:var(--accent)">${c.name}${c.sub?' ('+c.sub+')':''} · ${c.subj||''}</p>
-    ${ids.length>1?`<div class="seg" style="grid-template-columns:repeat(${ids.length},minmax(0,1fr))">${ids.map(k=>`<button class="seg-btn" aria-selected="${k===cid}" data-hubcourse="${k}">${COURSES[k].name}</button>`).join('')}</div>`:''}
+    ${ids.length>1?`<div class="seg" style="grid-template-columns:repeat(${ids.length},minmax(0,1fr))">${ids.map(k=>`<button class="seg-btn" aria-selected="${k===cid}" data-hubcourse="${k}">${ids.every(x=>COURSES[x].name===COURSES[ids[0]].name)?(COURSES[k].subj||COURSES[k].name):COURSES[k].name}</button>`).join('')}</div>`:''}
     ${CAN_EDIT?`<div class="hub-admin"><button class="adminbar" data-goadmin="exam">${svg('pencil')}<span>নতুন পরীক্ষা যোগ কর</span></button><button class="adminbar" data-goadmin="routine">${svg('calendar')}<span>রুটিন প্রকাশ কর</span></button></div>`:''}
     ${msg||banner}
     ${weeklyBtn(cid)}
@@ -2732,7 +2734,8 @@ app.addEventListener('click',e=>{
     S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
     persist(); go('home'); toast('লগ আউট হয়েছে'); return; }
   if(t.hasAttribute('data-frpast')){ S.frPast=!S.frPast; render(); return; }
-  if(t.hasAttribute('data-newfree')){ S.xf=null; const xf=xfInit(); xf.aud='free'; xf.title='সাপ্তাহিক ফ্রী পরীক্ষা'; S.atab='exam'; render(); window.scrollTo(0,0); return; }
+  if(t.dataset.frcourse){ if(S.fr&&S.fr.dirty&&S.fr.cid!==t.dataset.frcourse) toast('আগের ফ্রী ব্যাচের অপ্রকাশিত পরিবর্তন বাদ গেছে'); S.frCid=t.dataset.frcourse; S.fr=null; render(); return; }
+  if(t.hasAttribute('data-newfree')){ S.xf=null; const xf=xfInit(); xf.course=frInit().cid; xf.units=[]; xf.aud='free'; xf.title='সাপ্তাহিক ফ্রী পরীক্ষা'; S.atab='exam'; render(); window.scrollTo(0,0); return; }
   if(t.hasAttribute('data-nctbmath')){ const fr=frInit(); fr.items.nctb.unshift(Object.assign({},NCTB_MATH)); fr.dirty=true; render(); return; }
   if(t.hasAttribute('data-fradd')){ const fr=frInit(), x=fr.rd; if(!/^\d{4}-\d{2}-\d{2}$/.test(x.d||'')){ toast('তারিখ দিন'); return; } if(String(x.t||'').trim().length<2){ toast('বিষয় লিখুন'); return; }
     fr.routine.push({d:x.d,t:String(x.t).trim().slice(0,120),k:x.k||'study'}); fr.rd={d:x.d,t:'',k:x.k}; fr.dirty=true; render(); toast('রুটিনে যোগ হয়েছে · প্রকাশ চাপলে সংরক্ষণ হবে'); return; }
