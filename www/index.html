@@ -378,6 +378,12 @@ select.input{appearance:auto}
 .xa-pdfs{display:flex;flex-direction:column;gap:6px}
 .pdf-row,.pdf-item{display:flex;align-items:center;gap:10px;min-height:46px;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--fg);text-decoration:none}
 .pdf-t{flex:1;min-width:0;font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
+button.pdf-row{width:100%;font:inherit;text-align:left;cursor:pointer}
+.pdf-s{font-weight:400;color:var(--muted);font-size:12.5px}
+.pdf-pick{cursor:pointer;justify-content:center;text-align:center}
+.pdf-prog{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;font-weight:600;background:var(--bg)}
+.pdf-prog span{position:relative;z-index:1}
+.pdf-prog i{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--accent) 22%,transparent);transition:width .3s}
 .pdf-ed{display:flex;flex-direction:column;gap:8px}
 .pdf-add{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
 .pdf-box{border:1px dashed var(--line);border-radius:12px;padding:6px 10px}
@@ -1027,7 +1033,7 @@ const FREE_DEFAULT={nctb:[NCTB_MATH]};
 const freeId=cid=>`freebatch_${cid}`;
 function freeItems(cid){
   const r=SYL[freeId(cid)], out={};
-  FREE_CATS.forEach(([k])=>{ const a=r&&r.items&&Array.isArray(r.items[k])?r.items[k].filter(f=>f&&safeLink(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:safeLink(f.u)})):null; out[k]=a&&a.length?a:(r&&r.items&&Array.isArray(r.items[k])?[]:(FREE_DEFAULT[k]||[])); });
+  FREE_CATS.forEach(([k])=>{ const a=r&&r.items&&Array.isArray(r.items[k])?r.items[k].filter(f=>f&&fileUrl(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:fileUrl(f.u),s:+f.s||0})):null; out[k]=a&&a.length?a:(r&&r.items&&Array.isArray(r.items[k])?[]:(FREE_DEFAULT[k]||[])); });
   return out;
 }
 const FR_TYPES={exam:['পরীক্ষা','#e53935'],study:['পড়া','#1e88e5'],pdf:['সাজেশন/PDF','#2e9e5b']};
@@ -1446,20 +1452,74 @@ const unitVal=u=>u.ex?String(u.ex):String(u.ch);
 const valUnit=v=>({ch:exCh(v),ex:String(v).indexOf('.')>0?String(v):null});
 /* অ্যাডমিনের যোগ করা বিশেষ পরীক্ষা (syllabus সংগ্রহে type:'exam', তাই নতুন রুলস লাগে না) */
 /* পরীক্ষার সাথে যুক্ত PDF/লিংক: [{t:নাম, u:https লিংক}] */
-function filesOf(r){ return Array.isArray(r&&r.files)?r.files.filter(f=>f&&safeLink(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:safeLink(f.u)})).slice(0,10):[]; }
+/* ডিভাইস থেকে আপলোড করা PDF: Firestore-এর 'pdfs' সংগ্রহে ছোট ছোট টুকরো করে রাখা হয়; u='pdf:<id>:<টুকরো সংখ্যা>' */
+const PDF_RE=/^pdf:[a-z0-9]{8,32}:\d{1,2}$/;
+const pdfRef=u=>PDF_RE.test(String(u||''))?String(u):'';
+const fileUrl=u=>pdfRef(u)||safeLink(u);
+const PDF_MAX=8*1024*1024, PDF_CHUNK=600*1024, PDF_CACHE={};
+const fsize=n=>n>=1048576?`${bn((n/1048576).toFixed(1))} MB`:`${bn(Math.max(1,Math.round(n/1024)))} KB`;
+function filesOf(r){ return Array.isArray(r&&r.files)?r.files.filter(f=>f&&fileUrl(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:fileUrl(f.u),s:+f.s||0})).slice(0,10):[]; }
 function pdfList(files){
   if(!files||!files.length) return '';
-  return `<div class="xa-pdfs">${files.map(f=>`<a class="pdf-row" href="${esc(f.u)}" target="_blank" rel="noopener"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}</span><span class="file-go">খুলুন</span></a>`).join('')}</div>`;
+  return `<div class="xa-pdfs">${files.map(f=>pdfRef(f.u)
+    ?`<button type="button" class="pdf-row" data-pdfopen="${esc(f.u)}" data-pdfname="${esc(f.t)}"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}${f.s?`<small class="pdf-s"> · ${fsize(f.s)}</small>`:''}</span><span class="file-go">${S.pdfBusy===f.u?'খুলছে…':'খুলুন'}</span></button>`
+    :`<a class="pdf-row" href="${esc(f.u)}" target="_blank" rel="noopener"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}</span><span class="file-go">খুলুন</span></a>`).join('')}</div>`;
 }
-/* অ্যাডমিন: PDF যোগের ছোট ফর্ম (key = 'rf|তারিখ' বা 'xf') */
+/* অ্যাডমিন: ডিভাইস থেকে PDF আপলোড (key = 'rf|তারিখ', 'xf', 'cf' বা 'fr|ধরন') */
 function pdfEditor(key,files){
-  const d=(S.pdfDraft||{})[key]||{t:'',u:''};
+  const d=(S.pdfDraft||{})[key]||{t:''}, up=(S.upl||{})[key], pc=up?Math.round(up.p/up.n*100):0;
   return `<div class="pdf-ed">
-    ${(files||[]).map((f,i)=>`<div class="pdf-item"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}</span><button type="button" class="link del" data-pdfrm="${key}|${i}" aria-label="${esc(f.t)} বাদ দিন">বাদ</button></div>`).join('')}
-    <div class="pdf-add"><input class="input" data-pdft="${key}" maxlength="80" placeholder="PDF-এর নাম, যেমন: অনুশীলনী 3.1 শিট" value="${esc(d.t)}">
-      <input class="input" data-pdfu="${key}" inputmode="url" placeholder="লিংক (https://… Google Drive ইত্যাদি)" value="${esc(d.u)}">
-      <button type="button" class="btn ghost" data-pdfadd="${key}">+ PDF যোগ</button></div>
+    ${(files||[]).map((f,i)=>`<div class="pdf-item"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}${f.s?`<small class="pdf-s"> · ${fsize(f.s)}</small>`:''}</span><button type="button" class="link del" data-pdfrm="${key}|${i}" aria-label="${esc(f.t)} বাদ দিন">বাদ</button></div>`).join('')}
+    ${up?`<div class="pdf-prog" role="status"><span>“${esc(up.name)}” আপলোড হচ্ছে… ${bn(pc)}%</span><i style="width:${pc}%"></i></div>`
+    :`<div class="pdf-add"><input class="input" data-pdft="${key}" maxlength="80" placeholder="PDF-এর নাম (না দিলে ফাইলের নামই থাকবে)" value="${esc(d.t)}">
+      <label class="btn ghost pdf-pick"><input type="file" accept="application/pdf,.pdf" data-pdffile="${key}" hidden>📎 ডিভাইস থেকে PDF বাছাই করো</label>
+      <span class="muted" style="font-size:12.5px">সর্বোচ্চ ৮ MB · ফাইল বাছাই করলেই আপলোড শুরু হবে</span></div>`}
   </div>`;
+}
+function b64(bytes){ let s=''; for(let i=0;i<bytes.length;i+=0x8000) s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000)); return btoa(s); }
+const pdfDocs=u=>{ const [,id,n]=pdfRef(u).split(':'); return Array.from({length:+n},(_,i)=>`${id}_${i}`); };
+async function uploadPdf(key,file){
+  if(!DB||!CAN_EDIT){ toast('আগে অ্যাডমিন হিসেবে লগইন করো'); return; }
+  if(!file) return;
+  if(!/\.pdf$/i.test(file.name)&&file.type!=='application/pdf'){ toast('শুধু PDF ফাইল দেওয়া যাবে'); return; }
+  if(file.size>PDF_MAX){ toast('ফাইলটি ৮ MB-এর বেশি; ছোট করে আবার দাও'); return; }
+  S.upl=S.upl||{}; if(S.upl[key]) return;
+  const d=(S.pdfDraft||{})[key]||{}, name=(String(d.t||'').trim()||String(file.name).replace(/\.pdf$/i,'').trim()||'PDF').slice(0,80);
+  S.upl[key]={name,p:0,n:1}; render();
+  let id='', n=0;
+  try{
+    const bytes=new Uint8Array(await file.arrayBuffer()); n=Math.max(1,Math.ceil(bytes.length/PDF_CHUNK));
+    id=(Date.now().toString(36)+Math.random().toString(36).slice(2,10)).slice(0,24); S.upl[key].n=n;
+    for(let i=0;i<n;i++){
+      await DB.collection('pdfs').doc(`${id}_${i}`).set({d:b64(bytes.subarray(i*PDF_CHUNK,(i+1)*PDF_CHUNK)),i,n,name,size:bytes.length,at:new Date().toISOString()});
+      S.upl[key].p=i+1; render();
+    }
+    pdfTarget(key).push({t:name,u:`pdf:${id}:${n}`,s:bytes.length});
+    S.pdfDraft=S.pdfDraft||{}; S.pdfDraft[key]={t:'',u:''}; S.pdfOpen=S.pdfOpen||{}; S.pdfOpen[key]=true;
+    delete S.upl[key]; render(); toast('PDF আপলোড হয়েছে · এবার প্রকাশ/সংরক্ষণ চাপো');
+  }catch(e){
+    delete S.upl[key]; if(id) for(let i=0;i<n;i++) DB.collection('pdfs').doc(`${id}_${i}`).delete().catch(()=>{});
+    render(); toast(e&&e.code==='permission_denied'?'অনুমতি নেই: Firebase রুলসে pdfs অংশটি যোগ করো':'আপলোড হয়নি; ইন্টারনেট দেখে আবার চেষ্টা করো');
+  }
+}
+async function openPdf(u,name){
+  if(!pdfRef(u)||S.pdfBusy) return;
+  if(!DB){ toast('ইন্টারনেট সংযোগ পাওয়া যায়নি'); return; }
+  S.pdfBusy=u; render();
+  try{
+    let parts=PDF_CACHE[u];
+    if(!parts){ const docs=await Promise.all(pdfDocs(u).map(id=>DB.collection('pdfs').doc(id).get()));
+      if(docs.some(x=>!x||typeof x.d!=='string')) throw Object.assign(new Error('missing'),{code:'missing'});
+      parts=PDF_CACHE[u]=docs.map(x=>x.d); }
+    const cap=window.Capacitor, id=pdfRef(u).split(':')[1];
+    if(cap&&cap.isNativePlatform&&cap.isNativePlatform()){ await cap.nativePromise('SohogFile','openPdf',{name:`sohog-${id}.pdf`,parts,title:String(name||'PDF')}); }
+    else{
+      const url=URL.createObjectURL(new Blob(parts.map(x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0))),{type:'application/pdf'}));
+      const w=window.open(url,'_blank'); if(!w){ const a=document.createElement('a'); a.href=url; a.download=`${String(name||'file').slice(0,60)}.pdf`; document.body.appendChild(a); a.click(); a.remove(); }
+      setTimeout(()=>URL.revokeObjectURL(url),120000);
+    }
+  }catch(e){ toast(e&&e.code==='missing'?'ফাইলটি পাওয়া যায়নি (হয়তো মুছে ফেলা হয়েছে)':e&&String(e.message||'').indexOf('noviewer')>=0?'ফোনে PDF খোলার কোনো অ্যাপ নেই':'PDF খোলা যায়নি; ইন্টারনেট দেখে আবার চেষ্টা করো'); }
+  S.pdfBusy=''; render();
 }
 function pdfTarget(key){ if(key.indexOf('fr|')===0){ const fr=frInit(); fr.dirty=true; const k=key.split('|')[1]; return fr.items[k]=fr.items[k]||[]; } if(key==='cf'){ const cf=cfInit(); cf.dirty=true; cf.vals.files=cf.vals.files||[]; return cf.vals.files; } if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
 function freeExams(cid){ return specialExams(cid,true); }
@@ -2620,7 +2680,9 @@ app.addEventListener('click',e=>{
     if(!u){ toast('সঠিক লিংক দিন (https:// দিয়ে শুরু)'); return; }
     const arr=pdfTarget(key); if(arr.length>=10){ toast('সর্বোচ্চ ১০টি PDF দেওয়া যায়'); return; }
     arr.push({t:tt||'PDF',u}); S.pdfDraft[key]={t:'',u:''}; S.pdfOpen=S.pdfOpen||{}; S.pdfOpen[key]=true; render(); toast('PDF যোগ হয়েছে · প্রকাশ চাপলে সংরক্ষণ হবে'); return; }
-  if(t.dataset.pdfrm){ const parts=t.dataset.pdfrm.split('|'), i=+parts.pop(), key=parts.join('|'); pdfTarget(key).splice(i,1); render(); return; }
+  if(t.dataset.pdfrm){ const parts=t.dataset.pdfrm.split('|'), i=+parts.pop(), key=parts.join('|'), arr=pdfTarget(key), f=arr[i];
+    arr.splice(i,1); if(f&&pdfRef(f.u)&&DB){ pdfDocs(f.u).forEach(id=>DB.collection('pdfs').doc(id).delete().catch(()=>{})); delete PDF_CACHE[f.u]; toast('PDF মুছে গেছে · প্রকাশ/সংরক্ষণ চাপো'); } render(); return; }
+  if(t.dataset.pdfopen){ openPdf(t.dataset.pdfopen,t.dataset.pdfname); return; }
   if(t.dataset.weekly){ S.hubCourse=t.dataset.weekly; S.hubFrom=S.view==='course'?'course':S.view==='exams'?'exams':'home'; S.wkAll=false; return go('weekly'); }
   if(t.hasAttribute('data-wkall')){ S.wkAll=true; render(); return; }
   if(t.dataset.feat!==undefined){ const i=+t.dataset.feat; S.featOpen=S.featOpen===i?null:i; render(); return; }
@@ -2757,6 +2819,7 @@ app.addEventListener('input',e=>{
 });
 app.addEventListener('change',e=>{
   const t=e.target;
+  if(t.dataset.pdffile){ const f=t.files&&t.files[0]; t.value=''; if(f) uploadPdf(t.dataset.pdffile,f); return; }
   if(t.dataset.rf==='week'&&t.value){ const rf=rfInit(); rf.week=isoD(weekStartOf(parseD(t.value))); rf.vals=null; pendingRender=false; render(); }
   if(t.dataset.when){ const st=stFor(t.dataset.when); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }

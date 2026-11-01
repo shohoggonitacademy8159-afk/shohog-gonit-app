@@ -30,6 +30,11 @@ service cloud.firestore {
         && request.resource.data.total <= 100;
     }
     // শিক্ষার্থীদের সমস্যা রিপোর্ট: শিক্ষার্থী শুধু নতুন পাঠাতে পারে, দেখা/বদলানো/মোছা শুধু অ্যাডমিন
+    // ডিভাইস থেকে আপলোড করা PDF (টুকরো করে রাখা); সবাই পড়বে, শুধু অ্যাডমিন লিখবে
+    match /pdfs/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
     match /reports/{id} {
       allow read, update, delete: if isAdmin();
       allow create: if request.resource.data.keys().hasOnly(['type','text','improve','rating','exam','name','roll','phone','device','ua','at','status','ref'])

@@ -3,7 +3,7 @@
 import { initializeApp } from 'firebase/app';
 import {
   initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
-  collection, doc, setDoc, getDocFromServer, deleteDoc, onSnapshot, query, orderBy
+  collection, doc, setDoc, getDoc, getDocFromServer, deleteDoc, onSnapshot, query, orderBy
 } from 'firebase/firestore';
 import {
   getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
@@ -34,6 +34,7 @@ function colRef(name) {
     doc(id) {
       const r = doc(fs, name, id);
       return {
+        get: () => getDoc(r).then(x => (x.exists() ? x.data() : null), e => { throw wrapErr(e); }),
         set: data => setDoc(r, data).catch(e => { throw wrapErr(e); }),
         delete: () => deleteDoc(r).catch(e => { throw wrapErr(e); })
       };

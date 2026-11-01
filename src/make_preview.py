@@ -13,14 +13,14 @@ MOCK = r"""
 (function(){
   const pad=n=>String(n).padStart(2,'0'), d=new Date(), today=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   const ago=new Date(Date.now()-3600e3).toISOString();
-  const store={routines:{}, syllabus:{}, results:{}, reports:{}};
+  const store={routines:{}, syllabus:{}, results:{}, reports:{}, pdfs:{}};
   store.routines['c10_'+today]={course:'c10',date:today,kind:'daily',syllabus:'অনুশীলনী 2.1 (সেট)',chapter:2,ex:'2.1',publishAt:ago};
   store.syllabus['ex_c10_2_1']={type:'exnote',course:'c10',no:2,ex:'2.1',title:'অনুশীলনী 2.1: সেট (নমুনা নোট)',note:'এটি প্রিভিউয়ের নমুনা নোট।\nঅ্যাডমিন প্যানেল → অধ্যায় ট্যাব থেকে প্রতিটি অনুশীলনীর আলাদা নোট দেওয়া যায়।',link:'',publishAt:ago};
-  const subs={routines:[],syllabus:[],results:[],reports:[]}; let authCb=null;
+  const subs={routines:[],syllabus:[],results:[],reports:[],pdfs:[]}; let authCb=null;
   const emit=n=>{ const docs=Object.entries(store[n]).map(([id,v])=>({id,data:()=>v})); subs[n].forEach(f=>f({docs})); };
   window.SohogDB={ init(){return true;}, onAuth(cb){ authCb=cb; setTimeout(()=>cb(null),20); },
     collection(n){ return { orderBy(){return this;}, onSnapshot(next){ subs[n].push(next); setTimeout(()=>emit(n),30); return ()=>{ subs[n]=subs[n].filter(f=>f!==next); }; },
-      doc(id){ return { set:async v=>{ store[n][id]=JSON.parse(JSON.stringify(v)); emit(n); }, delete:async()=>{ delete store[n][id]; emit(n); } }; } }; },
+      doc(id){ return { get:async()=>store[n][id]?JSON.parse(JSON.stringify(store[n][id])):null, set:async v=>{ store[n][id]=JSON.parse(JSON.stringify(v)); emit(n); }, delete:async()=>{ delete store[n][id]; emit(n); } }; } }; },
     async signIn(email){ setTimeout(()=>authCb&&authCb({email:String(email||'').toLowerCase()}),20); },
     async signOut(){ setTimeout(()=>authCb&&authCb(null),20); } };
   window.SOHOG_FIREBASE={apiKey:'demo'};
