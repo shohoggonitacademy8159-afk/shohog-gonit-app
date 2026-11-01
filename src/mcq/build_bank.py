@@ -15,6 +15,11 @@ if f8.exists():
     new8 = json.loads(f8.read_text(encoding='utf-8'))
     for i, x in enumerate(new8): x['n'] = len(old8) + 1 + i   # প্রশ্ন নম্বর অধ্যায়ের ভিতরে অনন্য রাখতে হবে (পরীক্ষা n দিয়ে প্রশ্ন খোঁজে)
     bank['c10']['8'] = old8 + new8
+# উচ্চতর গণিত (দশম, c10h): chh1.json … chh14.json
+bank['c10h'] = {}
+for ch in range(1, 15):
+    f = root / f'src/mcq/chh{ch}.json'
+    if f.exists(): bank['c10h'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')
 (root / 'www/mcq.js').write_text('// সহগ গণিত একাডেমি — MCQ প্রশ্নব্যাংক (src/mcq/build_bank.py থেকে তৈরি)\nwindow.SOHOG_MCQ = ' + json.dumps(bank, ensure_ascii=False) + ';\n', encoding='utf-8')
-print({k: len(v) for k, v in bank['c10'].items()})
+print({k: len(v) for k, v in bank['c10'].items()}); print('c10h', {k: len(v) for k, v in bank['c10h'].items()})
