@@ -967,7 +967,7 @@ function courseFeatures(id){
     ['#e0457b','calendar','ডেইলি লাইভ MCQ এক্সাম',`শনি থেকে বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`],
     ['#f08c1a','exam','সাপ্তাহিক পরীক্ষা',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের পরীক্ষা, সময় ${bn(o.friday.mins)} মিনিট। সিলেবাস আগের ৬ দিনের পরীক্ষার সিলেবাস, সাথে সাপ্তাহিক মেধাতালিকা।`],
     ['#e53935','report','মাসিক পরীক্ষা ও মডেল টেস্ট','রুটিনের বাইরে মাসিক পরীক্ষা ও মডেল টেস্ট। নম্বর, সময় ও সিলেবাস প্রতিবার আলাদাভাবে ঘোষণা করা হয়।'],
-    ['#8e44ef','openbook','লেকচার শিট ও স্টাডি ম্যাটেরিয়াল',`অধ্যায় ও অনুশীলনীভিত্তিক নোট ও PDF। প্রতিটি পরীক্ষার সিলেবাস অনুযায়ী PDF নিজে থেকে "স্টাডি ম্যাটেরিয়াল"-এ চলে আসে, পরীক্ষা দাও বোতামের ঠিক উপরে।`],
+    ['#8e44ef','openbook','লেকচার শিট ও স্টাডি ম্যাটেরিয়াল',`অধ্যায় ও অনুশীলনীভিত্তিক নোট। প্রতিটি পরীক্ষার সিলেবাস অনুযায়ী নোট নিজে থেকে "স্টাডি ম্যাটেরিয়াল"-এ চলে আসে, পরীক্ষা দাও বোতামের ঠিক উপরে।`],
     ['#1e88e5','pencil',`${bn(nq)}+ প্রশ্নের প্রশ্নব্যাংক`,`${bn(c.chapters.length)}টি অধ্যায় ও ${bn(nex)}টি অনুশীলনী জুড়ে সহজ, মধ্যম ও কঠিন প্রশ্ন। প্রতিটি শিক্ষার্থী এলোমেলোভাবে আলাদা প্রশ্ন পায়, তাই দেখাদেখির সুযোগ কম।`],
     ['#2e9e5b','check','তাৎক্ষণিক ফলাফল ও ব্যাখ্যা','খাতা জমা দিলেই নম্বর, প্রতিটি প্রশ্নের সঠিক উত্তর ও ব্যাখ্যা। উত্তর একবার দিলে আর বদলানো যায় না, তাই আসল পরীক্ষার অভ্যাস তৈরি হয়।'],
     ['#f2b705','medal','মেধাতালিকা','প্রতিটি পরীক্ষার মেধাতালিকা সবাই দেখতে পারে। প্রথমবার দেওয়া নম্বরে মেধাক্রম, সমান নম্বর হলে যে আগে জমা দিয়েছে সে উপরে।'],
@@ -1036,7 +1036,7 @@ function freeItems(cid){
   FREE_CATS.forEach(([k])=>{ const a=r&&r.items&&Array.isArray(r.items[k])?r.items[k].filter(f=>f&&fileUrl(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:fileUrl(f.u),s:+f.s||0})):null; out[k]=a&&a.length?a:(r&&r.items&&Array.isArray(r.items[k])?[]:(FREE_DEFAULT[k]||[])); });
   return out;
 }
-const FR_TYPES={exam:['পরীক্ষা','#e53935'],study:['পড়া','#1e88e5'],pdf:['সাজেশন/PDF','#2e9e5b']};
+const FR_TYPES={exam:['পরীক্ষা','#e53935'],study:['পড়া','#1e88e5'],pdf:['সাজেশন','#2e9e5b']};
 function freeRoutine(cid){
   const r=SYL[freeId(cid)], rows=(r&&Array.isArray(r.routine)?r.routine:[]).filter(x=>x&&/^\d{4}-\d{2}-\d{2}$/.test(x.d)).map(x=>({d:x.d,t:String(x.t||'').slice(0,120),k:FR_TYPES[x.k]?x.k:'study'}));
   if(RSTATE==='ready') freeExams(cid).filter(e=>!e.pending||CAN_EDIT).forEach(e=>{ if(!rows.some(x=>x.d===e.date&&x.k==='exam')) rows.push({d:e.date,t:`${e.title} · ${bn(e.marks)} নম্বর · ${bn(e.mins)} মিনিট${examChapters(e).length?' · '+examChapters(e).map(u=>unitLabel(cid,u)).join(', '):''}`,k:'exam',auto:true}); });
@@ -1054,7 +1054,7 @@ function freeBanner(cid,size){
   const b=FREE_BATCH[cid].banner, sym=['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
   return `<div class="cbanner free ${size||''}" aria-hidden="true">${sym.map((x,i)=>`<span class="cb-sym" style="--i:${i}">${x}</span>`).join('')}
     <span class="cb-badge">${esc(b.badge)}</span><span class="cb-main">${esc(b.main)}</span><span class="cb-sub">${esc(b.sub)}</span>
-    <span class="cb-chip"><i></i>সাজেশন · NCTB বই · টেস্ট পরীক্ষা</span><span class="cb-shine"></span></div>`;
+    <span class="cb-chip"><i></i>সাপ্তাহিক ফ্রী পরীক্ষা · রুটিন</span><span class="cb-shine"></span></div>`;
 }
 function freeExamSection(cid){
   if(RSTATE!=='ready') return '';
@@ -1075,12 +1075,9 @@ function vFree(){
   const cid=S.freeCid||'c10', fb=FREE_BATCH[cid], items=freeItems(cid), open=S.freeOpen===undefined?'sugg':S.freeOpen;
   return `<div class="screen">${backTop(fb.title,S.freeFrom||'play')}
     ${freeBanner(cid,'big')}
-    <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। এসএসসি পরীক্ষার প্রস্তুতির জন্য সাজেশন, বোর্ডের বই আর টেস্ট পরীক্ষার প্রশ্নের সমাধান এক জায়গায়।</p></div>
+    <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। প্রতি সপ্তাহে একটি ফ্রী পরীক্ষা আর পড়ার রুটিন দিয়ে এসএসসির প্রস্তুতি।</p></div>
     ${freeExamSection(cid)}
     ${freeRoutineSection(cid)}
-    ${FREE_CATS.map(([k,l,ic,d])=>{ const a=items[k]||[], on=open===k;
-      return `<section class="free-sec ${on?'open':''}"><button class="free-head" data-freecat="${k}" aria-expanded="${on}"><span class="free-ic">${ic}</span><span style="flex:1;min-width:0"><b>${l}</b><small>${d}</small></span><span class="free-n">${a.length?bn(a.length)+'টি':'শীঘ্রই'}</span><span class="free-ch">${on?'▾':'›'}</span></button>
-        ${on?(a.length?pdfList(a):`<div class="empty" style="padding:12px">শীঘ্রই এখানে যোগ হবে।</div>`):''}</section>`; }).join('')}
     ${COURSES[cid]&&COURSES[cid].offer?`<article class="pcard"><b class="pc-title">প্রতিদিন লাইভ পরীক্ষা দিয়ে পুরো প্রস্তুতি নিতে চাও?</b><button class="btn" data-course="${cid}">${esc(ptitle(COURSES[cid]))} দেখো</button></article>`:''}
   </div>`;
 }
@@ -1092,7 +1089,7 @@ function frInit(){
 function freePanel(){
   const fr=frInit();
   return `<section class="admin" aria-label="ফ্রী ব্যাচ"><div><span class="offer-tag">সবার জন্য ফ্রী</span><h2 class="display" style="font-size:22px;margin-top:6px">${esc(FREE_BATCH[fr.cid].title)}</h2>
-    <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → দশম শ্রেণি ফ্রী ব্যাচ থেকে দেখবে। PDF Google Drive-এ রেখে "Anyone with the link" করে লিংক দিন।</p></div>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → দশম শ্রেণি ফ্রী ব্যাচ থেকে দেখবে।</p></div>
     <section class="fr-adm"><h3>🎁 সাপ্তাহিক ফ্রী পরীক্ষা</h3>
       ${(()=>{ const fx=Object.values(SYL).filter(r=>r.type==='exam'&&r.free&&r.course===fr.cid).sort((a,b)=>a.date<b.date?1:-1);
         return fx.length?`<div class="xlist">${fx.slice(0,5).map(r=>`<div class="xitem"><div><b>${esc(r.title)}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':' · প্রকাশ '+fmtDT(r.publishAt)}</span></div><button class="link del" data-xdel="${esc(r.id)}">মুছুন</button></div>`).join('')}</div>`:'<p class="muted" style="margin:0">এখনো কোনো ফ্রী পরীক্ষা নেই।</p>'; })()}
@@ -1103,11 +1100,8 @@ function freePanel(){
       <div class="xf-grid"><input class="input" type="date" data-frd="d" value="${esc(fr.rd.d)}" aria-label="তারিখ"><select class="input" data-frd="k" aria-label="ধরন">${Object.entries(FR_TYPES).map(([k,[l]])=>`<option value="${k}" ${fr.rd.k===k?'selected':''}>${l}</option>`).join('')}</select></div>
       <input class="input" data-frd="t" maxlength="120" placeholder="যেমন: অধ্যায় ৩ — বীজগাণিতিক রাশি (অনুশীলনী 3.1, 3.2)" value="${esc(fr.rd.t)}">
       <button type="button" class="btn ghost" data-fradd>+ রুটিনে যোগ</button></section>
-    <section class="fr-adm"><h3>📚 PDF ও বই</h3>
-    ${FREE_CATS.map(([k,l,ic])=>`<div class="field"><label>${ic} ${l}</label>${pdfEditor('fr|'+k,fr.items[k])}</div>`).join('')}
-    ${fr.items.nctb.some(f=>f.u===NCTB_MATH.u)?'':`<button type="button" class="link" data-nctbmath style="align-self:flex-start">+ NCTB গণিত বই (অফিসিয়াল) যোগ করো</button>`}</section>
     <div class="error" id="frErr" role="alert"></div>
-    <button class="btn" data-frpublish style="width:100%" ${S.frBusy?'disabled':''}>${S.frBusy?'প্রকাশ হচ্ছে…':'ফ্রী ব্যাচ (রুটিন ও PDF) প্রকাশ কর'}</button>
+    <button class="btn" data-frpublish style="width:100%" ${S.frBusy?'disabled':''}>${S.frBusy?'প্রকাশ হচ্ছে…':'ফ্রী ব্যাচ রুটিন প্রকাশ কর'}</button>
   </section>`;
 }
 async function publishFree(){
@@ -1202,7 +1196,7 @@ function vProfile(){
     <div class="list">
       ${item('data-go="routine"','calendar','c-blue','পরীক্ষার রুটিন')}
       ${item('data-go="report"','chart','c-blue','আমার লার্নিং রিপোর্ট')}
-      ${item('data-go="downloads"','download','c-teal','ডাউনলোড','PDF, ফলাফল ফাইল ও এপের নতুন সংস্করণ')}
+      ${item('data-go="downloads"','download','c-teal','ডাউনলোড','ফলাফল ফাইল ও এপের নতুন সংস্করণ')}
     </div>
     <h3 class="m-sec">সাহায্য এবং নীতি</h3>
     <div class="list">
@@ -1336,10 +1330,6 @@ function vDownloads(){
     <div class="topbar"><span style="width:44px"></span><h1>ডাউনলোড</h1><span style="width:44px"></span></div>
     <section class="dl-card"><span class="dl-ic">${svg('download')}</span><div style="flex:1;min-width:0"><b>এপের সর্বশেষ সংস্করণ</b><span class="muted">নতুন সুবিধা পেতে মাঝে মাঝে আপডেট করো</span></div><a class="btn" href="${APK_URL}" target="_blank" rel="noopener">নামাও</a></section>
     <section class="dl-card"><span class="dl-ic">${svg('report')}</span><div style="flex:1;min-width:0"><b>আমার ফলাফলের ফাইল</b><span class="muted">${mine?`${bn(mine)}টি পরীক্ষার নম্বর (Excel/CSV)`:'পরীক্ষা দিলে এখান থেকে নামানো যাবে'}</span></div><button class="btn ghost" data-mycsv ${mine?'':'disabled'}>নামাও</button></section>
-    <h2 class="xa-h">স্টাডি ম্যাটেরিয়াল (PDF) ${nf?`<small class="muted" style="font-size:14px">${bn(nf)}টি</small>`:''}</h2>
-    ${nf?groups.map(g=>`<section class="dl-group"><b>${esc(g.t)}</b>${pdfList(g.files)}</section>`).join('')
-      :`<div class="empty">এখনো কোনো PDF প্রকাশ হয়নি। শিক্ষক PDF দিলে অধ্যায় অনুযায়ী এখানে জমা হবে।</div>`}
-    <p class="muted" style="margin:0;font-size:13px">PDF খুলে Google Drive-এর ⤓ বোতাম চাপলে ফোনে নামিয়ে রাখা যাবে, পরে ইন্টারনেট ছাড়াও পড়া যাবে।</p>
   </div>`;
 }
 async function myResultsCSV(){
@@ -1460,6 +1450,7 @@ const PDF_MAX=8*1024*1024, PDF_CHUNK=600*1024, PDF_CACHE={};
 const fsize=n=>n>=1048576?`${bn((n/1048576).toFixed(1))} MB`:`${bn(Math.max(1,Math.round(n/1024)))} KB`;
 function filesOf(r){ return Array.isArray(r&&r.files)?r.files.filter(f=>f&&fileUrl(f.u)).map(f=>({t:String(f.t||'PDF').slice(0,80),u:fileUrl(f.u),s:+f.s||0})).slice(0,10):[]; }
 function pdfList(files){
+  return '';   // PDF দেখানো বন্ধ
   if(!files||!files.length) return '';
   return `<div class="xa-pdfs">${files.map(f=>pdfRef(f.u)
     ?`<button type="button" class="pdf-row" data-pdfopen="${esc(f.u)}" data-pdfname="${esc(f.t)}"><span class="file-ic" aria-hidden="true">PDF</span><span class="pdf-t">${esc(f.t)}${f.s?`<small class="pdf-s"> · ${fsize(f.s)}</small>`:''}</span><span class="file-go">${S.pdfBusy===f.u?'খুলছে…':'খুলুন'}</span></button>`
@@ -1662,6 +1653,7 @@ function xaMaterials(e){
 }
 /* পরীক্ষার PDF: পরীক্ষার সাথে দেওয়া PDF + সিলেবাসের প্রতিটি অধ্যায়/অনুশীলনীর PDF লাইব্রেরি (অ্যাডমিন → অধ্যায় ট্যাব) থেকে স্বয়ংক্রিয়ভাবে */
 function examPdfs(e){
+  return [];   // PDF দেখানো বন্ধ
   const out=[], seen=new Set(), add=f=>{ if(f&&f.u&&!seen.has(f.u)){ seen.add(f.u); out.push(f); } };
   (e.files||[]).forEach(add);
   examChapters(e).forEach(u=>{
@@ -1853,7 +1845,7 @@ function vXNotes(){
     const r=chDoc(cid,i), f=CAN_EDIT?chFiles(cid,i):[], exs=exList(cid,i+1).filter(x=>exDoc(cid,x));
     if(r||f.length||exs.length) rows.push(`<button class="item" data-hubch="${cid}|${i}"><span class="num">${bn(i+1)}</span><span class="t">${esc(chTitle(cid,i))}<br><span class="s">${[r?'অধ্যায়ের নোট':'',exs.length?'অনুশীলনী '+exs.join(', ')+'-এর নোট':'',f.length?'PDF (শুধু অ্যাডমিন)':''].filter(Boolean).join(' · ')}</span></span></button>`);
   });
-  return `<div class="screen">${hubTop('নোট ও PDF')}
+  return `<div class="screen">${hubTop('নোট')}
     ${rows.length?`<div class="list">${rows.join('')}</div>`:`<div class="empty">এখনো কোনো নোট প্রকাশ হয়নি। প্রকাশ হলে এখানে দেখা যাবে।</div>`}
   </div>`;
 }
@@ -2055,9 +2047,7 @@ function adminPanel(){
     ${[0,1,2,3,4,5].map(i=>{const d=addD(s,i),k=isoD(d);return `<div class="field"><label for="rf_${k}">${DAYN[d.getDay()]}, ${fmtD(d)} <span class="muted" style="font-weight:400">· 20 নম্বর · 15 মিনিট</span></label>
       <div class="rf-row"><select class="input rf-ch" id="rfc_${k}" data-rfadd="${k}" aria-label="${DAYN[d.getDay()]}-এর পরীক্ষায় অধ্যায় বা অনুশীলনী যোগ করুন"><option value="">+ অধ্যায়/অনুশীলনী যোগ</option>${unitOptions(rf.course,'')}</select>
       <input class="input" id="rf_${k}" data-rfday="${k}" maxlength="200" placeholder="সিলেবাস, যেমন: অনুশীলনী 1.1" value="${esc(rf.vals[k]||'')}"></div>
-      ${unitChips(rf.course,rf.chs[k],'rfrm',k)}
-      <details class="pdf-box" ${(rf.files&&rf.files[k]&&rf.files[k].length)||(S.pdfOpen&&S.pdfOpen['rf|'+k])||(S.pdfDraft&&S.pdfDraft['rf|'+k]&&(S.pdfDraft['rf|'+k].t||S.pdfDraft['rf|'+k].u))?'open':''} data-pdfbox="rf|${k}"><summary>সিলেবাসের নিচে PDF${rf.files&&rf.files[k]&&rf.files[k].length?` (${rf.files[k].length})`:''}</summary>${pdfEditor('rf|'+k,(rf.files||{})[k])}</details></div>`}).join('')}
-    <p class="muted" style="margin:0;font-size:13px">PDF দিতে: ফাইলটি Google Drive-এ রেখে Share → "Anyone with the link" করে লিংক কপি করুন, তারপর নাম ও লিংক বসিয়ে "+ PDF যোগ" চাপুন। শিক্ষার্থীরা পরীক্ষার সিলেবাসের নিচে দেখবে।</p>
+      ${unitChips(rf.course,rf.chs[k],'rfrm',k)}</div>`}).join('')}
     <p class="muted" style="margin:0;font-size:13px">প্রতিদিন এক বা একাধিক অধ্যায়/অনুশীলনী যোগ করা যায় (যেমন 3.1 ও 3.2)। শিক্ষার্থীরা সেদিন ঐ অংশগুলোর প্রশ্ন থেকে লাইভ পরীক্ষা দেবে। সিলেবাস ফাঁকা রাখলে বেছে নেওয়া অংশের নাম নিজে থেকে বসবে।</p>
     <div class="fri-auto"><b>শুক্রবার, ${fmtD(fri)} · 50 নম্বর · 40 মিনিট</b><br>সিলেবাস ও প্রশ্ন: উপরের 6 দিনের অধ্যায়গুলো একসাথে</div>
     ${whenUI('rf',rf)}
@@ -2412,8 +2402,6 @@ function chapterPanel(){
       <textarea class="input area" id="cfNote" data-cfv="note" maxlength="5000" rows="8" placeholder="যেমন: মূল সূত্র, গুরুত্বপূর্ণ উদাহরণ, কোন অনুশীলনী করতে হবে">${esc(cf.vals.note)}</textarea></div>
     <div class="field"><label for="cfLink">ভিডিও বা ফাইলের লিংক (ঐচ্ছিক)</label>
       <input class="input" id="cfLink" data-cfv="link" type="url" inputmode="url" placeholder="https://youtube.com/..." value="${esc(cf.vals.link)}"></div>
-    <div class="field"><label>এই ${cf.ex?'অনুশীলনীর':'অধ্যায়ের'} PDF (স্টাডি ম্যাটেরিয়াল)</label>${pdfEditor('cf',cf.vals.files)}
-      <span class="muted" style="font-size:13px">এখানে একবার PDF দিলে যে পরীক্ষার সিলেবাসে এই ${cf.ex?'অনুশীলনী':'অধ্যায়'} থাকবে, সেই পরীক্ষার "স্টাডি ম্যাটেরিয়াল"-এ PDF নিজে থেকে চলে যাবে।</span></div>
     ${whenUI('cf',cf)}
     <div class="error" id="cfErr" role="alert"></div>
     <button class="btn" data-cpublish style="width:100%" ${S.cpublishing?'disabled':''}>${S.cpublishing?'প্রকাশ হচ্ছে…':cf.ex?'অনুশীলনী '+cf.ex+'-এর নোট প্রকাশ কর':'অধ্যায়ের নোট প্রকাশ কর'}</button>
@@ -2426,7 +2414,7 @@ async function publishChapter(){
   const cf=cfInit(), el=()=>document.getElementById('cfErr'), w=whenISO(cf);
   const title=cf.vals.title.trim(), note=cf.vals.note.trim(), link=cf.vals.link.trim();
   const files=(cf.vals.files||[]).slice(0,10);
-  if(!note&&!link&&!files.length){ el().textContent='নোট, লিংক বা PDF — অন্তত একটি দিন।'; return; }
+  if(!note&&!link&&!files.length){ el().textContent='নোট বা লিংক — অন্তত একটি দিন।'; return; }
   if(link&&!safeLink(link)){ el().textContent='লিংকটি https:// দিয়ে শুরু হতে হবে।'; return; }
   if(w.err){ el().textContent=w.err; return; }
   S.cpublishing=true; render();
@@ -2469,7 +2457,6 @@ function examPanel(){
       ${unitChips(cid,xf.units,'xfrm','x')}
       <span class="muted" style="font-size:13px">${xf.units.length?`প্রশ্নব্যাংকে মোট ${pool}টি প্রশ্ন আছে${mk>pool?`; নম্বর ${pool} এর বেশি দিলে ${pool}টি প্রশ্ন আসবে`:''}।`:'এক বা একাধিক অংশ যোগ করুন।'}</span></div>
     <div class="field"><label for="xfSyl">সিলেবাস (ঐচ্ছিক)</label><input class="input" id="xfSyl" data-xf="syllabus" maxlength="200" placeholder="ফাঁকা রাখলে অংশগুলোর নাম বসবে" value="${esc(xf.syllabus)}"></div>
-    <div class="field"><label>সিলেবাসের নিচে PDF (ঐচ্ছিক)</label>${pdfEditor('xf',xf.files)}</div>
     ${whenUI('xf',xf)}
     <div class="error" id="xfErr" role="alert">${esc(xf.err||'')}</div>
     <button class="btn" data-xpublish style="width:100%" ${S.xpublishing?'disabled':''}>${S.xpublishing?'প্রকাশ হচ্ছে…':'পরীক্ষা প্রকাশ কর'}</button>
