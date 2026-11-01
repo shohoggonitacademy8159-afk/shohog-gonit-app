@@ -145,18 +145,20 @@ h1,h2,h3{margin:0;text-wrap:balance}
   --sky-bg:#E6F0FC; --sky-b:#C3D9F6; --sky-a:#2F7DE1;
   --mint-bg:#DFF5F3; --mint-b:#B3E6E0; --mint-a:#0EA5A0;
   --orange-bg:#FDF0E1; --orange-b:#F6D3A8; --orange-a:#F97316;
+  --rose-bg:#FCE8F3; --rose-b:#F5C2DD; --rose-a:#DB2777;
+  --amber-bg:#FEF4D6; --amber-b:#F6DC92; --amber-a:#C77C02;
   --tab-on:#16A34A;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --hero:#1A4F9E; --hero-2:#2560B8; --panel:#131F31; --panel-head:#1A2A44; --panel-line:#26354D; --rule:#34507A;
   --green-bg:#16301F; --green-b:#24503A; --yellow-bg:#332A12; --yellow-b:#57471C; --pink-bg:#3A1B22; --pink-b:#5E2C37;
   --purple-bg:#2A2148; --purple-b:#463873; --sky-bg:#172A47; --sky-b:#2A4670; --mint-bg:#12312F; --mint-b:#1F524E;
-  --orange-bg:#3A2614; --orange-b:#5E3E1F; --tab-on:#6FD39A}}
+  --orange-bg:#3A2614; --orange-b:#5E3E1F; --rose-bg:#3A1830; --rose-b:#5F2A4E; --amber-bg:#352910; --amber-b:#5C4719; --tab-on:#6FD39A}}
 :root[data-theme="dark"]{
   --hero:#1A4F9E; --hero-2:#2560B8; --panel:#131F31; --panel-head:#1A2A44; --panel-line:#26354D; --rule:#34507A;
   --green-bg:#16301F; --green-b:#24503A; --yellow-bg:#332A12; --yellow-b:#57471C; --pink-bg:#3A1B22; --pink-b:#5E2C37;
   --purple-bg:#2A2148; --purple-b:#463873; --sky-bg:#172A47; --sky-b:#2A4670; --mint-bg:#12312F; --mint-b:#1F524E;
-  --orange-bg:#3A2614; --orange-b:#5E3E1F; --tab-on:#6FD39A}
+  --orange-bg:#3A2614; --orange-b:#5E3E1F; --rose-bg:#3A1830; --rose-b:#5F2A4E; --amber-bg:#352910; --amber-b:#5C4719; --tab-on:#6FD39A}
 .t-green{--tbg:var(--green-bg);--tb:var(--green-b);--ta:var(--green-a)}
 .t-yellow{--tbg:var(--yellow-bg);--tb:var(--yellow-b);--ta:var(--yellow-a)}
 .t-pink{--tbg:var(--pink-bg);--tb:var(--pink-b);--ta:var(--pink-a)}
@@ -164,6 +166,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .t-sky{--tbg:var(--sky-bg);--tb:var(--sky-b);--ta:var(--sky-a)}
 .t-mint{--tbg:var(--mint-bg);--tb:var(--mint-b);--ta:var(--mint-a)}
 .t-orange{--tbg:var(--orange-bg);--tb:var(--orange-b);--ta:var(--orange-a)}
+.t-rose{--tbg:var(--rose-bg);--tb:var(--rose-b);--ta:var(--rose-a)}
+.t-amber{--tbg:var(--amber-bg);--tb:var(--amber-b);--ta:var(--amber-a)}
 .screen.home{padding-top:0;gap:16px}
 .hero{margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
   padding:18px 16px 20px;background:linear-gradient(180deg,var(--hero-2),var(--hero));color:var(--hero-ink);border-radius:0 0 26px 26px;
@@ -663,6 +667,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .pickbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;display:flex;align-items:center;justify-content:center;gap:10px;
   min-height:52px;padding:8px 16px;border-radius:16px;background:var(--surface);border:2px solid var(--accent);color:var(--accent);
   font-family:var(--font-display);font-size:21px;line-height:1.2;text-align:center;box-shadow:0 6px 14px -8px rgba(16,35,63,.35)}
+.pkgbar{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:16px;background:var(--surface);border:2px solid var(--accent);box-shadow:0 6px 14px -8px rgba(16,35,63,.35)}
+.pkgbar h2{margin:0;display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:400;font-size:19px;color:var(--accent)}
+.pkgbar.none{flex-direction:row;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:8px 16px;font-family:var(--font-display);font-size:19px;color:var(--muted,#5B6B82);border-style:dashed}
+.pk-ic{font-size:22px}
+.pk-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:var(--tbg);border:1.5px solid var(--tb);color:var(--fg);cursor:pointer;font:inherit}
+.pk-item b{display:block;font-size:15px}.pk-item small{display:block;font-size:12.5px;color:var(--ta);font-weight:600}
+.pk-item.pend small{color:var(--muted,#5B6B82)}
+.pk-item .arrow{font-size:22px;color:var(--ta)}
 .pick-ic{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex-shrink:0}
 .join{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;border:1.5px dashed var(--pink-a);background:var(--pink-bg);color:var(--fg);text-align:left;cursor:pointer}
 .join:hover{border-style:solid}
@@ -778,10 +790,10 @@ const COURSES = {
   c9:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'সাধারণ গণিত', exs:{2:['2.1','2.2'],3:['3.1','3.2','3.3','3.4','3.5'],4:['4.1','4.2','4.3'],5:['5.1','5.2'],6:['6.1','6.2','6.3'],7:['7.1','7.2'],8:['8.1','8.2','8.3','8.4','8.5'],9:['9.1','9.2'],11:['11.1','11.2'],12:['12.1','12.2','12.3','12.4'],13:['13.1','13.2'],14:['14.1','14.2','14.3'],16:['16.1','16.2','16.3','16.4']}, art:'abacus', t:'sky', content:true, chapters:['বাস্তব সংখ্যা','সেট ও ফাংশন','বীজগাণিতিক রাশি','সূচক ও লগারিদম','এক চলকবিশিষ্ট সমীকরণ','রেখা, কোণ ও ত্রিভুজ','ব্যবহারিক জ্যামিতি','বৃত্ত','ত্রিকোণমিতিক অনুপাত','দূরত্ব ও উচ্চতা','বীজগাণিতিক অনুপাত ও সমানুপাত','দুই চলকবিশিষ্ট সরল সহসমীকরণ','সসীম ধারা','অনুপাত, সদৃশতা ও প্রতিসমতা','ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য','পরিমিতি','পরিসংখ্যান']},
   c10:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', exs:{2:['2.1','2.2'],3:['3.1','3.2','3.3','3.4','3.5'],4:['4.1','4.2','4.3'],5:['5.1','5.2'],6:['6.1','6.2','6.3'],7:['7.1','7.2'],8:['8.1','8.2','8.3','8.4','8.5'],9:['9.1','9.2'],11:['11.1','11.2'],12:['12.1','12.2','12.3','12.4'],13:['13.1','13.2'],14:['14.1','14.2','14.3'],16:['16.1','16.2','16.3','16.4']}, offer:{price:199, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, subj:'সাধারণ গণিত', art:'openbook', t:'mint', content:true, chapters:['বাস্তব সংখ্যা','সেট ও ফাংশন','বীজগাণিতিক রাশি','সূচক ও লগারিদম','এক চলকবিশিষ্ট সমীকরণ','রেখা, কোণ ও ত্রিভুজ','ব্যবহারিক জ্যামিতি','বৃত্ত','ত্রিকোণমিতিক অনুপাত','দূরত্ব ও উচ্চতা','বীজগাণিতিক অনুপাত ও সমানুপাত','দুই চলকবিশিষ্ট সরল সহসমীকরণ','সসীম ধারা','অনুপাত, সদৃশতা ও প্রতিসমতা','ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য','পরিমিতি','পরিসংখ্যান']},
   c9h:{name:'নবম শ্রেণি', sub:'এসএসসি ২৮', subj:'উচ্চতর গণিত', art:'hmCompass', t:'purple', chapters:['সেট ও ফাংশন','বীজগাণিতিক রাশি','জ্যামিতি','জ্যামিতিক অঙ্কন','সমীকরণ','অসমতা','অসীম ধারা']},
-  c10h:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', exs:{1:['1.1','1.2'],3:['3.1','3.2'],5:['5.1','5.2','5.3','5.4','5.5','5.6','5.7'],6:['6.1','6.2','6.3'],8:['8.1','8.2','8.3'],9:['9.1','9.2'],10:['10.1','10.2'],11:['11.1','11.2','11.3','11.4']}, content:true, subj:'উচ্চতর গণিত', art:'hmGraph', t:'orange', chapters:['সেট ও ফাংশন','বীজগাণিতিক রাশি','জ্যামিতি','জ্যামিতিক অঙ্কন','সমীকরণ','অসমতা','অসীম ধারা','ত্রিকোণমিতি','সূচকীয় ও লগারিদমীয় ফাংশন','দ্বিপদী বিস্তৃতি','স্থানাঙ্ক জ্যামিতি','সমতলীয় ভেক্টর','ঘন জ্যামিতি','সম্ভাবনা']},
+  c10h:{name:'দশম শ্রেণি', sub:'এসএসসি ২৭', exs:{1:['1.1','1.2'],3:['3.1','3.2'],5:['5.1','5.2','5.3','5.4','5.5','5.6','5.7'],6:['6.1','6.2','6.3'],8:['8.1','8.2','8.3'],9:['9.1','9.2'],10:['10.1','10.2'],11:['11.1','11.2','11.3','11.4']}, content:true, subj:'উচ্চতর গণিত', art:'hmGraph', t:'rose', chapters:['সেট ও ফাংশন','বীজগাণিতিক রাশি','জ্যামিতি','জ্যামিতিক অঙ্কন','সমীকরণ','অসমতা','অসীম ধারা','ত্রিকোণমিতি','সূচকীয় ও লগারিদমীয় ফাংশন','দ্বিপদী বিস্তৃতি','স্থানাঙ্ক জ্যামিতি','সমতলীয় ভেক্টর','ঘন জ্যামিতি','সম্ভাবনা']},
   jb:{name:'জুনিয়র বৃত্তি গণিত', sub:'স্পেশাল ব্যাচ', art:'target', t:'yellow', chapters:['বৃত্তি পরীক্ষার সিলেবাস','অধ্যায়ভিত্তিক অনুশীলন','মানসাঙ্ক ও শর্টকাট','মডেল টেস্ট','বিগত বছরের প্রশ্ন']},
   h11:{name:'একাদশ শ্রেণি', sub:'এইচএসসি ২৮', exs:{1:['1.A','1.B'],2:['2.A','2.B','2.C'],3:['3.A','3.B','3.C','3.D','3.E','3.F','3.G'],4:['4.A','4.B'],5:['5.A','5.B'],6:['6.A','6.B','6.C'],7:['7.A','7.B','7.C','7.D','7.E','7.F','7.G'],9:['9.A','9.B','9.C','9.D','9.E','9.F','9.G','9.H','9.I'],10:['10.A','10.B','10.C','10.D','10.E','10.F','10.G']}, content:true, subj:'উচ্চতর গণিত ১ম পত্র', art:'gradM', t:'purple', chapters:['ম্যাট্রিক্স ও নির্ণায়ক','ভেক্টর','সরলরেখা','বৃত্ত','বিন্যাস ও সমাবেশ','ত্রিকোণমিতিক অনুপাত','সংযুক্ত ও যৌগিক কোণ','ফাংশন ও লেখচিত্র','অন্তরীকরণ','যোগজীকরণ']},
-  h12:{name:'দ্বাদশ শ্রেণি', sub:'এইচএসসি ২৭', exs:{1:['1.A','1.B'],3:['3.A','3.B'],5:['5.A','5.B'],6:['6.A','6.B','6.C'],7:['7.A','7.B'],8:['8.A','8.B','8.C'],9:['9.A','9.B','9.C','9.D'],10:['10.A','10.B']}, content:true, subj:'উচ্চতর গণিত ২য় পত্র', art:'gradF', t:'sky', chapters:['বাস্তব সংখ্যা ও অসমতা','যোগাশ্রয়ী প্রোগ্রাম','জটিল সংখ্যা','বহুপদী ও বহুপদী সমীকরণ','দ্বিপদী বিস্তৃতি','কণিক','বিপরীত ত্রিকোণমিতিক ফাংশন','স্থিতিবিদ্যা','সমতলে বস্তুকণার গতি','বিস্তার পরিমাপ ও সম্ভাবনা']},
+  h12:{name:'দ্বাদশ শ্রেণি', sub:'এইচএসসি ২৭', exs:{1:['1.A','1.B'],3:['3.A','3.B'],5:['5.A','5.B'],6:['6.A','6.B','6.C'],7:['7.A','7.B'],8:['8.A','8.B','8.C'],9:['9.A','9.B','9.C','9.D'],10:['10.A','10.B']}, content:true, subj:'উচ্চতর গণিত ২য় পত্র', art:'gradF', t:'amber', chapters:['বাস্তব সংখ্যা ও অসমতা','যোগাশ্রয়ী প্রোগ্রাম','জটিল সংখ্যা','বহুপদী ও বহুপদী সমীকরণ','দ্বিপদী বিস্তৃতি','কণিক','বিপরীত ত্রিকোণমিতিক ফাংশন','স্থিতিবিদ্যা','সমতলে বস্তুকণার গতি','বিস্তার পরিমাপ ও সম্ভাবনা']},
   adm:{name:'এডমিশন কেয়ার', subj:'উচ্চতর গণিত (১ম ও ২য় পত্র)', art:'signpost', t:'green', chapters:['১ম পত্র: পূর্ণ রিভিশন','২য় পত্র: পূর্ণ রিভিশন','প্রকৌশল ভর্তি গণিত','ঢাবি ক-ইউনিট প্রস্তুতি','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট']}
 };
 Object.assign(COURSES.h12,{offer:{price:120, perMonth:15, daily:{marks:25, mins:20}, friday:null}, exam:'এইচএসসি ২০২৭', ptitle:'এইচএসসি ২০২৭ উচ্চতর গণিত ২য় পত্র', banner:{badge:'HSC 27', main:'উচ্চতর গণিত', sub:'২য় পত্র · মাসে ১৫ পরীক্ষা'}});
@@ -929,10 +941,7 @@ function vHome(){
     </header>
     ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>অ্যাডমিন প্যানেল: রুটিন ও সিলেবাস প্রকাশ</span></button>`:''}
     ${todayExamBanner()}
-    <div class="pickbar" role="heading" aria-level="2">
-      <span class="pick-ic">${svg('pointdown','width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"')}</span>
-      <span>তোমার শ্রেণি নির্বাচন কর</span>
-    </div>
+    ${myPkgBar()}
     ${SECTIONS.map(sec=>`<section class="panel">
       <div class="panel-head">${art(sec.art)}<h2>${sec.title}</h2><span class="rule"></span>
         <span class="chev" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
@@ -1277,6 +1286,16 @@ const pkgActive=cid=>pkgUntil(cid)>Date.now();
 const pendingPay=cid=>Object.values(S.pays||{}).some(p=>p.course===cid&&p.status==='pending');
 /* পেইড কোর্সের পরীক্ষায় প্যাকেজ লাগবে কি না (অ্যাডমিন সেটিং চালু থাকলে) */
 function needPay(e){ return !!(e&&payCfg().enforce&&e.kind!=='free'&&COURSES[e.course]&&COURSES[e.course].offer&&!pkgActive(e.course)&&!CAN_EDIT); }
+/* হোম: শিক্ষার্থীর চালু প্যাকেজ */
+function myPkgBar(){
+  const ids=Object.keys(COURSES).filter(k=>COURSES[k].offer);
+  const act=ids.filter(pkgActive), pend=ids.filter(k=>!pkgActive(k)&&pendingPay(k));
+  if(!act.length&&!pend.length) return `<div class="pkgbar none" role="status"><span class="pk-ic" aria-hidden="true">📦</span><span>তোমার কোনো প্যাকেজ চালু নেই</span></div>`;
+  return `<section class="pkgbar" aria-label="আমার প্যাকেজ"><h2>${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}আমার প্যাকেজ</h2>
+    ${act.map(k=>`<button class="pk-item t-${COURSES[k].t}" data-course="${k}"><span style="flex:1;min-width:0"><b>${esc(ptitle(COURSES[k]))}</b><small>চালু · ${bnD(new Date(pkgUntil(k))).split(',')[0]} পর্যন্ত</small></span><span class="arrow" aria-hidden="true">›</span></button>`).join('')}
+    ${pend.map(k=>`<button class="pk-item pend t-${COURSES[k].t}" data-course="${k}"><span style="flex:1;min-width:0"><b>${esc(ptitle(COURSES[k]))}</b><small>⏳ পেমেন্ট যাচাই হচ্ছে</small></span><span class="arrow" aria-hidden="true">›</span></button>`).join('')}
+  </section>`;
+}
 function pkgBadge(cid){
   const u=pkgUntil(cid);
   if(u>Date.now()) return `<div class="enrolled" style="flex:1">${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}প্যাকেজ চালু · ${bnD(new Date(u)).split(',')[0]} পর্যন্ত</div>`;
