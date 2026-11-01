@@ -109,7 +109,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabbar nav{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));height:72px;align-items:center}
+.tabbar nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:72px;align-items:center}
 .tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;line-height:1.15;text-align:center;padding:0 2px;color:var(--muted);cursor:pointer;min-height:56px;justify-content:center}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tab[aria-current="page"]{color:var(--accent);font-weight:700}
@@ -450,6 +450,53 @@ select.input{appearance:auto}
 .bb-price{flex:1;display:flex;flex-direction:column;line-height:1.2}
 .bb-price span{font-size:13px;color:var(--muted)}.bb-price b{font-size:24px;color:var(--fg)}
 .bb-btn{background:#1f9d55!important;color:#fff!important;min-height:52px;padding:0 22px;font-size:17px;box-shadow:0 4px 0 #157a40}
+.me-head{display:flex;align-items:center;gap:14px;padding:18px 16px;border-radius:22px;background:linear-gradient(135deg,#ffe8d6,#fff4ea);color:#3a1d06}
+.me-av{width:64px;height:64px;border-radius:50%;background:#5b2a7a;color:#fff;display:grid;place-items:center;font-size:28px;font-weight:700;flex-shrink:0}
+.me-hi{display:block;font-size:22px}
+.me-edit{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:#c2410c;font:inherit;font-size:14.5px;padding:4px 0;cursor:pointer}
+.me-edit svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+:root[data-theme="dark"] .me-head{background:linear-gradient(135deg,#3a2414,#2b1d12);color:#ffe2c7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .me-head{background:linear-gradient(135deg,#3a2414,#2b1d12);color:#ffe2c7}}
+.m-sec{margin:6px 0 -8px;font-size:14px;font-weight:600;color:var(--muted)}
+.c-red{background:#fdecec;color:#d32f2f}
+.fbs{padding-bottom:190px}
+.fb-intro{display:flex;gap:10px;align-items:flex-start;background:var(--accent-soft);color:var(--accent);border-radius:14px;padding:12px 14px;font-size:14.5px;line-height:1.55}
+.fb-intro svg{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.fb-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.fb-card h2{margin:0;font-size:17px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.fb-card h2 small{font-weight:400;color:var(--muted);font-size:13px}
+.fb-step{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.fb-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fb-type{display:flex;align-items:center;gap:8px;min-height:54px;padding:8px 10px;border:1.5px solid var(--line);border-radius:14px;background:var(--bg);color:var(--fg);font:inherit;font-size:14px;text-align:left;cursor:pointer;transition:transform .12s,border-color .12s}
+.fb-type svg{width:22px;height:22px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9}
+.fb-type.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
+.fb-type:active{transform:scale(.97)}
+.fb-lbl{font-size:14px;font-weight:600}
+.fb-text{min-height:120px;resize:vertical;font:inherit;font-size:15.5px;line-height:1.55}
+.fb-count{align-self:flex-end;font-size:12.5px;color:var(--muted);margin-top:-6px}
+.fb-chips{display:flex;flex-wrap:wrap;gap:8px}
+.fb-chip{border:1.5px solid var(--line);background:var(--bg);color:var(--fg);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer;min-height:40px}
+.fb-chip.on{border-color:#1f9d55;background:#e7f6ec;color:#1b7a3a;font-weight:700}
+.fb-rate{display:flex;justify-content:space-between;gap:6px}
+.fb-rate button{flex:1;font-size:30px;line-height:1;padding:8px 0;border:1.5px solid transparent;border-radius:14px;background:var(--bg);cursor:pointer;filter:grayscale(.85);opacity:.6;transition:transform .15s}
+.fb-rate button.on{filter:none;opacity:1;border-color:var(--accent);transform:scale(1.12)}
+.fb-bar{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:6;max-width:460px;margin:0 auto;padding:10px 16px;background:var(--surface);border-top:1px solid var(--line)}
+.fb-submit{width:100%;min-height:54px;font-size:18px;background:#1f9d55!important;color:#fff!important;box-shadow:0 4px 0 #157a40}
+.fb-hist{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:8px;font-size:14px}
+.fb-st{font-size:12.5px;color:var(--amber)}.fb-st.ok{color:#1b7a3a}
+.fb-done{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:20px 8px}
+.fb-done h2{margin:0;font-size:21px}.fb-done .btn{width:100%}
+.fb-check{width:78px;height:78px;border-radius:50%;background:#1f9d55;display:grid;place-items:center;animation:fbpop .5s cubic-bezier(.2,1.6,.4,1)}
+.fb-check svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-dasharray:30;stroke-dashoffset:30;animation:fbdraw .4s .3s forwards}
+@keyframes fbpop{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes fbdraw{to{stroke-dashoffset:0}}
+.fb-ref{background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:6px 12px;font-size:14px}
+.dl-card{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px}
+.dl-card div{display:flex;flex-direction:column;gap:2px}.dl-card .muted{font-size:13px}
+.dl-card .btn{min-height:44px;padding:0 16px;flex-shrink:0;text-decoration:none;display:inline-flex;align-items:center}
+.dl-ic{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex-shrink:0}
+.dl-ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.dl-group{display:flex;flex-direction:column;gap:8px}
+.tab{font-size:11px!important}
 .hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .hub-tile{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;font-weight:600;text-align:left;cursor:pointer}
 .hub-tile svg{width:26px;height:26px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -550,6 +597,10 @@ const en = s => String(s).replace(/[০-৯]/g, d => '০১২৩৪৫৬৭�
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const ICONS = {
+  download:'<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/>',
+  wallet:'<rect x="3.5" y="6" width="17" height="13" rx="2.5"/><path d="M16 12.5h4.5M6.5 6l9-2.5 1 2.5"/>',
+  flag:'<path d="M6 21V4M6 4h10.5l-2 4 2 4H6"/>',
+  logout:'<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 8l-4 4 4 4M6 12h10"/>',
   archive:'<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v10a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V9M10 13h4"/>',
   star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
   medal:'<path d="M8 3h8l-2 6h-4zM12 9a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/><path d="M12 12.2l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3z"/>',
@@ -688,13 +739,14 @@ const S = {
   retakes: saved.retakes||{},
   fav: saved.fav||{},
   favx: saved.favx||{},
+  reports: saved.reports||[],
   examRun: saved.examRun||null,
   student: saved.student||null,
   dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -995,22 +1047,168 @@ function vReport(){
   </div>`;
 }
 function vProfile(){
-  const id=S.user||'';
+  const id=S.user||'', st=S.student, nm=st&&st.name?st.name:'শিক্ষার্থী';
+  const item=(attr,ic,col,t,sub,right)=>`<button class="item mitem" ${attr}><span class="ic ${col}">${svg(ic)}</span><span class="t">${t}${sub?`<br><span class="s">${sub}</span>`:''}</span>${right||''}</button>`;
+  const nEn=Object.keys(S.enrolled||{}).filter(k=>S.enrolled[k]).length;
   return `<div class="screen">
-    <div class="topbar"><span style="width:44px"></span><h1>আরো</h1><span style="width:44px"></span></div>
+    <div class="me-head"><span class="me-av">${esc((nm||'শ').trim().slice(0,1))}</span><div style="min-width:0"><b class="me-hi">হ্যালো, ${esc(nm)}!</b>
+      <button class="me-edit" data-go="student">${svg('user')} ${st?'তথ্য বদলাও':'নাম ও রোল যোগ করো'} →</button></div></div>
     <div class="profile-card"><span class="avatar">স</span><div style="min-width:0"><b style="font-size:18px">শিক্ষার্থী</b><br><span class="muted" style="word-break:break-all">${esc(bn(id))}</span></div></div>
+    ${CAN_EDIT?`<div class="list">${item('data-go="admin"','pencil','c-violet','অ্যাডমিন প্যানেল','রুটিন, প্রশ্ন, ফলাফল ও রিপোর্ট')}</div>`:''}
+    <h3 class="m-sec">পেমেন্ট</h3>
+    <div class="list">${item('data-go="pay"','wallet','c-teal','পেমেন্ট ও অর্ডার হিস্ট্রি',nEn?`${bn(nEn)}টি প্যাকেজ`:'')}</div>
+    <h3 class="m-sec">পড়াশোনা</h3>
     <div class="list">
-      ${CAN_EDIT?`<button class="item" data-go="admin"><span class="ic c-violet">${svg('pencil')}</span><span class="t">অ্যাডমিন প্যানেল<br><span class="s">রুটিন, প্রশ্ন ও ফলাফল</span></span></button>`:''}
-      <button class="item" data-go="student"><span class="ic c-teal">${svg('user')}</span><span class="t">আমার তথ্য<br><span class="s">${S.student?esc(S.student.name)+(S.student.roll?' · রোল '+esc(S.student.roll):''):'নাম দেওয়া হয়নি'}</span></span></button>
-      <button class="item" data-go="routine"><span class="ic c-blue">${svg('calendar')}</span><span class="t">পরীক্ষার রুটিন</span></button>
-      <button class="item" data-quiz="daily"><span class="ic c-teal">${svg('pencil')}</span><span class="t">আজকের গণিত চ্যালেঞ্জ</span></button>
-      <button class="item" data-go="report"><span class="ic c-blue">${svg('chart')}</span><span class="t">আমার লার্নিং রিপোর্ট</span></button>
-      <button class="item" data-reset><span class="ic c-amber">${svg('pencil')}</span><span class="t">অগ্রগতি মুছে নতুন করে শুরু<br><span class="s" id="resetHint">দুইবার চাপলে মুছে যাবে</span></span></button>
+      ${item('data-go="routine"','calendar','c-blue','পরীক্ষার রুটিন')}
+      ${item('data-go="report"','chart','c-blue','আমার লার্নিং রিপোর্ট')}
+      ${item('data-go="downloads"','download','c-teal','ডাউনলোড','PDF, ফলাফল ফাইল ও এপের নতুন সংস্করণ')}
+    </div>
+    <h3 class="m-sec">সাহায্য এবং নীতি</h3>
+    <div class="list">
+      ${item('data-go="feedback"','flag','c-red','সমস্যা সম্পর্কে বিস্তারিত লিখে জানাও…','সরাসরি শিক্ষকের কাছে যাবে')}
+      ${item('data-reset','pencil','c-amber','অগ্রগতি মুছে নতুন করে শুরু','<span id="resetHint">দুইবার চাপলে মুছে যাবে</span>')}
+    </div>
+    <h3 class="m-sec">অ্যাকাউন্ট</h3>
+    <div class="list">
       <button class="item" data-logout><span class="ic c-violet">${svg('back')}</span><span class="t">লগ আউট</span></button>
+      ${item('data-stulogout','logout','c-red',S.stuOutArmed?'নিশ্চিত? আবার চাপলে লগ আউট হবে':'শিক্ষার্থী হিসেবে লগ আউট','এই ফোন থেকে তোমার নাম, ফলাফল ও প্যাকেজের তথ্য মুছে যাবে')}
     </div>
   </div>`;
 }
-
+/* পেমেন্ট ও অর্ডার হিস্ট্রি */
+function vPay(){
+  const rows=Object.keys(S.enrolled||{}).filter(k=>S.enrolled[k]&&COURSES[k]).map(k=>({k,c:COURSES[k],at:S.enrolled[k]&&S.enrolled[k].at}));
+  return `<div class="screen">${backTop('পেমেন্ট ও অর্ডার হিস্ট্রি','profile')}
+    ${rows.length?rows.map(r=>`<article class="xa-card">
+        <div class="xa-top"><span class="xa-date">${r.at?bnD(new Date(r.at)):'তারিখ জানা নেই'}</span><span class="xa-pill st-sched">পেমেন্ট বাকি</span></div>
+        <h3 class="xa-title">${esc(ptitle(r.c))}</h3>
+        <div class="xa-line">মাসিক প্যাকেজ · <b>৳${bn(r.c.offer?r.c.offer.price:0)}</b> / মাস</div>
+        <p class="muted" style="margin:0;font-size:13.5px">অনলাইন পেমেন্ট ব্যবস্থা (বিকাশ/নগদ) চালু হলে এখান থেকেই মাসিক ফি দেওয়া যাবে এবং প্রতিটি পেমেন্টের রসিদ এখানে দেখা যাবে।</p>
+        <button class="btn outline" data-course="${r.k}">কোর্স দেখো</button></article>`).join('')
+      :`<div class="empty">এখনো কোনো প্যাকেজ নেওয়া হয়নি।<br><button class="btn" data-go="play" style="margin-top:12px">চলমান কোর্স দেখো</button></div>`}
+  </div>`;
+}
+const backTop=(title,to)=>`<div class="topbar"><button class="iconbtn" data-go="${to}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>${title}</h1><span style="width:44px"></span></div>`;
+/* সমস্যা রিপোর্ট */
+const FB_TYPES=[['exam','পরীক্ষা শুরু বা জমা হচ্ছে না','exam'],['wrong','প্রশ্ন বা উত্তরে ভুল','xcircle'],['result','ফলাফল বা মেধাতালিকা','medal'],['pdf','PDF বা নোট খুলছে না','files'],['slow','এপ ধীর বা বন্ধ হয়ে যায়','report'],['pay','প্যাকেজ বা পেমেন্ট','wallet'],['idea','পরামর্শ','star'],['other','অন্যান্য','flag']];
+const FB_IMP=['আরও প্রশ্ন ও পরীক্ষা','ব্যাখ্যা আরও সহজ করে','ভিডিও ক্লাস','লাইভ ক্লাস','নতুন শ্রেণি বা বিষয়','পরীক্ষার সময় বদলে','অন্য কিছু'];
+const FB_RATE=['😞','😕','😐','🙂','😍'];
+function fbInit(){ if(!S.fb) S.fb={type:'',text:'',imp:[],rate:0,exam:'',phone:'',err:'',sent:null}; return S.fb; }
+function vFeedback(){
+  const f=fbInit();
+  if(f.sent) return `<div class="screen">${backTop('সমস্যা জানাও','profile')}
+    <div class="fb-done"><span class="fb-check">${svg('check')}</span><h2>ধন্যবাদ! তোমার রিপোর্ট ${f.sent.queued?'জমা আছে':'পাঠানো হয়েছে'}</h2>
+      <p class="muted">${f.sent.queued?'ইন্টারনেট পেলেই নিজে থেকে শিক্ষকের কাছে পৌঁছে যাবে।':'শিক্ষক দেখে ব্যবস্থা নেবেন।'}</p>
+      <span class="fb-ref">রিপোর্ট নম্বর: <b>${esc(f.sent.ref)}</b></span>
+      <button class="btn" data-fbnew>আরেকটি সমস্যা জানাও</button><button class="btn ghost" data-go="profile">আরো পাতায় ফিরে যাও</button></div>
+    ${fbHistory()}</div>`;
+  const myEx=Object.entries(S.exams||{}).sort((a,b)=>(b[1].at||0)-(a[1].at||0)).slice(0,15);
+  const n=f.text.length;
+  return `<div class="screen fbs">${backTop('সমস্যা জানাও','profile')}
+    <div class="fb-intro">${svg('flag')}<span>তোমার সমস্যা বা পরামর্শ সরাসরি শিক্ষকের কাছে যাবে। যত পরিষ্কার করে লিখবে, তত দ্রুত সমাধান করা যাবে।</span></div>
+    <section class="fb-card"><h2><span class="fb-step">১</span>সমস্যাটি কোন ধরনের?</h2>
+      <div class="fb-types" role="radiogroup">${FB_TYPES.map(([v,l,ic])=>`<button class="fb-type ${f.type===v?'on':''}" role="radio" aria-checked="${f.type===v}" data-fbtype="${v}">${svg(ic)}<span>${l}</span></button>`).join('')}</div>
+      ${(f.type==='wrong'||f.type==='exam'||f.type==='result')&&myEx.length?`<label class="fb-lbl" for="fbEx">কোন পরীক্ষায়? (ঐচ্ছিক)</label><select class="input" id="fbEx" data-fbf="exam"><option value="">বেছে নাও</option>${myEx.map(([k,r])=>`<option value="${esc(k)}" ${f.exam===k?'selected':''}>${esc(String(r.title||k))}</option>`).join('')}</select>`:''}
+    </section>
+    <section class="fb-card"><h2><span class="fb-step">২</span>বিস্তারিত লেখো</h2>
+      <textarea class="input fb-text" id="fbText" data-fbf="text" maxlength="1000" rows="5" placeholder="যেমন: আজকের দৈনিক পরীক্ষায় ৭ নম্বর প্রশ্নের সঠিক উত্তর (খ) হওয়ার কথা, কিন্তু (গ) দেখাচ্ছে।">${esc(f.text)}</textarea>
+      <span class="fb-count" id="fbCount">${bn(n)}/১০০০</span></section>
+    <section class="fb-card"><h2><span class="fb-step">৩</span>কীভাবে আমরা আরও ভালো করতে পারি? <small>(ঐচ্ছিক)</small></h2>
+      <div class="fb-chips">${FB_IMP.map((l,i)=>`<button class="fb-chip ${f.imp.includes(i)?'on':''}" aria-pressed="${f.imp.includes(i)}" data-fbimp="${i}">${f.imp.includes(i)?'✓ ':''}${l}</button>`).join('')}</div></section>
+    <section class="fb-card"><h2><span class="fb-step">৪</span>এপটি কেমন লাগছে?</h2>
+      <div class="fb-rate">${FB_RATE.map((e,i)=>`<button class="${f.rate===i+1?'on':''}" data-fbrate="${i+1}" aria-label="${i+1} তারা">${e}</button>`).join('')}</div></section>
+    <section class="fb-card"><h2><span class="fb-step">৫</span>যোগাযোগ</h2>
+      <p class="muted" style="margin:0;font-size:14px">নাম: <b>${esc(S.student?S.student.name:'দেওয়া হয়নি')}</b>${S.student&&S.student.roll?' · রোল '+esc(S.student.roll):''} <button class="link" data-go="student">বদলাও</button></p>
+      <input class="input" data-fbf="phone" inputmode="tel" maxlength="15" placeholder="মোবাইল নম্বর (ঐচ্ছিক, দরকার হলে শিক্ষক ফোন করবেন)" value="${esc(f.phone)}">
+      <span class="muted" style="font-size:12.5px">সমস্যা খুঁজতে সুবিধার জন্য ফোনের মডেল ও এপের তথ্য সাথে যাবে।</span></section>
+    <div class="error" id="fbErr" role="alert">${esc(f.err||'')}</div>
+    ${fbHistory()}
+    <div class="fb-bar"><button class="btn fb-submit" data-fbsend ${S.fbSending?'disabled':''}>${S.fbSending?'পাঠানো হচ্ছে…':'সাবমিট'}</button></div>
+  </div>`;
+}
+function fbHistory(){
+  const h=(S.reports||[]).slice(-5).reverse(); if(!h.length) return '';
+  return `<section class="fb-card"><h2>আমার পাঠানো রিপোর্ট</h2>${h.map(r=>`<div class="fb-hist"><b>${esc((FB_TYPES.find(t=>t[0]===r.type)||['','অন্যান্য'])[1])}</b><span class="muted">${esc(r.text.slice(0,70))}${r.text.length>70?'…':''}</span><span class="fb-st ${r.sent?'ok':''}">${r.sent?'পাঠানো হয়েছে':'অপেক্ষমাণ'} · ${esc(r.ref)}</span></div>`).join('')}</section>`;
+}
+async function sendReport(r){
+  if(!DB) throw new Error('offline');
+  const {sent,...data}=r;
+  await DB.collection('reports').doc(`${S.dev}_${r.ref}`).set(data);
+}
+async function sendPendingReports(){
+  for(const r of (S.reports||[])){ if(r.sent) continue; try{ await sendReport(r); r.sent=true; persist(); }catch(e){ break; } }
+}
+async function submitFeedback(){
+  const f=fbInit();
+  const fail=m=>{ f.err=m; S.fbSending=false; render(); };
+  const text=String(f.text||'').trim();
+  if(!f.type) return fail('সমস্যাটি কোন ধরনের, বেছে নাও।');
+  if(text.length<10) return fail('সমস্যাটি অন্তত ১০ অক্ষরে লেখো।');
+  const ref=Date.now().toString(36).slice(-6).toUpperCase();
+  const r={type:f.type,text:text.slice(0,1000),improve:f.imp.map(i=>FB_IMP[i]),rating:f.rate||0,exam:f.exam||'',name:S.student?S.student.name:'',roll:S.student?S.student.roll||'':'',phone:en(String(f.phone||'')).replace(/[^\d+]/g,'').slice(0,15),
+    device:S.dev,ua:String(navigator.userAgent||'').slice(0,200),at:new Date().toISOString(),status:'new',ref,sent:false};
+  S.fbSending=true; f.err=''; render();
+  S.reports=(S.reports||[]).concat([r]).slice(-30); persist();
+  let queued=false;
+  try{ await sendReport(r); r.sent=true; }catch(e){ queued=true; }
+  persist(); S.fbSending=false; S.fb={type:'',text:'',imp:[],rate:0,exam:'',phone:f.phone,err:'',sent:{ref,queued}}; render(); window.scrollTo(0,0);
+}
+/* অ্যাডমিন: রিপোর্টের তালিকা */
+let REP={}, repUnsub=null, REP_OK=null;
+function watchReports(){
+  if(repUnsub||!DB) return;
+  try{ repUnsub=DB.collection('reports').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); REP=m; REP_OK=true; softRender(); },()=>{ REP_OK=false; repUnsub=null; softRender(); }); }catch(e){ REP_OK=false; }
+}
+function reportsPanel(){
+  watchReports();
+  const list=Object.values(REP).sort((a,b)=>String(b.at).localeCompare(String(a.at))), f=S.repF||'new';
+  const shown=list.filter(r=>f==='all'||(f==='new'?r.status!=='done':r.status==='done'));
+  return `<section class="admin" aria-label="শিক্ষার্থীদের রিপোর্ট"><div><h2 class="display" style="font-size:22px">শিক্ষার্থীদের রিপোর্ট</h2>
+    <p class="muted" style="margin:4px 0 0;font-size:14px">"আরো → সমস্যা সম্পর্কে বিস্তারিত লিখে জানাও" থেকে পাঠানো সমস্যা ও পরামর্শ।</p></div>
+    ${REP_OK===false?`<div class="empty">রিপোর্ট দেখা যাচ্ছে না। Firebase Rules-এ "reports" অংশটি যোগ করা হয়েছে কি না দেখুন।</div>`:''}
+    <div class="seg" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[['new','নতুন'],['done','সমাধান হয়েছে'],['all','সব']].map(([v,l])=>`<button class="seg-btn" aria-selected="${f===v}" data-repf="${v}">${l} (${bn(list.filter(r=>v==='all'||(v==='new'?r.status!=='done':r.status==='done')).length)})</button>`).join('')}</div>
+    ${shown.length?shown.map(r=>`<article class="xa-card"><div class="xa-top"><span class="xa-date">${r.at?bnD(new Date(r.at))+' · '+pad2(new Date(r.at).getHours())+':'+pad2(new Date(r.at).getMinutes()):''}</span><span class="xa-pill ${r.status==='done'?'st-done':'st-miss'}">${r.status==='done'?'সমাধান হয়েছে':'নতুন'}</span></div>
+      <h3 class="xa-title" style="font-size:17px">${esc((FB_TYPES.find(t=>t[0]===r.type)||['','অন্যান্য'])[1])}${r.rating?' · '+FB_RATE[r.rating-1]:''}</h3>
+      <p class="xa-note" style="white-space:pre-line">${esc(r.text||'')}</p>
+      ${r.exam?`<span class="muted" style="font-size:13px">পরীক্ষা: ${esc(r.exam)}</span>`:''}
+      ${(r.improve||[]).length?`<div class="xa-line">${r.improve.map(x=>`<span class="chip">${esc(x)}</span>`).join(' ')}</div>`:''}
+      <span style="font-size:14px"><b>${esc(r.name||'নাম নেই')}</b>${r.roll?' · রোল '+esc(r.roll):''}${r.phone?` · <a href="tel:${esc(r.phone)}">${esc(r.phone)}</a>`:''}</span>
+      <div class="xa-act"><button class="btn outline" data-repdel="${esc(r.id)}">${S.repArmed===r.id?'নিশ্চিত?':'মুছুন'}</button><button class="btn" data-repdone="${esc(r.id)}">${r.status==='done'?'আবার নতুন করো':'সমাধান হয়েছে'}</button></div></article>`).join('')
+      :`<div class="empty">${REP_OK?'এই তালিকায় কোনো রিপোর্ট নেই।':'রিপোর্ট আনা হচ্ছে…'}</div>`}
+  </section>`;
+}
+/* ডাউনলোড */
+const APK_URL='https://github.com/shohoggonitacademy8159-afk/shohog-gonit-app/releases/latest/download/sohog-ganit-academy.apk';
+function vDownloads(){
+  const groups=[];
+  OFFER_IDS().forEach(cid=>{ const c=COURSES[cid];
+    c.chapters.forEach((_,i)=>{ const files=[], seen=new Set(), add=f=>{ if(f&&f.u&&!seen.has(f.u)){ seen.add(f.u); files.push(f); } };
+      const r=chDoc(cid,i); if(r) filesOf(r).forEach(add);
+      exList(cid,i+1).forEach(x=>{ const d=exDoc(cid,x); if(d) filesOf(d).forEach(f=>add({t:`${x}: ${f.t}`,u:f.u})); });
+      examsFor(cid).forEach(e=>(e.files||[]).forEach(f=>{ if(examChapters(e).some(u=>u.ch===i+1)) add(f); }));
+      if(files.length) groups.push({t:`অধ্যায় ${bn(i+1)}: ${chTitle(cid,i)}`,files});
+    });
+  });
+  const nf=groups.reduce((n,g)=>n+g.files.length,0), mine=Object.keys(S.exams||{}).length;
+  return `<div class="screen">
+    <div class="topbar"><span style="width:44px"></span><h1>ডাউনলোড</h1><span style="width:44px"></span></div>
+    <section class="dl-card"><span class="dl-ic">${svg('download')}</span><div style="flex:1;min-width:0"><b>এপের সর্বশেষ সংস্করণ</b><span class="muted">নতুন সুবিধা পেতে মাঝে মাঝে আপডেট করো</span></div><a class="btn" href="${APK_URL}" target="_blank" rel="noopener">নামাও</a></section>
+    <section class="dl-card"><span class="dl-ic">${svg('report')}</span><div style="flex:1;min-width:0"><b>আমার ফলাফলের ফাইল</b><span class="muted">${mine?`${bn(mine)}টি পরীক্ষার নম্বর (Excel/CSV)`:'পরীক্ষা দিলে এখান থেকে নামানো যাবে'}</span></div><button class="btn ghost" data-mycsv ${mine?'':'disabled'}>নামাও</button></section>
+    <h2 class="xa-h">স্টাডি ম্যাটেরিয়াল (PDF) ${nf?`<small class="muted" style="font-size:14px">${bn(nf)}টি</small>`:''}</h2>
+    ${nf?groups.map(g=>`<section class="dl-group"><b>${esc(g.t)}</b>${pdfList(g.files)}</section>`).join('')
+      :`<div class="empty">এখনো কোনো PDF প্রকাশ হয়নি। শিক্ষক PDF দিলে অধ্যায় অনুযায়ী এখানে জমা হবে।</div>`}
+    <p class="muted" style="margin:0;font-size:13px">PDF খুলে Google Drive-এর ⤓ বোতাম চাপলে ফোনে নামিয়ে রাখা যাবে, পরে ইন্টারনেট ছাড়াও পড়া যাবে।</p>
+  </div>`;
+}
+async function myResultsCSV(){
+  const rows=[['পরীক্ষা','তারিখ','প্রাপ্ত নম্বর','মোট নম্বর','শতকরা','দেরিতে','আবার দিয়ে সেরা']];
+  Object.entries(S.exams||{}).sort((a,b)=>(a[1].at||0)-(b[1].at||0)).forEach(([k,r])=>{ const rt=S.retakes[k];
+    rows.push([String(r.title||'').split(' · ')[0],keyParts(k).date,r.score,r.total,r.total?Math.round(r.score/r.total*1000)/10:'',r.late?'হ্যাঁ':'না',rt?`${rt.best}/${rt.total}`:'']); });
+  const text='﻿'+rows.map(l=>l.map(csvCell).join(',')).join('\r\n'), name=`sohog-my-results-${todayISO()}.csv`;
+  const cap=window.Capacitor;
+  if(cap&&cap.isNativePlatform&&cap.isNativePlatform()){ try{ await cap.nativePromise('SohogFile','share',{name,mime:'text/csv',content:text,title:'ফলাফল সংরক্ষণ বা শেয়ার'}); }catch(e){ toast('ফাইল তৈরি করা যায়নি'); } return; }
+  try{ const url=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'})), a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); toast('ফাইল নামানো হয়েছে'); }catch(e){ toast('ফাইল নামানো যায়নি'); }
+}
 /* ---------- পরীক্ষার রুটিন (শেয়ার করা ডেটা) ---------- */
 const pad2=n=>String(n).padStart(2,'0');
 const isoD=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
@@ -2154,13 +2352,14 @@ function vAdmin(){
       <button class="seg-btn" role="tab" aria-selected="${tab==='qbank'}" data-atab="qbank">${svg('pencil')}প্রশ্ন</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='exam'}" data-atab="exam">${svg('report')}পরীক্ষা</button>
       <button class="seg-btn" role="tab" aria-selected="${tab==='results'}" data-atab="results">${svg('chart')}ফলাফল</button>
+      <button class="seg-btn" role="tab" aria-selected="${tab==='reports'}" data-atab="reports">${svg('flag')}রিপোর্ট${Object.values(REP).filter(r=>r.status!=='done').length?` (${bn(Object.values(REP).filter(r=>r.status!=='done').length)})`:''}</button>
     </div>
-    ${RSTATE!=='ready'?routineStateMsg():tab==='exam'?examPanel():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
+    ${RSTATE!=='ready'?routineStateMsg():tab==='reports'?reportsPanel():tab==='exam'?examPanel():tab==='results'?resultsPanel():tab==='qbank'?qbankPanel():tab==='chapters'?chapterPanel():tab==='routine'?adminPanel()+`<button class="btn ghost" data-go="routine">শিক্ষার্থীরা যেভাবে দেখবে</button>`:syllabusPanel()}
   </div>`;
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 
-const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','লার্নিং রিপোর্ট','report'],['profile','আরো','grid']];
+const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','রিপোর্ট','report'],['downloads','ডাউনলোড','download'],['profile','আরো','grid']];
 function renderTabs(){
   const active = S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view;
   const live=OFFER_IDS().some(liveToday);
@@ -2169,7 +2368,7 @@ function renderTabs(){
 function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
-  const V={weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
   if(authed) renderTabs();
@@ -2242,6 +2441,19 @@ app.addEventListener('click',e=>{
   if(t.dataset.weekly){ S.hubCourse=t.dataset.weekly; S.hubFrom=S.view==='course'?'course':S.view==='exams'?'exams':'home'; S.wkAll=false; return go('weekly'); }
   if(t.hasAttribute('data-wkall')){ S.wkAll=true; render(); return; }
   if(t.dataset.feat!==undefined){ const i=+t.dataset.feat; S.featOpen=S.featOpen===i?null:i; render(); return; }
+  if(t.dataset.fbtype){ const f=fbInit(); f.type=t.dataset.fbtype; f.err=''; render(); return; }
+  if(t.dataset.fbimp!==undefined){ const f=fbInit(), i=+t.dataset.fbimp; f.imp=f.imp.includes(i)?f.imp.filter(x=>x!==i):f.imp.concat(i); render(); return; }
+  if(t.dataset.fbrate){ fbInit().rate=+t.dataset.fbrate; render(); return; }
+  if(t.hasAttribute('data-fbsend')){ if(!S.fbSending) submitFeedback(); return; }
+  if(t.hasAttribute('data-fbnew')){ S.fb=null; render(); return; }
+  if(t.hasAttribute('data-mycsv')){ myResultsCSV(); return; }
+  if(t.dataset.repf){ S.repF=t.dataset.repf; render(); return; }
+  if(t.dataset.repdone){ const r=REP[t.dataset.repdone]; if(r){ const {id,...d}=r; d.status=r.status==='done'?'new':'done'; DB.collection('reports').doc(id).set(d).then(()=>toast(d.status==='done'?'সমাধান হয়েছে চিহ্নিত':'আবার নতুন করা হয়েছে'),()=>toast('বদলানো যায়নি')); } return; }
+  if(t.dataset.repdel){ const id=t.dataset.repdel; if(S.repArmed===id){ S.repArmed=''; DB.collection('reports').doc(id).delete().then(()=>toast('রিপোর্ট মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); } else { S.repArmed=id; render(); } return; }
+  if(t.hasAttribute('data-stulogout')){
+    if(!S.stuOutArmed){ S.stuOutArmed=true; render(); setTimeout(()=>{ if(S.stuOutArmed){ S.stuOutArmed=false; render(); } },5000); return; }
+    S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
+    persist(); go('home'); toast('লগ আউট হয়েছে'); return; }
   if(t.dataset.hub){ S.hubCourse=t.dataset.hubc||hubCourse(); S.hubFrom=S.view==='course'?'course':S.view==='routine'?'routine':'exams'; if(t.dataset.hub==='routine') return go('routine'); S.wlim=20; return go(t.dataset.hub); }
   if(t.dataset.hubcourse){ S.hubCourse=t.dataset.hubcourse; render(); return; }
   if(t.dataset.hubch){ const [c,i]=t.dataset.hubch.split('|'); S.course=c; S.chFrom='play'; return go('chapter',{chIdx:+i}); }
@@ -2294,7 +2506,7 @@ app.addEventListener('click',e=>{
     else{ t.dataset.armed='1'; t.textContent='নিশ্চিত? আবার চাপুন'; }
     return;
   }
-  if(t.dataset.enroll){ S.enrolled[t.dataset.enroll]=true; persist(); render(); toast('প্যাকেজ নেওয়া হয়েছে'); return; }
+  if(t.dataset.enroll){ S.enrolled[t.dataset.enroll]={at:Date.now()}; persist(); render(); toast('প্যাকেজ নেওয়া হয়েছে'); return; }
   if(t.hasAttribute('data-primary')){
     if(!S.joined){ S.joined=true; persist(); toast('পঞ্চম শ্রেণিতে ফ্রীতে যুক্ত হয়েছ'); }
     return go('course',{course:'p5'});
@@ -2346,6 +2558,7 @@ app.addEventListener('input',e=>{
   if(t.dataset.whenat){ const st=stFor(t.dataset.whenat); st.at=t.value; }
   if(t.dataset.xf&&t.dataset.xf!=='course'){ xfInit()[t.dataset.xf]=t.value; }
   if(t.dataset.pdft!==undefined||t.dataset.pdfu!==undefined){ const key=t.dataset.pdft||t.dataset.pdfu; S.pdfDraft=S.pdfDraft||{}; const d=S.pdfDraft[key]=S.pdfDraft[key]||{t:'',u:''}; if(t.dataset.pdft!==undefined) d.t=t.value; else d.u=t.value; }
+  if(t.dataset.fbf){ const f=fbInit(); f[t.dataset.fbf]=t.value; if(t.dataset.fbf==='text'){ const c=document.getElementById('fbCount'); if(c) c.textContent=bn(t.value.length)+'/১০০০'; } }
   if(t.dataset.xq){ S.xq=t.value; S.xpage=1; const el=document.getElementById('xaList'); if(el&&!routineStateMsg()) el.innerHTML=xaListHTML(); }
 });
 app.addEventListener('change',e=>{

@@ -14,7 +14,7 @@ rep('<meta name="claude:viewport-fit-sides" content="cover">\n', '')
 # শিক্ষার্থীদের জন্য লগইন নেই: সরাসরি হোম
 rep("view: saved.user ? 'home' : 'login',", "view: 'home',")
 rep("""    <div class="profile-card"><span class="avatar">স</span><div style="min-width:0"><b style="font-size:18px">শিক্ষার্থী</b><br><span class="muted" style="word-break:break-all">${esc(bn(id))}</span></div></div>""",
-    """    <div class="profile-card"><span class="avatar">স</span><div style="min-width:0"><b style="font-size:18px">${CAN_EDIT?'অ্যাডমিন':'শিক্ষার্থী'}</b><br><span class="muted" style="word-break:break-all">সহগ গণিত একাডেমি</span></div></div>""")
+    "")
 rep("""      <button class="item" data-logout><span class="ic c-violet">${svg('back')}</span><span class="t">লগ আউট</span></button>""",
     """      ${CAN_EDIT?`<button class="item" data-adminout><span class="ic c-violet">${svg('back')}</span><span class="t">অ্যাডমিন লগ আউট</span></button>`
         :`<button class="item" data-go="adminLogin"><span class="ic c-violet">${svg('user')}</span><span class="t">অ্যাডমিন লগইন<br><span class="s">শুধু একাডেমির পরিচালকের জন্য</span></span></button>`}""")

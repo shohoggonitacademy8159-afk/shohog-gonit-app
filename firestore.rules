@@ -29,5 +29,14 @@ service cloud.firestore {
         && request.resource.data.score >= 0 && request.resource.data.score <= request.resource.data.total
         && request.resource.data.total <= 100;
     }
+    // শিক্ষার্থীদের সমস্যা রিপোর্ট: শিক্ষার্থী শুধু নতুন পাঠাতে পারে, দেখা/বদলানো/মোছা শুধু অ্যাডমিন
+    match /reports/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['type','text','improve','rating','exam','name','roll','phone','device','ua','at','status','ref'])
+        && request.resource.data.text is string && request.resource.data.text.size() >= 5 && request.resource.data.text.size() <= 1000
+        && request.resource.data.type is string && request.resource.data.type.size() <= 20
+        && request.resource.data.improve is list && request.resource.data.improve.size() <= 10
+        && request.resource.data.status == 'new';
+    }
   }
 }
