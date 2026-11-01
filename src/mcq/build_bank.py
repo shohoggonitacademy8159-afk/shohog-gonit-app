@@ -24,6 +24,10 @@ bank['h11'] = {}
 for ch in range(1, 11):
     f = root / f'src/mcq/chi{ch}.json'
     if f.exists(): bank['h11'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+bank['h12'] = {}
+for ch in range(1, 11):
+    f = root / f'src/mcq/chj{ch}.json'
+    if f.exists(): bank['h12'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')
 (root / 'www/mcq.js').write_text('// সহগ গণিত একাডেমি — MCQ প্রশ্নব্যাংক (src/mcq/build_bank.py থেকে তৈরি)\nwindow.SOHOG_MCQ = ' + json.dumps(bank, ensure_ascii=False) + ';\n', encoding='utf-8')
-print({k: len(v) for k, v in bank['c10'].items()}); print('c10h', {k: len(v) for k, v in bank['c10h'].items()}); print('h11', {k: len(v) for k, v in bank['h11'].items()})
+print({k: len(v) for k, v in bank['c10'].items()}); print('c10h', {k: len(v) for k, v in bank['c10h'].items()}); print('h11', {k: len(v) for k, v in bank['h11'].items()}); print('h12', {k: len(v) for k, v in bank['h12'].items()})
