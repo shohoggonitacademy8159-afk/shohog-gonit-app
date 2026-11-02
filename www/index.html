@@ -865,6 +865,9 @@ const COURSES = {
 Object.assign(COURSES.c8,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'৮ম শ্রেণির বার্ষিক', ptitle:'৮ম শ্রেণি গণিত ও বিজ্ঞান', bsubj:'গণিত ও বিজ্ঞান', bundle:['c8s'], banner:{badge:'Class 8', main:'গণিত ও বিজ্ঞান', sub:'প্রতি বিষয়ে সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
 /* ৮ম শ্রেণির বিজ্ঞান আলাদা প্যাকেজ নয়: গণিতের (c8) প্যাকেজেই অন্তর্ভুক্ত, একই ফি */
 Object.assign(COURSES.c8s,{offer:COURSES.c8.offer, pkg:'c8', exam:COURSES.c8.exam});
+/* ৬ষ্ঠ শ্রেণি: গণিত ও বিজ্ঞান একটি প্যাকেজে, ৮ম শ্রেণির মতো */
+Object.assign(COURSES.c6,{offer:COURSES.c8.offer, exam:'৬ষ্ঠ শ্রেণির বার্ষিক', ptitle:'৬ষ্ঠ শ্রেণি গণিত ও বিজ্ঞান', bsubj:'গণিত ও বিজ্ঞান', bundle:['c6s'], banner:{badge:'Class 6', main:'গণিত ও বিজ্ঞান', sub:'প্রতি বিষয়ে সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
+Object.assign(COURSES.c6s,{offer:COURSES.c6.offer, pkg:'c6', exam:COURSES.c6.exam});
 const pkgKey=cid=>(COURSES[cid]&&COURSES[cid].pkg)||cid;
 const PKG_IDS=()=>Object.keys(COURSES).filter(k=>COURSES[k].offer&&!COURSES[k].pkg);
 Object.assign(COURSES.c9,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'এসএসসি ২০২৮', ptitle:'এসএসসি ২০২৮ সাধারণ গণিত', banner:{badge:'SSC 28', main:'সাধারণ গণিত', sub:'সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
@@ -875,7 +878,7 @@ Object.assign(COURSES.c10h,{offer:{price:99, daily:{marks:20, mins:15}, friday:{
 Object.assign(COURSES.c10,{ptitle:'এসএসসি ২০২৭ সাধারণ গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'সাধারণ গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 const SECTIONS = [
   {title:'প্রাথমিক', art:'boy', rows:[{kind:'primary'}]},
-  {title:'মাধ্যমিক', art:'cap', rows:[{cls:'g2', kind:'stack', ids:['c6','c6s']},{cls:'g2', kind:'stack', ids:['c7','jb']},{cls:'g1', kind:'combo', ids:['c8']},{cls:'g2', kind:'stack', ids:['c9','c9h']},{cls:'g2', kind:'stack', ids:['c10','c10h']}]},
+  {title:'মাধ্যমিক', art:'cap', rows:[{cls:'g1', kind:'combo', ids:['c6']},{cls:'g2', kind:'stack', ids:['c7','jb']},{cls:'g1', kind:'combo', ids:['c8']},{cls:'g2', kind:'stack', ids:['c9','c9h']},{cls:'g2', kind:'stack', ids:['c10','c10h']}]},
   {title:'উচ্চ মাধ্যমিক', art:'bookstack', rows:[{cls:'g3 hs', kind:'stack', ids:['h11','h12','adm']}]}
 ];
 
@@ -1187,7 +1190,7 @@ function vCourse(){
   </div>`;
 }
 /* দশম শ্রেণি ফ্রী ব্যাচ: সাজেশন PDF, NCTB বই, টেস্ট পরীক্ষার প্রশ্ন সমাধান (অ্যাডমিন → ফ্রী ব্যাচ ট্যাব থেকে দেওয়া) */
-const FREE_BATCH={c8:{title:'৮ম শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৮ম শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c9:{title:'নবম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c9h:{title:'নবম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},h11:{title:'একাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · একাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'১ম পত্র · ফ্রী ব্যাচ'}},h12:{title:'দ্বাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দ্বাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'২য় পত্র · ফ্রী ব্যাচ'}}};
+const FREE_BATCH={c6:{title:'৬ষ্ঠ শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৬ষ্ঠ শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c8:{title:'৮ম শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৮ম শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c9:{title:'নবম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c9h:{title:'নবম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},h11:{title:'একাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · একাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'১ম পত্র · ফ্রী ব্যাচ'}},h12:{title:'দ্বাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দ্বাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'২য় পত্র · ফ্রী ব্যাচ'}}};
 const FREE_CATS=[['sugg','ফ্রী সাজেশন PDF','📄','গুরুত্বপূর্ণ অধ্যায় ও প্রশ্নের সাজেশন'],['nctb','NCTB বই','📚','বোর্ডের পাঠ্যবই (অনলাইন সংস্করণ)'],['test','টেস্ট পরীক্ষার প্রশ্ন সমাধান','✅','বিভিন্ন স্কুলের টেস্ট পরীক্ষার প্রশ্ন ও সমাধান']];
 const NCTB_MATH={t:'নবম-দশম শ্রেণি গণিত বই ২০২৬ (NCTB অফিসিয়াল)',u:'https://nctb.gov.bd/pages/static-pages/695b99afc4774958d7b70612'};
 const FREE_DEFAULT={nctb:[NCTB_MATH]};
@@ -1229,7 +1232,7 @@ function freeExamSection(cid){
 }
 const freeLive=cid=>RSTATE==='ready'&&freeBatchExams(cid).some(e=>e.date===todayISO()&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
 /* হোমের শ্রেণি-কার্ড থেকে খোলে: এই শ্রেণির কোর্স ও ফ্রী ব্যাচ (এক্সপ্লোরের বদলে এখানে) */
-const HUB_CLASSES=['c8','c9','c9h','c10','c10h','h11','h12'];
+const HUB_CLASSES=['c6','c8','c9','c9h','c10','c10h','h11','h12'];
 function vCHub(){
   const cid=HUB_CLASSES.includes(S.chubCid)?S.chubCid:HUB_CLASSES[0], c=COURSES[cid];
   return `<div class="screen">${backTop(`${c.name} ${c.bsubj||c.subj||''}`,'home')}
@@ -1267,7 +1270,7 @@ function freePanel(){
   const fr=frInit();
   return `<section class="admin" aria-label="ফ্রী ব্যাচ"><div><span class="offer-tag">সবার জন্য ফ্রী</span><h2 class="display" style="font-size:22px;margin-top:6px">${esc(FREE_BATCH[fr.cid].title)}</h2>
     <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → ${esc(FREE_BATCH[fr.cid].title)} থেকে দেখবে।</p></div>
-    ${Object.keys(FREE_BATCH).length>1?`<div class="seg" style="grid-template-columns:repeat(${Object.keys(FREE_BATCH).length},minmax(0,1fr))">${Object.keys(FREE_BATCH).map(k=>`<button class="seg-btn" aria-selected="${k===fr.cid}" data-frcourse="${k}">${esc(COURSES[k].subj||k)}</button>`).join('')}</div>`:''}
+    ${Object.keys(FREE_BATCH).length>1?`<div class="seg" style="grid-template-columns:repeat(${Math.min(4,Object.keys(FREE_BATCH).length)},minmax(0,1fr))">${Object.keys(FREE_BATCH).map(k=>`<button class="seg-btn" aria-selected="${k===fr.cid}" data-frcourse="${k}" style="flex-direction:column;gap:0;line-height:1.25;padding:6px 2px">${esc(COURSES[k].name.replace(' শ্রেণি',''))}<small style="font-size:11px">${esc(COURSES[k].bsubj||COURSES[k].subj||k)}</small></button>`).join('')}</div>`:''}
     <section class="fr-adm"><h3>🎁 সাপ্তাহিক ফ্রী পরীক্ষা</h3>
       ${(()=>{ const fx=Object.values(SYL).filter(r=>r.type==='exam'&&r.free&&bundleOf(fr.cid).includes(r.course)).sort((a,b)=>a.date<b.date?1:-1);
         return fx.length?`<div class="xlist">${fx.slice(0,5).map(r=>`<div class="xitem"><div><b>${esc(r.title)}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':' · প্রকাশ '+fmtDT(r.publishAt)}</span></div><button class="link del" data-xdel="${esc(r.id)}">মুছুন</button></div>`).join('')}</div>`:'<p class="muted" style="margin:0">এখনো কোনো ফ্রী পরীক্ষা নেই।</p>'; })()}
