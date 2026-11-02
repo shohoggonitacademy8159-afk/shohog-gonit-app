@@ -62,6 +62,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .grid{display:grid;gap:10px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g1{grid-template-columns:minmax(0,1fr)}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;cursor:pointer;color:var(--fg);font-size:13.5px;font-weight:600;line-height:1.3;min-height:100px}
 .tile.row{flex-direction:row;text-align:left;padding:12px;min-height:72px}
 .tile:hover{border-color:var(--accent)}
@@ -171,6 +172,42 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .ctile{position:relative;border-radius:16px;border:1.5px solid var(--tb);background:var(--tbg);color:var(--fg);cursor:pointer;display:flex;padding:12px;text-align:left;transition:transform .15s}
 .ctile:hover{transform:translateY(-2px)}
+.ctile:active{transform:scale(.97)}
+/* সব ট্যাবে এনিমেশন: প্রথমবার ঢোকার সময় ধাপে ধাপে আসা, ছবি দুলে ওঠা, ঝিলিক ও ভাসমান প্রতীক */
+.home.enter .ctile{animation:tilein .55s cubic-bezier(.2,.8,.3,1.2) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes tilein{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+.ctile>.art,.ctile .combo-arts .art{animation:artbob 3.4s ease-in-out infinite;animation-delay:calc(var(--i,0)*-.45s)}
+@keyframes artbob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-3deg)}}
+.ct-fx{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:0}
+.ct-fx::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:45%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:tshine 6s ease-in-out infinite;animation-delay:calc(var(--i,0)*.7s)}
+@keyframes tshine{0%,70%{left:-60%}100%{left:130%}}
+.ct-fx i{position:absolute;bottom:-14px;left:var(--x);font-style:normal;font-weight:700;font-size:12px;color:var(--ta);opacity:0;white-space:nowrap;animation:tsym 7s linear infinite;animation-delay:calc(var(--j)*-2.3s - var(--i,0)*.5s)}
+@keyframes tsym{0%{transform:translateY(0) rotate(0);opacity:0}15%{opacity:.35}80%{opacity:.25}100%{transform:translateY(-150px) rotate(25deg);opacity:0}}
+.ctile>*:not(.ct-fx):not(.live-badge):not(.arrow){position:relative;z-index:1}
+.ctile .arrow{z-index:1}
+.ctile.combo{flex-direction:column;gap:10px;padding:14px 14px 14px;min-height:150px;background:linear-gradient(125deg,var(--purple-bg),var(--green-bg));border-color:var(--purple-b)}
+.combo-top{display:flex;align-items:center;gap:12px;padding-right:30px}
+.combo-arts{display:flex;flex-shrink:0}
+.combo-arts .art{width:54px;height:54px}
+.combo-arts .art+.art{margin-left:-12px}
+.ctile.combo b{font-size:17px}
+.ctile.combo .subj{font-size:15px}
+.ctile.combo .price-tag{margin:5px 0 0}
+.fx-strip{display:block;overflow:hidden;border-radius:10px;background:rgba(255,255,255,.55);border:1px solid var(--purple-b);padding:6px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.fx-track{display:inline-flex;gap:8px;white-space:nowrap;animation:fxmarq 38s linear infinite;padding-left:8px}
+.fx-track i{font-style:normal;font-weight:700;font-size:13px;padding:3px 10px;border-radius:999px;background:var(--surface)}
+.fx-track i.m{color:var(--purple-a);border:1px solid var(--purple-b)}
+.fx-track i.s{color:var(--green-a);border:1px solid var(--green-b)}
+@keyframes fxmarq{to{transform:translateX(-50%)}}
+.ctile.combo .arrow{bottom:auto;top:14px}
+.subj-books{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sbook{position:relative;display:flex;align-items:center;gap:10px;padding:12px 34px 12px 12px;border-radius:16px;border:1.5px solid var(--tb);background:var(--tbg);color:var(--fg);text-align:left;cursor:pointer;animation:tilein .5s both;animation-delay:calc(var(--i)*90ms)}
+.sbook .sb-art{width:44px;height:44px;flex-shrink:0;animation:artbob 3.4s ease-in-out infinite}
+.sbook b{display:block;font-size:16px}
+.sbook small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.sbook .arrow{position:absolute;right:8px;top:50%;margin-top:-12px;width:24px;height:24px;border-radius:50%;background:var(--ta);display:grid;place-items:center}
+.sbook .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-reduced-motion:reduce){.home.enter .ctile,.ctile>.art,.ctile .combo-arts .art,.ct-fx::after,.ct-fx i,.fx-track,.sbook,.sbook .sb-art{animation:none}.ct-fx i{display:none}.fx-track{flex-wrap:wrap;white-space:normal}}
 .ctile.wide{align-items:center;gap:10px;min-height:100px;padding-right:36px}
 .ctile.wide .art{width:62px;height:62px;flex-shrink:0}
 .ctile.stack{flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:6px;padding:12px 4px 34px;min-height:136px}
@@ -817,7 +854,7 @@ Object.assign(COURSES.c10h,{offer:{price:99, daily:{marks:20, mins:15}, friday:{
 Object.assign(COURSES.c10,{ptitle:'এসএসসি ২০২৭ সাধারণ গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'সাধারণ গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 const SECTIONS = [
   {title:'প্রাথমিক', art:'boy', rows:[{kind:'primary'}]},
-  {title:'মাধ্যমিক', art:'cap', rows:[{cls:'g3', kind:'stack', ids:['c6','c7','jb']},{cls:'g2', kind:'stack', ids:['c8','c8s']},{cls:'g2', kind:'stack', ids:['c9','c9h']},{cls:'g2', kind:'stack', ids:['c10','c10h']}]},
+  {title:'মাধ্যমিক', art:'cap', rows:[{cls:'g3', kind:'stack', ids:['c6','c7','jb']},{cls:'g1', kind:'combo', ids:['c8']},{cls:'g2', kind:'stack', ids:['c9','c9h']},{cls:'g2', kind:'stack', ids:['c10','c10h']}]},
   {title:'উচ্চ মাধ্যমিক', art:'bookstack', rows:[{cls:'g3 hs', kind:'stack', ids:['h11','h12','adm']}]}
 ];
 
@@ -944,11 +981,20 @@ function joinCard(){
 }
 function vHome(){
   const chev='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
-  const tile=(id,kind)=>{const c=COURSES[id];
-    return `<button class="ctile ${kind} t-${c.t}" ${HUB_CLASSES.includes(id)?`data-chub="${id}"`:`data-course="${id}"`}>${liveToday(id)?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${art(c.art)}
+  let ti=0;
+  const fxLayer=(c,i)=>{ const sy=(c.subj==='বিজ্ঞান'?SCI_SYM:MATH_SYM); return `<span class="ct-fx" aria-hidden="true">${[0,1,2].map(j=>`<i style="--j:${j};--x:${12+((i*37+j*31)%76)}%">${sy[(i*3+j)%sy.length]}</i>`).join('')}</span>`; };
+  const tile=(id,kind)=>{const c=COURSES[id], i=ti++;
+    if(kind==='combo'){ const live=bundleOf(id).some(liveToday);
+      return `<button class="ctile combo t-${c.t}" style="--i:${i}" data-chub="${id}">${live?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${fxLayer(c,i)}
+        <span class="combo-top"><span class="combo-arts">${bundleOf(id).map(k=>art(COURSES[k].art)).join('')}</span>
+        <span style="flex:1;min-width:0"><b>${c.name}</b><span class="subj">${esc(c.bsubj||c.subj)}</span>${c.offer?`<span class="price-tag">মাসিক ৳${bn(c.offer.price)} · দুই বিষয়</span>`:''}</span></span>
+        <span class="fx-strip" aria-hidden="true"><span class="fx-track">${FORMULAS.concat(FORMULAS).map(f=>`<i class="${f[0]}">${f[1]}</i>`).join('')}</span></span>
+        <span class="arrow">${chev}</span></button>`; }
+    return `<button class="ctile ${kind} t-${c.t}" style="--i:${i}" ${HUB_CLASSES.includes(id)?`data-chub="${id}"`:`data-course="${id}"`}>${liveToday(id)?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${fxLayer(c,i)}${art(c.art)}
       <span style="flex:1;min-width:0"><b>${c.name}</b>${c.sub?`<small>(${c.sub})</small>`:''}${c.subj?`<span class="subj">${c.subj}</span>`:''}${c.offer&&!c.pkg?`<span class="price-tag">মাসিক ৳${bn(c.offer.price)}</span>`:''}</span>
       <span class="arrow">${chev}</span></button>`;};
-  return `<div class="screen home">
+  const anim=!HOME_ANIM_DONE; if(anim) setTimeout(()=>{ HOME_ANIM_DONE=true; },1500);
+  return `<div class="screen home ${anim?'enter':''}">
     <header class="hero">
       <span class="logo-art">${art('logo')}</span>
       <div class="ttl"><h1>সহগ গণিত একাডেমি</h1><p>ভাবি · শিখি · সমাধান করি</p></div>
@@ -1028,10 +1074,16 @@ function freqOf(o){
   if(o&&o.perMonth) return {chip:`মাসে ${bn(o.perMonth)}টি লাইভ পরীক্ষা`, n:o.perMonth, stat:'মাসিক লাইভ পরীক্ষা', title:`মাসে ${bn(o.perMonth)}টি লাইভ MCQ এক্সাম`, desc:`মাসে ${bn(o.perMonth)}টি লাইভ পরীক্ষা (মোটামুটি একদিন পরপর), প্রতিটি ${bn(o.daily.marks)} নম্বর, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`, perk:`মাসে ${bn(o.perMonth)}টি লাইভ পরীক্ষা (${bn(o.daily.marks)} নম্বর, ${bn(o.daily.mins)} মিনিট), রুটিন অনুযায়ী`};
   return {chip:'প্রতিদিন লাইভ পরীক্ষা', n:6, stat:'দিন লাইভ পরীক্ষা', title:'ডেইলি লাইভ MCQ এক্সাম', desc:o?`শনি থেকে বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা, সময় ${bn(o.daily.mins)} মিনিট। রুটিনে দেওয়া অধ্যায়/অনুশীলনী থেকে প্রশ্ন আসে, পরীক্ষা সারাদিন খোলা থাকে।`:'', perk:o?`শনি – বৃহস্পতিবার প্রতিদিন ${bn(o.daily.marks)} নম্বরের লাইভ পরীক্ষা (${bn(o.daily.mins)} মিনিট)`:''};
 }
+/* হোম ট্যাবের ভাসমান প্রতীক ও ৮ম শ্রেণির সূত্র/বিক্রিয়া */
+let HOME_ANIM_DONE=false;
+const MATH_SYM=['π','√x','x²','∑','△','θ','÷','∞','a+b','%','∠','≠'];
+const SCI_SYM=['H₂O','CO₂','O₂','⚛','NaCl','pH','Ω','DNA'];
+const MIX_SYM=['π','H₂O','√x','CO₂','x²','⚛','△','O₂','θ','Ω'];
+const FORMULAS=[['m','a² + b² = c²'],['s','2H₂ + O₂ → 2H₂O'],['m','(a + b)² = a² + 2ab + b²'],['s','V = IR'],['m','মুনাফা = বিক্রয়মূল্য − ক্রয়মূল্য'],['s','NaOH + HCl → NaCl + H₂O'],['m','বৃত্তের ক্ষেত্রফল = πr²'],['s','W = mg'],['m','a² − b² = (a + b)(a − b)'],['s','CaCO₃ → CaO + CO₂'],['m','A ∪ B'],['s','sin c = 1/μ'],['s','6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂'],['s','Zn + H₂SO₄ → ZnSO₄ + H₂']];
 const ptitle=c=>c.ptitle||`${c.name} ${c.subj||''}`;
 function courseBanner(id,size){
   const c=COURSES[id], b=c.banner||{badge:c.sub||'', main:c.subj||c.name, sub:c.name};
-  const sym=['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
+  const sym=c.bundle?MIX_SYM:['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
   return `<div class="cbanner cbt-${c.t} ${size||''}" aria-hidden="true">
     ${sym.map((x,i)=>`<span class="cb-sym" style="--i:${i}">${x}</span>`).join('')}
     <span class="cb-badge">${esc(b.badge)}</span>
@@ -1044,7 +1096,7 @@ function courseBanner(id,size){
 function bundleOf(id){ return [id].concat(COURSES[id].bundle||[]); }
 function bundleStats(id){ const mem=bundleOf(id);
   return {mem, nch:mem.reduce((s,m)=>s+COURSES[m].chapters.length,0), nq:mem.reduce((s,m)=>s+COURSES[m].chapters.reduce((n,_,i)=>n+bankFor(m,i+1).length,0),0), nex:mem.reduce((s,m)=>s+Object.values(COURSES[m].exs||{}).reduce((n,a)=>n+a.length,0),0), uw:mem.length>1?'অনুশীলনী ও পাঠ':'অনুশীলনী'}; }
-function pkgLinkCard(id){ const k=COURSES[id].pkg, p=COURSES[k];
+function pkgLinkCard(id){ const k=COURSES[id].pkg||id, p=COURSES[k];
   return `<article class="pcard"><span class="offer-tag" style="align-self:flex-start">কোর্সে অন্তর্ভুক্ত</span><b class="pc-title">${esc(COURSES[id].subj)}-এর লাইভ পরীক্ষা "${esc(ptitle(p))}" কোর্সের অন্তর্ভুক্ত। একই প্যাকেজে (মাসিক ৳${bn(p.offer.price)}) দুই বিষয়ের পরীক্ষা দেওয়া যাবে।</b><button class="btn" data-course="${k}">${esc(ptitle(p))} দেখো</button></article>`; }
 function courseFeatures(id){
   const c=COURSES[id], o=c.offer, bs=bundleStats(id);
@@ -1087,22 +1139,22 @@ function vCourseOffer(){
   </div>`;
 }
 function vCourse(){
-  if(COURSES[S.course]&&COURSES[S.course].offer&&!COURSES[S.course].pkg) return vCourseOffer();
+  if(COURSES[S.course]&&COURSES[S.course].offer&&!COURSES[S.course].pkg&&!S.cview) return vCourseOffer();
   const id=S.course, c=COURSES[id];
   const doneCount=c.chapters.filter((_,i)=>S.done[id+':'+i]).length;
   return `<div class="screen">
-    <div class="topbar"><button class="iconbtn" data-go="home" aria-label="হোমে ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><span></span><span style="width:44px"></span></div>
+    <div class="topbar"><button class="iconbtn" data-go="${S.courseFrom==='chub'?'chub':'home'}" aria-label="ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><span></span><span style="width:44px"></span></div>
     <div style="display:flex;gap:14px;align-items:center">
       <span class="t-${c.t}" style="width:64px;height:64px;border-radius:18px;background:var(--tbg);border:1.5px solid var(--tb);display:grid;place-items:center;flex-shrink:0"><span style="width:48px;height:48px">${art(c.art)}</span></span>
       <div style="min-width:0"><h1 class="display" style="font-size:24px">${c.name}${c.sub?` <span class="muted" style="font-size:16px">(${c.sub})</span>`:''}${c.subj?`<br><span style="font-size:18px;color:var(--accent)">${c.subj}</span>`:''}</h1>
       <span class="muted" style="font-size:14px">${bn(c.chapters.length)}টি অধ্যায় · ${bn(doneCount)}টি পড়া শেষ</span></div>
     </div>
     <div class="progress" aria-hidden="true"><i style="width:${Math.round(doneCount/c.chapters.length*100)}%"></i></div>
-    ${c.pkg?pkgLinkCard(id):''}
-    ${c.offer&&!c.pkg?weeklyBtn(id):''}
-    ${c.offer&&!c.pkg?offerCard(id,c.offer):''}
-    ${c.pkg?'':sylCard(id)}
-    ${c.offer&&!c.pkg?'':`<div class="list" role="list">
+    ${c.pkg||(S.cview&&c.offer)?pkgLinkCard(id):''}
+    ${c.offer&&!c.pkg&&!S.cview?weeklyBtn(id):''}
+    ${c.offer&&!c.pkg&&!S.cview?offerCard(id,c.offer):''}
+    ${c.pkg||S.cview?'':sylCard(id)}
+    ${c.offer&&!c.pkg&&!S.cview?'':`<div class="list" role="list">
       ${c.chapters.map((ch,i)=>{const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
         <span class="num">${bn(i+1)}</span>
         <span class="t">${esc(chTitle(id,i))}<br><span class="s">${chDoc(id,i)?'নোট আছে · চাপ দিয়ে পড়ুন':'নোট শিগগিরই আসবে'}</span></span>`:`<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
@@ -1114,7 +1166,7 @@ function vCourse(){
   </div>`;
 }
 /* দশম শ্রেণি ফ্রী ব্যাচ: সাজেশন PDF, NCTB বই, টেস্ট পরীক্ষার প্রশ্ন সমাধান (অ্যাডমিন → ফ্রী ব্যাচ ট্যাব থেকে দেওয়া) */
-const FREE_BATCH={c8:{title:'৮ম শ্রেণি গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৮ম শ্রেণি',main:'গণিত',sub:'ফ্রী ব্যাচ'}},c9:{title:'নবম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c9h:{title:'নবম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},h11:{title:'একাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · একাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'১ম পত্র · ফ্রী ব্যাচ'}},h12:{title:'দ্বাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দ্বাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'২য় পত্র · ফ্রী ব্যাচ'}}};
+const FREE_BATCH={c8:{title:'৮ম শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৮ম শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c9:{title:'নবম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c9h:{title:'নবম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},h11:{title:'একাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · একাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'১ম পত্র · ফ্রী ব্যাচ'}},h12:{title:'দ্বাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দ্বাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'২য় পত্র · ফ্রী ব্যাচ'}}};
 const FREE_CATS=[['sugg','ফ্রী সাজেশন PDF','📄','গুরুত্বপূর্ণ অধ্যায় ও প্রশ্নের সাজেশন'],['nctb','NCTB বই','📚','বোর্ডের পাঠ্যবই (অনলাইন সংস্করণ)'],['test','টেস্ট পরীক্ষার প্রশ্ন সমাধান','✅','বিভিন্ন স্কুলের টেস্ট পরীক্ষার প্রশ্ন ও সমাধান']];
 const NCTB_MATH={t:'নবম-দশম শ্রেণি গণিত বই ২০২৬ (NCTB অফিসিয়াল)',u:'https://nctb.gov.bd/pages/static-pages/695b99afc4774958d7b70612'};
 const FREE_DEFAULT={nctb:[NCTB_MATH]};
@@ -1127,7 +1179,7 @@ function freeItems(cid){
 const FR_TYPES={exam:['পরীক্ষা','#e53935'],study:['পড়া','#1e88e5'],pdf:['সাজেশন','#2e9e5b']};
 function freeRoutine(cid){
   const r=SYL[freeId(cid)], rows=(r&&Array.isArray(r.routine)?r.routine:[]).filter(x=>x&&/^\d{4}-\d{2}-\d{2}$/.test(x.d)).map(x=>({d:x.d,t:String(x.t||'').slice(0,120),k:FR_TYPES[x.k]?x.k:'study'}));
-  if(RSTATE==='ready') freeExams(cid).filter(e=>!e.pending||CAN_EDIT).forEach(e=>{ if(!rows.some(x=>x.d===e.date&&x.k==='exam')) rows.push({d:e.date,t:`${e.title} · ${bn(e.marks)} নম্বর · ${bn(e.mins)} মিনিট${examChapters(e).length?' · '+examChapters(e).map(u=>unitLabel(cid,u)).join(', '):''}`,k:'exam',auto:true}); });
+  if(RSTATE==='ready') freeBatchExams(cid).filter(e=>!e.pending||CAN_EDIT).forEach(e=>{ if(!rows.some(x=>x.d===e.date&&x.k==='exam')) rows.push({d:e.date,t:`${e.title} · ${bn(e.marks)} নম্বর · ${bn(e.mins)} মিনিট${examChapters(e).length?' · '+examChapters(e).map(u=>unitLabel(cid,u)).join(', '):''}`,k:'exam',auto:true}); });
   return rows.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);
 }
 function freeRoutineSection(cid){
@@ -1139,14 +1191,14 @@ function freeRoutineSection(cid){
     ${past.length?`<button class="link" data-frpast style="align-self:center">${S.frPast?'আগের রুটিন লুকাও':`আগের রুটিন (${bn(past.length)}টি)`}</button>${S.frPast?past.map(row).join(''):''}`:''}</section>`;
 }
 function freeBanner(cid,size){
-  const b=FREE_BATCH[cid].banner, sym=['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
+  const b=FREE_BATCH[cid].banner, sym=COURSES[cid]&&COURSES[cid].bundle?MIX_SYM:['π','√x','∑','x²','∫','△','θ','÷','∞','%'];
   return `<div class="cbanner free cbt-${(COURSES[cid]||{}).t} ${size||''}" aria-hidden="true">${sym.map((x,i)=>`<span class="cb-sym" style="--i:${i}">${x}</span>`).join('')}
     <span class="cb-badge">${esc(b.badge)}</span><span class="cb-main">${esc(b.main)}</span><span class="cb-sub">${esc(b.sub)}</span>
     <span class="cb-chip"><i></i>সাপ্তাহিক ফ্রী পরীক্ষা · রুটিন</span><span class="cb-shine"></span></div>`;
 }
 function freeExamSection(cid){
   if(RSTATE!=='ready') return '';
-  const today=todayISO(), all=freeExams(cid);
+  const today=todayISO(), all=freeBatchExams(cid);
   const cur=all.filter(e=>e.date>=today&&!(e.date===today&&S.exams[examKey(e)])&&(!e.pending||CAN_EDIT)).sort((a,b)=>a.date<b.date?-1:1);
   const past=all.filter(e=>e.date<today||(e.date===today&&S.exams[examKey(e)])).sort((a,b)=>a.date<b.date?1:-1);
   return `<section class="free-exam"><div class="fx-head"><span aria-hidden="true">🎁</span><div><b>সাপ্তাহিক ফ্রী পরীক্ষা</b><small>প্রতি সপ্তাহে একটি পরীক্ষা · সবার জন্য ফ্রী · মেধাতালিকা সবাই দেখবে</small></div></div>
@@ -1154,12 +1206,12 @@ function freeExamSection(cid){
     ${past.length?`<button class="link" data-fxpast style="align-self:center">${S.fxPast?'আগের ফ্রী পরীক্ষা লুকাও':`আগের ফ্রী পরীক্ষা (${bn(past.length)}টি)`}</button>${S.fxPast?past.map(e=>xaCard(e,false)).join(''):''}`:''}
   </section>`;
 }
-const freeLive=cid=>RSTATE==='ready'&&freeExams(cid).some(e=>e.date===todayISO()&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
+const freeLive=cid=>RSTATE==='ready'&&freeBatchExams(cid).some(e=>e.date===todayISO()&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
 /* হোমের শ্রেণি-কার্ড থেকে খোলে: এই শ্রেণির কোর্স ও ফ্রী ব্যাচ (এক্সপ্লোরের বদলে এখানে) */
 const HUB_CLASSES=['c8','c9','c9h','c10','c10h','h11','h12'];
 function vCHub(){
   const cid=HUB_CLASSES.includes(S.chubCid)?S.chubCid:HUB_CLASSES[0], c=COURSES[cid];
-  return `<div class="screen">${backTop(`${c.name} ${c.subj||''}`,'home')}
+  return `<div class="screen">${backTop(`${c.name} ${c.bsubj||c.subj||''}`,'home')}
     <p class="muted" style="margin:0">এই শ্রেণির কোর্স ও ফ্রী ব্যাচ। কার্ডে চাপ দিলে বিস্তারিত, রুটিন ও পরীক্ষা দেখা যাবে।</p>
     <div class="chub-list">
       ${c.offer?`<article class="pcard">${liveToday(cid)?'<span class="live-badge"><i></i>লাইভ</span>':''}
@@ -1168,6 +1220,7 @@ function vCHub(){
         <button class="pc-more" data-course="${cid}">বিস্তারিত দেখো</button></article>`:''}
       ${FREE_BATCH[cid]?freeCard(cid):''}
     </div>
+    ${c.bundle?`<h2 class="xa-h">বই, অধ্যায় ও পাঠ</h2><div class="subj-books">${bundleOf(cid).map((k,i)=>`<button class="sbook t-${COURSES[k].t}" style="--i:${i}" data-course="${k}" ${k===cid?'data-cview="1"':''}><span class="sb-art">${art(COURSES[k].art)}</span><span><b>${esc(COURSES[k].subj)}</b><small>${bn(COURSES[k].chapters.length)}টি অধ্যায় · ${COURSES[k].unitWord==='পাঠ'?'পাঠভিত্তিক':'অনুশীলনীভিত্তিক'}</small></span><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span></button>`).join('')}</div>`:''}
   </div>`;
 }
 function freeCard(cid){
@@ -1195,8 +1248,9 @@ function freePanel(){
     <p class="muted" style="margin:4px 0 0;font-size:14px">শিক্ষার্থীরা এক্সপ্লোর → ${esc(FREE_BATCH[fr.cid].title)} থেকে দেখবে।</p></div>
     ${Object.keys(FREE_BATCH).length>1?`<div class="seg" style="grid-template-columns:repeat(${Object.keys(FREE_BATCH).length},minmax(0,1fr))">${Object.keys(FREE_BATCH).map(k=>`<button class="seg-btn" aria-selected="${k===fr.cid}" data-frcourse="${k}">${esc(COURSES[k].subj||k)}</button>`).join('')}</div>`:''}
     <section class="fr-adm"><h3>🎁 সাপ্তাহিক ফ্রী পরীক্ষা</h3>
-      ${(()=>{ const fx=Object.values(SYL).filter(r=>r.type==='exam'&&r.free&&r.course===fr.cid).sort((a,b)=>a.date<b.date?1:-1);
+      ${(()=>{ const fx=Object.values(SYL).filter(r=>r.type==='exam'&&r.free&&bundleOf(fr.cid).includes(r.course)).sort((a,b)=>a.date<b.date?1:-1);
         return fx.length?`<div class="xlist">${fx.slice(0,5).map(r=>`<div class="xitem"><div><b>${esc(r.title)}</b><span class="muted">${fmtD(parseD(r.date))} · ${+r.marks} নম্বর · ${+r.mins} মিনিট${isLive(r)?'':' · প্রকাশ '+fmtDT(r.publishAt)}</span></div><button class="link del" data-xdel="${esc(r.id)}">মুছুন</button></div>`).join('')}</div>`:'<p class="muted" style="margin:0">এখনো কোনো ফ্রী পরীক্ষা নেই।</p>'; })()}
+      ${COURSES[fr.cid].bundle?`<p class="muted" style="margin:0;font-size:13px">এই ব্যাচে ${esc(COURSES[fr.cid].bsubj)} দুটোই আছে। বিজ্ঞানের ফ্রী পরীক্ষার জন্য ফর্মে কোর্স হিসেবে "${esc(COURSES[fr.cid].bundle.map(k=>COURSES[k].name+' '+COURSES[k].subj).join(', '))}" বেছে নিন।</p>`:''}
       <button class="btn" data-newfree style="width:100%">+ নতুন ফ্রী পরীক্ষা যোগ কর</button></section>
     <section class="fr-adm"><h3>🗓️ ফ্রী ব্যাচ রুটিন</h3>
       <p class="muted" style="margin:0;font-size:13px">ফ্রী পরীক্ষাগুলো রুটিনে নিজে থেকে দেখায়। এখানে পড়ার দিন বা সাজেশন দেওয়ার দিনও যোগ করতে পারেন।</p>
@@ -1812,6 +1866,8 @@ async function openPdf(u,name){
 }
 function pdfTarget(key){ if(key.indexOf('fr|')===0){ const fr=frInit(); fr.dirty=true; const k=key.split('|')[1]; return fr.items[k]=fr.items[k]||[]; } if(key==='cf'){ const cf=cfInit(); cf.dirty=true; cf.vals.files=cf.vals.files||[]; return cf.vals.files; } if(key==='xf'){ const xf=xfInit(); xf.files=xf.files||[]; return xf.files; } const rf=rfInit(), k=key.split('|')[1]; rf.files=rf.files||{}; return rf.files[k]=rf.files[k]||[]; }
 function freeExams(cid){ return specialExams(cid,true); }
+/* ফ্রী ব্যাচে একসাথে থাকা সব বিষয়ের ফ্রী পরীক্ষা (৮ম: গণিত + বিজ্ঞান) */
+function freeBatchExams(cid){ return bundleOf(cid).flatMap(freeExams); }
 function specialExams(cid,free){
   return Object.values(SYL).filter(r=>r.type==='exam'&&r.course===cid&&typeof r.date==='string'&&canSee(r)&&!!r.free===!!free).map(r=>({
     kind:free?'free':'special',
@@ -3057,7 +3113,7 @@ app.addEventListener('click',e=>{
   }
   if(t.hasAttribute('data-join')){ S.joined=true; persist(); render(); toast('ফ্রী ক্লাসে জয়েন হয়েছে'); return; }
   if(t.dataset.chub) return go('chub',{chubCid:t.dataset.chub});
-  if(t.dataset.course) return go('course',{course:t.dataset.course,courseFrom:S.view==='play'?'play':S.view==='chub'?'chub':'home',featOpen:null});
+  if(t.dataset.course) return go('course',{cview:!!t.dataset.cview,course:t.dataset.course,courseFrom:S.view==='play'?'play':S.view==='chub'?'chub':'home',featOpen:null});
   if(t.dataset.quiz) return startQuiz(t.dataset.quiz);
   if(t.dataset.chapter!==undefined){
     const k=S.course+':'+t.dataset.chapter;
