@@ -32,6 +32,10 @@ bank['c8'] = {}
 for ch in range(1, 12):
     f = root / f'src/mcq/chk{ch}.json'
     if f.exists(): bank['c8'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+bank['c8s'] = {}   # ৮ম শ্রেণি বিজ্ঞান: প্রতি পাঠে 30টি (sci8/*.txt → build_sci8.py)
+for ch in range(1, 15):
+    f = root / f'src/mcq/chs{ch}.json'
+    if f.exists(): bank['c8s'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')   # মূল ব্যাংক (PDF এটি থেকে)
 # বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
 import re as _re

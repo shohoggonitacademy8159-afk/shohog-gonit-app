@@ -2647,7 +2647,7 @@ function vExercise(){
         ${link?`<a class="btn ghost linkbtn" href="${esc(link)}" target="_blank" rel="noopener">${svg('play')}<span>ভিডিও / লিংক খুলুন</span></a>`:''}
         <span class="muted" style="font-size:12.5px">প্রকাশ: ${fmtDT(r.publishAt||r.updatedAt)}</span>
       </section>`:`<div class="empty">এই ${unitOf(cid)} নোট এখনো প্রকাশ হয়নি।</div>`}
-    ${CAN_EDIT?(b.length?mcqBox(cid,exDom(ex),b,`অনুশীলনী ${exName(ex)}-এর MCQ`):`<div class="empty" style="padding:12px">এই অনুশীলনীর MCQ এখনো যোগ হয়নি।</div>`):''}
+    ${CAN_EDIT?(b.length?mcqBox(cid,exDom(ex),b,`${exLabel(cid,ex)}-এর MCQ`):`<div class="empty" style="padding:12px">এই ${unitOf(cid)} MCQ এখনো যোগ হয়নি।</div>`):''}
     <button class="btn ${d?'ghost':''}" data-exdone style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>
     <div style="display:flex;gap:10px">
       ${idx>0?`<button class="btn ghost" style="flex:1" data-openex="${list[idx-1]}">${esc(exLabel(cid,list[idx-1]))}</button>`:''}
