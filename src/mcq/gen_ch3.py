@@ -569,6 +569,8 @@ b.fill(H, 20, [h4_three, h4_trains, h4_eff, h4_profit_two, h4_upstream, h5_ci3, 
 B35 = b.final()
 
 items = B31 + B32 + B33 + B34 + B35
+import mcqlib as _ml
+if _ml.EXT: _ml.save('3', items); raise SystemExit
 for i, x in enumerate(items): x['n'] = i + 1
 root = pathlib.Path(__file__).resolve().parents[2]
 (root / 'src/mcq/ch3.json').write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding='utf-8')

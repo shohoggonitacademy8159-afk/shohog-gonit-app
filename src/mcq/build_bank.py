@@ -28,6 +28,27 @@ bank['h12'] = {}
 for ch in range(1, 11):
     f = root / f'src/mcq/chj{ch}.json'
     if f.exists(): bank['h12'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
-(root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')
+(root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')   # মূল ব্যাংক (PDF এটি থেকে)
+# বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
+import re as _re
+def _cc(lbl):
+    m = _re.match(r'S\d*_(\w+?)_(\d+)$', lbl)
+    if m: return m.group(1), m.group(2)
+    if lbl == '8x': return 'c10', '8'
+    if lbl[0] in 'hij': return {'h': 'c10h', 'i': 'h11', 'j': 'h12'}[lbl[0]], lbl[1:]
+    return 'c10', lbl
+_add = {}
+for f in sorted((root / 'src/mcq/ext').glob('*.json')):
+    if f.stem.startswith('need'): continue
+    c, ch = _cc(f.stem)
+    _add.setdefault((c, ch), []).extend(json.loads(f.read_text(encoding='utf-8')))
+for (c, ch), items in sorted(_add.items()):
+    cur = bank[c][ch]; n0 = max(x['n'] for x in cur)
+    order = {lv: i for i, lv in enumerate(('সহজ', 'মধ্যম', 'কঠিন'))}
+    items = sorted(items, key=lambda x: (str(x.get('ex') or ''), order[x['lv']]))
+    for i, x in enumerate(items):
+        x = dict(x); x['n'] = n0 + 1 + i
+        if not x.get('ex'): x.pop('ex', None)
+        cur.append(x)
 (root / 'www/mcq.js').write_text('// সহগ গণিত একাডেমি — MCQ প্রশ্নব্যাংক (src/mcq/build_bank.py থেকে তৈরি)\nwindow.SOHOG_MCQ = ' + json.dumps(bank, ensure_ascii=False) + ';\n', encoding='utf-8')
 print({k: len(v) for k, v in bank['c10'].items()}); print('c10h', {k: len(v) for k, v in bank['c10h'].items()}); print('h11', {k: len(v) for k, v in bank['h11'].items()}); print('h12', {k: len(v) for k, v in bank['h12'].items()})

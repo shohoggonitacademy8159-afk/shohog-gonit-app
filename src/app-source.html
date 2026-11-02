@@ -1995,7 +1995,8 @@ function xaListHTML(){
     <button class="iconbtn" data-xpg="${S.xpage+1}" ${S.xpage>=pages?'disabled':''} aria-label="পরের পাতা">›</button></nav>`;
 }
 const HUBV=['weekly','exams','xarchive','xresults','xmerit','xwrong','xfav','xsyl','xnotes','course','routine'];
-const hubCourse=()=>{ const ids=OFFER_IDS(); return ids.includes(S.hubCourse)?S.hubCourse:ids[0]; };
+const hubCourse=()=>{ const ids=OFFER_IDS(); if(ids.includes(S.hubCourse)) return S.hubCourse;
+  return ids.find(pkgActive)||ids.find(k=>RSTATE==='ready'&&liveToday(k))||(ids.includes('c10')?'c10':ids[0]); };
 const hubTop=(title)=>`<div class="topbar"><button class="iconbtn" data-go="${S.hubFrom||'exams'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>${title}</h1><span style="width:44px"></span></div>`;
 function myFirst(cid){ return Object.entries(S.exams||{}).filter(([k,r])=>r&&r.total&&(r.course||keyParts(k).course)===cid).sort((a,b)=>(b[1].at||0)-(a[1].at||0)); }
 function wrongList(cid){

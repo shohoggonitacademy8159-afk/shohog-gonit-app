@@ -5,6 +5,7 @@
 import json, random, pathlib, itertools, math
 from fractions import Fraction as F
 
+import sys; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent)); import mcqlib
 R = random.Random(2026103102)
 E, M, H = 'সহজ', 'মধ্যম', 'কঠিন'
 
@@ -31,7 +32,7 @@ def poly_str(a, b, c=None):
     s = term(a, 'x²', True); s += term(b, 'x', not s); s += term(c, '', not s); return s or '0'
 
 class Bank:
-    def __init__(s, ex): s.ex, s.items, s.seen = ex, [], set()
+    def __init__(s, ex): s.ex, s.items, s.seen = ex, [], set(mcqlib.EXISTING)
     def add(s, q, c, wrong, e, lv):
         c = str(c); opts = [c]
         for w in wrong:
@@ -39,7 +40,7 @@ class Bank:
             if w not in opts: opts.append(w)
         if len(opts) < 4: return False       # বিকল্প কম হলে প্রশ্ন বাদ
         opts = opts[:4]
-        key = q + '|' + c
+        key = mcqlib._keyn(q, c)
         if key in s.seen: return False
         s.seen.add(key)
         R.shuffle(opts)
@@ -56,9 +57,11 @@ def near_int(v, k=3):
 
 def fill(bank, lv, need, gens, cap=6):
     tries, used = 0, {}
+    if mcqlib.EXT: need = mcqlib.EXTQ[lv]
     while bank.count(lv) < need:
         tries += 1
-        assert tries < 40000, (bank.ex, lv, bank.count(lv))
+        if mcqlib.EXT and tries >= 150000: print('SHORT', bank.ex, lv, bank.count(lv), '/', need); return
+        assert mcqlib.EXT or tries < 40000, (bank.ex, lv, bank.count(lv))
         live = [g for g in gens if used.get(g.__name__, 0) < cap] or gens
         g = R.choice(live); before = bank.count(lv); g()
         if bank.count(lv) > before: used[g.__name__] = used.get(g.__name__, 0) + 1
@@ -337,12 +340,14 @@ fill(b2, H, 20, [h_domain_sqrt, h_domain_frac, h_find_k, h_roots, h_square_rel, 
 def finalize(b):
     out = []
     for lv, n in ((E, 30), (M, 50), (H, 20)):
-        out += [x for x in b.items if x['lv'] == lv][:n]
+        out += [x for x in b.items if x['lv'] == lv][:(mcqlib.EXTQ[lv] if mcqlib.EXT else n)]
+    if mcqlib.EXT: return out
     assert len(out) == 100
     for x in out: assert len(set(x['o'])) == 4 and 0 <= x['a'] < 4 and all(o.strip() for o in x['o']), x
     return out
 
 items = finalize(b1) + finalize(b2)
+if mcqlib.EXT: mcqlib.save('2', items); sys.exit()
 for i, x in enumerate(items): x['n'] = i + 1
 root = pathlib.Path(__file__).resolve().parents[2]
 (root / 'src/mcq/ch2.json').write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding='utf-8')

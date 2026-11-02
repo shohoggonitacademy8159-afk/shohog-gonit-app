@@ -3,3 +3,5 @@ www/db.js
 *.apk
 .DS_Store
 __pycache__/
+src/mcq/logs/
+src/mcq/__pycache__/

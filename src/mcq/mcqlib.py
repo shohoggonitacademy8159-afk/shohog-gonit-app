@@ -1,9 +1,26 @@
 """MCQ তৈরির সাধারণ সরঞ্জাম: প্রশ্নব্যাংক, বৈচিত্র্য-সীমা, বহুপদী লেখা।"""
-import random
+import random, os, re as _re0, json as _json0, pathlib as _pl0
 from fractions import Fraction as F
 from itertools import product
 
 E, M, H = 'সহজ', 'মধ্যম', 'কঠিন'
+# বর্ধিত মোড (MCQ_EXT=1): আগের সব প্রশ্ন বাদ দিয়ে প্রতি অংশে নতুন প্রশ্ন (সহজ 40, মধ্যম 50, কঠিন 10) → ext/<ch>.json
+EXT = bool(os.environ.get('MCQ_EXT'))
+EXTQ = {E: 40, M: 50, H: 10}
+_fixm = lambda t: _re0.sub(r'(?<![\w)\]°])-(?=\d)', '−', str(t))
+def _keyn(q, c): return _fixm(q) + '|' + _fixm(c)
+EXISTING = set()
+if EXT:
+    _d = _pl0.Path(__file__).resolve().parent
+    def _eat(v):
+        if isinstance(v, list):
+            for x in v:
+                if isinstance(x, dict) and 'q' in x: EXISTING.add(_keyn(x['q'], x['o'][x['a']]))
+        elif isinstance(v, dict):
+            for y in v.values(): _eat(y)
+    for _f in list(_d.glob('ch*.json')) + [_d / 'mcq.json'] + list((_d / 'ext').glob('*.json')):
+        _eat(_json0.loads(_f.read_text(encoding='utf-8')))
+SHORT = []
 SUP = {1: '', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶'}
 
 def fr(x):
@@ -17,7 +34,7 @@ def money(x):
 
 class Bank:
     def __init__(s, ex, rnd):
-        s.ex, s.R, s.items, s.seen = ex, rnd, [], set()
+        s.ex, s.R, s.items, s.seen = ex, rnd, [], set(EXISTING)
     def add(s, q, c, wrong, e, lv):
         c = str(c); opts = [c]
         for w in wrong:
@@ -25,7 +42,7 @@ class Bank:
             if w and w not in opts: opts.append(w)
         if len(opts) < 4: return False
         opts = opts[:4]
-        key = q + '|' + c
+        key = _keyn(q, c)
         if key in s.seen: return False
         s.seen.add(key)
         s.R.shuffle(opts)
@@ -34,9 +51,11 @@ class Bank:
     def count(s, lv): return sum(1 for x in s.items if x['lv'] == lv)
     def fill(s, lv, need, gens, cap=7):
         tries, used, miss = 0, {}, {}
+        if EXT: need = EXTQ[lv]
         while s.count(lv) < need:
             tries += 1
-            assert tries < 60000, (s.ex, lv, s.count(lv))
+            if EXT and tries >= 150000: SHORT.append((s.ex, lv, s.count(lv), need)); print('SHORT', s.ex, lv, s.count(lv), '/', need); return
+            assert EXT or tries < 60000, (s.ex, lv, s.count(lv))
             alive = [g for g in gens if miss.get(g.__name__, 0) < 300] or gens   # নতুন প্রশ্ন আর দিতে না পারা টেমপ্লেট বাদ
             live = [g for g in alive if used.get(g.__name__, 0) < cap] or alive
             g = s.R.choice(live); before = s.count(lv); g()
@@ -44,6 +63,9 @@ class Bank:
             else: miss[g.__name__] = miss.get(g.__name__, 0) + 1
     def final(s, mult=1):
         out = []
+        if EXT:
+            for lv in (E, M, H): out += [x for x in s.items if x['lv'] == lv][:EXTQ[lv]]
+            return out
         for lv, n in ((E, 30 * mult), (M, 50 * mult), (H, 20 * mult)):
             got = [x for x in s.items if x['lv'] == lv][:n]
             assert len(got) == n, (s.ex, lv, len(got))
@@ -135,6 +157,10 @@ def save(ch, items):
         x['n'] = i + 1; x['q'] = fix(x['q']); x['o'] = [fix(o) for o in x['o']]; x['e'] = fix(x['e'])
         assert len(set(x['o'])) == 4, x
     root = pathlib.Path(__file__).resolve().parents[2]
+    if EXT:
+        (root / 'src/mcq/ext').mkdir(exist_ok=True)
+        (root / f'src/mcq/ext/{ch}.json').write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding='utf-8')
+        c = Counter((x.get('ex', '-'), x['lv']) for x in items); print(f'EXT {ch}:', len(items), dict(sorted(c.items()))); return
     (root / f'src/mcq/ch{ch}.json').write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding='utf-8')
     c = Counter((x.get('ex', '-'), x['lv']) for x in items)
     print(f'ch{ch}:', len(items), dict(sorted(c.items())))
