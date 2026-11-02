@@ -14,8 +14,8 @@ function course(cid) {
   const m = line.match(/exs:(\{[^}]*\})/);
   return { chapters, exs: m ? eval('(' + m[1] + ')') : {}, subj: eval(line.match(/subj:('[^']*')/)[1]) };
 }
-const COURSES = { c10: course('c10'), c10h: course('c10h'), h11: course('h11'), h12: course('h12') };
-const CLS = { c10: 'দশম শ্রেণি (এসএসসি ২৭)', c10h: 'দশম শ্রেণি (এসএসসি ২৭)', h11: 'একাদশ শ্রেণি (এইচএসসি ২৮)', h12: 'দ্বাদশ শ্রেণি (এইচএসসি ২৭)' };
+const COURSES = { c8: course('c8'), c10: course('c10'), c10h: course('c10h'), h11: course('h11'), h12: course('h12') };
+const CLS = { c8: '৮ম শ্রেণি', c10: 'দশম শ্রেণি (এসএসসি ২৭)', c10h: 'দশম শ্রেণি (এসএসসি ২৭)', h11: 'একাদশ শ্রেণি (এইচএসসি ২৮)', h12: 'দ্বাদশ শ্রেণি (এইচএসসি ২৭)' };
 const exName = ex => String(ex).replace(/^(\d+)\.([A-Z])$/, '$1($2)');
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const BN = s => String(s).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
@@ -88,7 +88,7 @@ table.key td b{color:#1F5FBF}
         await p.setContent(html(c, cid, `${title}: ${c.chapters[ch - 1]}`, `অধ্যায় ${BN(ch)}: ${c.chapters[ch - 1]}`, data));
         await p.evaluate(() => document.fonts.ready);
         await p.pdf({ path: path.join(outDir, file), format: 'A4', printBackground: true, displayHeaderFooter: true, headerTemplate: '<span></span>',
-          footerTemplate: `<div style="font-size:8px;width:100%;text-align:center;color:#4A5B73">Sohog Ganit Academy · ${cid === 'c10h' ? 'Higher Math' : cid === 'h11' ? 'HSC Higher Math 1st Paper' : cid === 'h12' ? 'HSC Higher Math 2nd Paper' : 'General Math'} · ${key.replace('ch', 'Chapter ')} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`,
+          footerTemplate: `<div style="font-size:8px;width:100%;text-align:center;color:#4A5B73">Sohog Ganit Academy · ${cid === 'c10h' ? 'Higher Math' : cid === 'h11' ? 'HSC Higher Math 1st Paper' : cid === 'h12' ? 'HSC Higher Math 2nd Paper' : cid === 'c8' ? 'Class 8 Math' : 'General Math'} · ${key.replace('ch', 'Chapter ')} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`,
           margin: { top: '14mm', bottom: '16mm', left: '13mm', right: '13mm' } });
         const kb = Math.round(fs.statSync(path.join(outDir, file)).size / 1024);
         index[cid][key] = { f: file, n: data.length, kb, ch, q: data.map(x => x.n) };
