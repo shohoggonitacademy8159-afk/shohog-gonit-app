@@ -400,6 +400,7 @@ button.pdf-row{width:100%;font:inherit;text-align:left;cursor:pointer}
 .pdf-box summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
 .pdf-box[open] summary{margin-bottom:6px}
 .xa-h{margin:4px 0 0;font-size:20px}
+.xa-h.bsubj{margin-top:14px;padding:8px 12px;border-radius:12px;background:var(--tbg);border:1.5px solid var(--tb);color:var(--ta)}
 .xa-pill{font-size:13px;font-weight:600;border-radius:999px;padding:3px 12px;border:1.5px solid currentColor;background:none}
 .xa-pill.st-soon,.xa-pill.st-sched{color:var(--muted);background:none}
 .heart{width:36px;height:36px;border:0;background:none;padding:0;cursor:pointer;display:grid;place-items:center;color:#c9ced6}
@@ -822,7 +823,11 @@ const COURSES = {
   h12:{name:'দ্বাদশ শ্রেণি', sub:'এইচএসসি ২৭', exs:{1:['1.A','1.B'],3:['3.A','3.B'],5:['5.A','5.B'],6:['6.A','6.B','6.C'],7:['7.A','7.B'],8:['8.A','8.B','8.C'],9:['9.A','9.B','9.C','9.D'],10:['10.A','10.B']}, content:true, subj:'উচ্চতর গণিত ২য় পত্র', art:'gradF', t:'amber', chapters:['বাস্তব সংখ্যা ও অসমতা','যোগাশ্রয়ী প্রোগ্রাম','জটিল সংখ্যা','বহুপদী ও বহুপদী সমীকরণ','দ্বিপদী বিস্তৃতি','কণিক','বিপরীত ত্রিকোণমিতিক ফাংশন','স্থিতিবিদ্যা','সমতলে বস্তুকণার গতি','বিস্তার পরিমাপ ও সম্ভাবনা']},
   adm:{name:'এডমিশন কেয়ার', subj:'উচ্চতর গণিত (১ম ও ২য় পত্র)', art:'signpost', t:'green', chapters:['১ম পত্র: পূর্ণ রিভিশন','২য় পত্র: পূর্ণ রিভিশন','প্রকৌশল ভর্তি গণিত','ঢাবি ক-ইউনিট প্রস্তুতি','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট']}
 };
-Object.assign(COURSES.c8,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'৮ম শ্রেণির বার্ষিক', ptitle:'৮ম শ্রেণি গণিত', banner:{badge:'Class 8', main:'গণিত', sub:'সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
+Object.assign(COURSES.c8,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'৮ম শ্রেণির বার্ষিক', ptitle:'৮ম শ্রেণি গণিত ও বিজ্ঞান', bsubj:'গণিত ও বিজ্ঞান', bundle:['c8s'], banner:{badge:'Class 8', main:'গণিত ও বিজ্ঞান', sub:'প্রতি বিষয়ে সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
+/* ৮ম শ্রেণির বিজ্ঞান আলাদা প্যাকেজ নয়: গণিতের (c8) প্যাকেজেই অন্তর্ভুক্ত, একই ফি */
+Object.assign(COURSES.c8s,{offer:COURSES.c8.offer, pkg:'c8', exam:COURSES.c8.exam});
+const pkgKey=cid=>(COURSES[cid]&&COURSES[cid].pkg)||cid;
+const PKG_IDS=()=>Object.keys(COURSES).filter(k=>COURSES[k].offer&&!COURSES[k].pkg);
 Object.assign(COURSES.c9,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'এসএসসি ২০২৮', ptitle:'এসএসসি ২০২৮ সাধারণ গণিত', banner:{badge:'SSC 28', main:'সাধারণ গণিত', sub:'সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
 Object.assign(COURSES.c9h,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'এসএসসি ২০২৮', ptitle:'এসএসসি ২০২৮ উচ্চতর গণিত', banner:{badge:'SSC 28', main:'উচ্চতর গণিত', sub:'সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
 Object.assign(COURSES.h12,{offer:{price:99, perMonth:15, daily:{marks:25, mins:20}, friday:{marks:50, mins:40}}, exam:'এইচএসসি ২০২৭', ptitle:'এইচএসসি ২০২৭ উচ্চতর গণিত ২য় পত্র', banner:{badge:'HSC 27', main:'উচ্চতর গণিত', sub:'২য় পত্র · মাসে ১৫ পরীক্ষা + রিভিশন'}});
@@ -960,7 +965,7 @@ function vHome(){
   const chev='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
   const tile=(id,kind)=>{const c=COURSES[id];
     return `<button class="ctile ${kind} t-${c.t}" ${HUB_CLASSES.includes(id)?`data-chub="${id}"`:`data-course="${id}"`}>${liveToday(id)?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${art(c.art)}
-      <span style="flex:1;min-width:0"><b>${c.name}</b>${c.sub?`<small>(${c.sub})</small>`:''}${c.subj?`<span class="subj">${c.subj}</span>`:''}${c.offer?`<span class="price-tag">মাসিক ৳${bn(c.offer.price)}</span>`:''}</span>
+      <span style="flex:1;min-width:0"><b>${c.name}</b>${c.sub?`<small>(${c.sub})</small>`:''}${c.subj?`<span class="subj">${c.subj}</span>`:''}${c.offer&&!c.pkg?`<span class="price-tag">মাসিক ৳${bn(c.offer.price)}</span>`:''}</span>
       <span class="arrow">${chev}</span></button>`;};
   return `<div class="screen home">
     <header class="hero">
@@ -1051,19 +1056,24 @@ function courseBanner(id,size){
     <span class="cb-badge">${esc(b.badge)}</span>
     <span class="cb-main">${esc(b.main)}</span>
     <span class="cb-sub">${esc(b.sub)}</span>
-    <span class="cb-chip"><i></i>${freqOf(c.offer).chip}</span>
+    <span class="cb-chip"><i></i>${c.bundle?'প্রতি বিষয়ে ':''}${freqOf(c.offer).chip}</span>
     <span class="cb-shine"></span>
   </div>`;
 }
+function bundleOf(id){ return [id].concat(COURSES[id].bundle||[]); }
+function bundleStats(id){ const mem=bundleOf(id);
+  return {mem, nch:mem.reduce((s,m)=>s+COURSES[m].chapters.length,0), nq:mem.reduce((s,m)=>s+COURSES[m].chapters.reduce((n,_,i)=>n+bankFor(m,i+1).length,0),0), nex:mem.reduce((s,m)=>s+Object.values(COURSES[m].exs||{}).reduce((n,a)=>n+a.length,0),0), uw:mem.length>1?'অনুশীলনী ও পাঠ':'অনুশীলনী'}; }
+function pkgLinkCard(id){ const k=COURSES[id].pkg, p=COURSES[k];
+  return `<article class="pcard"><span class="offer-tag" style="align-self:flex-start">কোর্সে অন্তর্ভুক্ত</span><b class="pc-title">${esc(COURSES[id].subj)}-এর লাইভ পরীক্ষা "${esc(ptitle(p))}" কোর্সের অন্তর্ভুক্ত। একই প্যাকেজে (মাসিক ৳${bn(p.offer.price)}) দুই বিষয়ের পরীক্ষা দেওয়া যাবে।</b><button class="btn" data-course="${k}">${esc(ptitle(p))} দেখো</button></article>`; }
 function courseFeatures(id){
-  const c=COURSES[id], o=c.offer;
-  const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0), nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
+  const c=COURSES[id], o=c.offer, bs=bundleStats(id);
+  const nq=bs.nq, nex=bs.nex;
   return [
-    ['#e0457b','calendar',freqOf(o).title,freqOf(o).desc],
+    ['#e0457b','calendar',(c.bundle?'প্রতি বিষয়ে ':'')+freqOf(o).title,(c.bundle?`${c.bsubj}: প্রতিটি বিষয়ে আলাদা রুটিন। `:'')+freqOf(o).desc],
     !o.friday?null:['#f08c1a','exam','শুক্রবার রিভিশন পরীক্ষা',`প্রতি শুক্রবার ${bn(o.friday.marks)} নম্বরের পরীক্ষা, সময় ${bn(o.friday.mins)} মিনিট। সিলেবাস পুরো সপ্তাহের পরীক্ষাগুলোর সিলেবাস, সাথে আলাদা মেধাতালিকা।`],
     ['#e53935','report','মাসিক পরীক্ষা ও মডেল টেস্ট','রুটিনের বাইরে মাসিক পরীক্ষা ও মডেল টেস্ট। নম্বর, সময় ও সিলেবাস প্রতিবার আলাদাভাবে ঘোষণা করা হয়।'],
     ['#8e44ef','openbook','লেকচার শিট ও স্টাডি ম্যাটেরিয়াল',`অধ্যায় ও অনুশীলনীভিত্তিক নোট। প্রতিটি পরীক্ষার সিলেবাস অনুযায়ী নোট নিজে থেকে "স্টাডি ম্যাটেরিয়াল"-এ চলে আসে, পরীক্ষা দাও বোতামের ঠিক উপরে।`],
-    ['#1e88e5','pencil',`${bn(nq)}+ প্রশ্নের প্রশ্নব্যাংক`,`${bn(c.chapters.length)}টি অধ্যায় ও ${bn(nex)}টি অনুশীলনী জুড়ে সহজ, মধ্যম ও কঠিন প্রশ্ন। প্রতিটি শিক্ষার্থী এলোমেলোভাবে আলাদা প্রশ্ন পায়, তাই দেখাদেখির সুযোগ কম।`],
+    ['#1e88e5','pencil',`${bn(nq)}+ প্রশ্নের প্রশ্নব্যাংক`,`${bn(bs.nch)}টি অধ্যায় ও ${bn(nex)}টি ${bs.uw} জুড়ে সহজ, মধ্যম ও কঠিন প্রশ্ন। প্রতিটি শিক্ষার্থী এলোমেলোভাবে আলাদা প্রশ্ন পায়, তাই দেখাদেখির সুযোগ কম।`],
     ['#2e9e5b','check','তাৎক্ষণিক ফলাফল ও ব্যাখ্যা','খাতা জমা দিলেই নম্বর, প্রতিটি প্রশ্নের সঠিক উত্তর ও ব্যাখ্যা। উত্তর একবার দিলে আর বদলানো যায় না, তাই আসল পরীক্ষার অভ্যাস তৈরি হয়।'],
     ['#f2b705','medal','মেধাতালিকা','প্রতিটি পরীক্ষার মেধাতালিকা সবাই দেখতে পারে। প্রথমবার দেওয়া নম্বরে মেধাক্রম, সমান নম্বর হলে যে আগে জমা দিয়েছে সে উপরে।'],
     ['#e0457b','xcircle','ভুল ও উত্তরহীন প্রশ্নের রিভিশন','নিজের ভুল করা আর উত্তর না দেওয়া প্রশ্নগুলো আলাদা করে সঠিক উত্তর ও ব্যাখ্যাসহ আবার দেখা যায়।'],
@@ -1074,28 +1084,29 @@ function courseFeatures(id){
 }
 function vCourseOffer(){
   const id=S.course, c=COURSES[id], o=c.offer, enrolled=!!(S.enrolled&&S.enrolled[id]);
-  const nq=c.chapters.reduce((n,_,i)=>n+bankFor(id,i+1).length,0), nex=Object.values(c.exs||{}).reduce((n,a)=>n+a.length,0);
+  const bs=bundleStats(id), nq=bs.nq, nex=bs.nex, multi=bs.mem.length>1;
   const f=courseFeatures(id), open=S.featOpen;
   return `<div class="screen cdet">
     <div class="topbar"><button class="iconbtn" data-go="${S.courseFrom||'home'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1 class="cd-top">${esc(ptitle(c))}</h1><span style="width:44px"></span></div>
     ${courseBanner(id,'big')}
     <div><h2 class="cd-title">${esc(ptitle(c))}</h2>
-      <p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">${c.exam||'এসএসসি ২০২৭'} পরীক্ষার্থীদের জন্য ${c.name} ${c.subj}-এর পুরো সিলেবাসে ${freqOf(o).chip}${o.friday?', শুক্রবার রিভিশন পরীক্ষা':''} ও মডেল টেস্ট।</p></div>
-    <div class="cd-stats"><div><b>${bn(c.chapters.length)}</b><span>অধ্যায়</span></div><div><b>${bn(nex)}</b><span>অনুশীলনী</span></div><div><b>${bn(nq)}+</b><span>প্রশ্ন</span></div><div><b>${bn(freqOf(o).n)}</b><span>${freqOf(o).stat}</span></div></div>
+      <p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">${c.exam||'এসএসসি ২০২৭'} পরীক্ষার্থীদের জন্য ${c.name} ${c.bsubj||c.subj}-এর পুরো সিলেবাসে ${multi?'প্রতি বিষয়ে ':''}${freqOf(o).chip}${o.friday?', শুক্রবার রিভিশন পরীক্ষা':''} ও মডেল টেস্ট।</p></div>
+    <div class="cd-stats"><div><b>${bn(bs.nch)}</b><span>অধ্যায়</span></div><div><b>${bn(nex)}</b><span>${bs.uw}</span></div><div><b>${bn(nq)}+</b><span>প্রশ্ন</span></div><div><b>${bn(freqOf(o).n*bs.mem.length)}</b><span>${freqOf(o).stat}</span></div></div>
     <h2 class="xa-h">কোর্সটি যেভাবে সাজানো হয়েছে</h2>
     <div class="feat-list">${f.map(([col,ic,t,d],i)=>`<button class="feat ${open===i?'open':''}" data-feat="${i}" aria-expanded="${open===i}" style="--fc:${col};--d:${i}">
       <span class="feat-ic">${svg(ic)}</span><span class="feat-t"><b>${esc(t)}:</b><span>${esc(d)}</span></span></button>`).join('')}</div>
-    ${weeklyBtn(id)}
-    <section class="cd-week"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:17px">এই সপ্তাহের রুটিন</b><button class="link" data-go="routine">পুরো রুটিন</button></div>${weekPreview(id)}</section>
-    ${examTiles(id)}
-    ${sylCard(id)}
+    ${bs.mem.map(m=>`${multi?`<h2 class="xa-h bsubj t-${COURSES[m].t}">${esc(COURSES[m].subj)}</h2>`:''}
+    ${weeklyBtn(m)}
+    <section class="cd-week"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:17px">এই সপ্তাহের রুটিন${multi?' · '+esc(COURSES[m].subj):''}</b><button class="link" data-rtc="${m}" data-go="routine">পুরো রুটিন</button></div>${weekPreview(m)}</section>
+    ${examTiles(m)}
+    ${sylCard(m)}`).join('')}
     <div class="buybar">${pkgActive(id)||pendingPay(id)
       ?pkgBadge(id)+(pkgActive(id)?`<button class="btn outline bb-btn" data-buy="${id}">নবায়ন</button>`:'')
       :`<div class="bb-price"><span>মাসিক ফি</span><b>৳${bn(o.price)}</b></div><button class="btn bb-btn" data-buy="${id}">প্যাকেজ নাও</button>`}</div>
   </div>`;
 }
 function vCourse(){
-  if(COURSES[S.course]&&COURSES[S.course].offer) return vCourseOffer();
+  if(COURSES[S.course]&&COURSES[S.course].offer&&!COURSES[S.course].pkg) return vCourseOffer();
   const id=S.course, c=COURSES[id];
   const doneCount=c.chapters.filter((_,i)=>S.done[id+':'+i]).length;
   return `<div class="screen">
@@ -1106,10 +1117,11 @@ function vCourse(){
       <span class="muted" style="font-size:14px">${bn(c.chapters.length)}টি অধ্যায় · ${bn(doneCount)}টি পড়া শেষ</span></div>
     </div>
     <div class="progress" aria-hidden="true"><i style="width:${Math.round(doneCount/c.chapters.length*100)}%"></i></div>
-    ${c.offer?weeklyBtn(id):''}
-    ${c.offer?offerCard(id,c.offer):''}
-    ${sylCard(id)}
-    ${c.offer?'':`<div class="list" role="list">
+    ${c.pkg?pkgLinkCard(id):''}
+    ${c.offer&&!c.pkg?weeklyBtn(id):''}
+    ${c.offer&&!c.pkg?offerCard(id,c.offer):''}
+    ${c.pkg?'':sylCard(id)}
+    ${c.offer&&!c.pkg?'':`<div class="list" role="list">
       ${c.chapters.map((ch,i)=>{const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
         <span class="num">${bn(i+1)}</span>
         <span class="t">${esc(chTitle(id,i))}<br><span class="s">${chDoc(id,i)?'নোট আছে · চাপ দিয়ে পড়ুন':'নোট শিগগিরই আসবে'}</span></span>`:`<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
@@ -1222,7 +1234,7 @@ async function publishFree(){
   catch(e){ S.frBusy=false; render(); const el=document.getElementById('frErr'); if(el) el.textContent=e&&e.code==='permission_denied'?'প্রকাশের অনুমতি নেই। আবার অ্যাডমিন লগইন করুন।':'প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
 }
 function vPlay(){
-  const left=SECTIONS.flatMap(sec=>sec.rows.flatMap(r=>r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer&&!HUB_CLASSES.includes(k));
+  const left=SECTIONS.flatMap(sec=>sec.rows.flatMap(r=>r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer&&!COURSES[k].pkg&&!HUB_CLASSES.includes(k));
   return `<div class="screen">
     <div class="topbar"><span style="width:44px"></span><h1>এক্সপ্লোর</h1><span style="width:44px"></span></div>
     <section class="explore-empty">
@@ -1325,14 +1337,14 @@ const payName=m=>(PAYM.find(x=>x[0]===m)||['',m])[1];
 const payCfg=()=>{ const r=SYL.paycfg||{}; return {bkash:String(r.bkash||''),nagad:String(r.nagad||''),rocket:String(r.rocket||''),note:String(r.note||''),enforce:!!r.enforce,days:Math.min(366,Math.max(1,+r.days||30))}; };
 const payMethods=()=>{ const c=payCfg(); return PAYM.filter(([k])=>c[k]); };
 const DAYMS=86400000;
-function pkgUntil(cid){ const e=S.enrolled&&S.enrolled[cid]; return e&&e.until?+e.until:0; }
+function pkgUntil(cid){ cid=pkgKey(cid); const e=S.enrolled&&S.enrolled[cid]; return e&&e.until?+e.until:0; }
 const pkgActive=cid=>pkgUntil(cid)>Date.now();
-const pendingPay=cid=>Object.values(S.pays||{}).some(p=>p.course===cid&&p.status==='pending');
+const pendingPay=cid=>Object.values(S.pays||{}).some(p=>p.course===pkgKey(cid)&&p.status==='pending');
 /* পেইড কোর্সের পরীক্ষায় প্যাকেজ লাগবে কি না (অ্যাডমিন সেটিং চালু থাকলে) */
 function needPay(e){ return !!(e&&payCfg().enforce&&e.kind!=='free'&&COURSES[e.course]&&COURSES[e.course].offer&&!pkgActive(e.course)&&!CAN_EDIT); }
 /* হোম: শিক্ষার্থীর চালু প্যাকেজ */
 function myPkgBar(){
-  const ids=Object.keys(COURSES).filter(k=>COURSES[k].offer);
+  const ids=PKG_IDS();
   const act=ids.filter(pkgActive), pend=ids.filter(k=>!pkgActive(k)&&pendingPay(k));
   if(!act.length&&!pend.length) return `<div class="pkgbar none" role="status"><span class="pk-ic" aria-hidden="true">📦</span><span>তোমার কোনো প্যাকেজ চালু নেই</span></div>`;
   return `<section class="pkgbar" aria-label="আমার প্যাকেজ"><h2>${svg('check','width="18" height="18" fill="none" stroke="currentColor" stroke-width="3"')}আমার প্যাকেজ</h2>
@@ -1479,7 +1491,7 @@ async function savePayCfg(){
 function vPay(){
   refreshPays();
   const pays=Object.entries(S.pays||{}).map(([id,p])=>Object.assign({id},p)).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
-  const act=OFFER_IDS().filter(k=>pkgUntil(k));
+  const act=PKG_IDS().filter(k=>pkgUntil(k));
   return `<div class="screen">${backTop('পেমেন্ট ও অর্ডার হিস্ট্রি','profile')}
     ${act.map(k=>{ const on=pkgActive(k); return `<section class="pay-sum"><div><b>${esc(ptitle(COURSES[k]))}</b><span class="muted">${on?`প্যাকেজ চালু · ${bnD(new Date(pkgUntil(k))).split(',')[0]} পর্যন্ত`:`মেয়াদ শেষ হয়েছে ${bnD(new Date(pkgUntil(k))).split(',')[0]}`}</span></div><button class="btn ${on?'outline':''}" data-buy="${k}">${on?'আগাম নবায়ন':'নবায়ন করো'}</button></section>`; }).join('')}
     ${pays.length?`<h3 class="m-sec">পেমেন্টের তালিকা</h3>`+pays.map(p=>{ const c=COURSES[p.course];
@@ -1899,7 +1911,7 @@ function examAction(e){
 function findExam(k){ return OFFER_IDS().flatMap(id=>examsFor(id).concat(freeExams(id))).find(e=>examKey(e)===k); }
 function startExam(k,again){
   const e=findExam(k); if(!e||(S.exams[k]&&!again)||(again&&!S.exams[k])) return;
-  if(needPay(e)){ S.buyCid=e.course; S.course=e.course; S.buy=null; return go('buy'); }
+  if(needPay(e)){ S.buyCid=pkgKey(e.course); S.course=S.buyCid; S.buy=null; return go('buy'); }
   if(!S.student){ return go('student',{pendingExam:k}); }
   if(S.examRun&&!S.examRun.done){ toast('আগে চলমান পরীক্ষাটি শেষ করো'); return go('exam'); }
   const pool=examPool(e);
@@ -2969,7 +2981,7 @@ app.addEventListener('submit',e=>{
 });
 app.addEventListener('click',e=>{
   const t=e.target.closest('button'); if(!t) return;
-  if(t.dataset.go) return go(t.dataset.go);
+  if(t.dataset.go){ if(t.dataset.rtc) S.rtc=t.dataset.rtc; return go(t.dataset.go); }
   if(t.dataset.chlist){ S.chFrom=S.view==='admin'?'admin':S.view==='course'?'course':'play'; return go('chapters',{course:t.dataset.chlist}); }
   if(t.dataset.openex){ return go('exercise',{exKey:t.dataset.openex}); }
   if(t.hasAttribute('data-exdone')){ const k=`${S.course}:ex:${S.exKey}`; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); return; }
@@ -3057,7 +3069,7 @@ app.addEventListener('click',e=>{
   if(t.hasAttribute('data-xyes')){ const c=S.xconfirm; S.xconfirm=null; if(c) return startExam(c.k,c.again); render(); return; }
   if(t.dataset.exagain){ S.xconfirm={k:t.dataset.exagain,again:true}; render(); return; }
   if(t.dataset.leader){ S.leaderFrom=S.view==='examResult'?(S.resFrom||'routine'):(HUBV.includes(S.view)&&S.view!=='course')||S.view==='home'?S.view:'routine'; return go('leader',{leaderKey:t.dataset.leader}); }
-  if(t.dataset.exstart){ const e=findExam(t.dataset.exstart); if(needPay(e)){ toast('এই পরীক্ষা দিতে প্যাকেজ নিতে হবে'); S.buyCid=e.course; S.course=e.course; S.buy=null; return go('buy'); } S.xconfirm={k:t.dataset.exstart,again:false}; render(); return; }
+  if(t.dataset.exstart){ const e=findExam(t.dataset.exstart); if(needPay(e)){ toast('এই পরীক্ষা দিতে প্যাকেজ নিতে হবে'); S.buyCid=pkgKey(e.course); S.course=S.buyCid; S.buy=null; return go('buy'); } S.xconfirm={k:t.dataset.exstart,again:false}; render(); return; }
   if(t.dataset.exgo){ return go('exam'); }
   if(t.dataset.exview){ S.examView=t.dataset.exview; S.examViewAgain=false; return go('examResult'); }
   if(t.hasAttribute('data-exsubmit')){
@@ -3089,7 +3101,7 @@ app.addEventListener('click',e=>{
     else{ t.dataset.armed='1'; t.textContent='নিশ্চিত? আবার চাপুন'; }
     return;
   }
-  if(t.dataset.buy){ S.buyCid=t.dataset.buy; S.course=t.dataset.buy; S.buy=null; return go('buy'); }
+  if(t.dataset.buy){ S.buyCid=pkgKey(t.dataset.buy); S.course=S.buyCid; S.buy=null; return go('buy'); }
   if(t.dataset.paym){ S.buy.m=t.dataset.paym; render(); return; }
   if(t.dataset.paymo){ S.buy.months=+t.dataset.paymo; render(); return; }
   if(t.dataset.paycopy!==undefined){ const v=t.dataset.paycopy; (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast('কপি হয়েছে: '+v),()=>toast(v)); return; }
