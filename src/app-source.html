@@ -439,6 +439,8 @@ button.pdf-row{width:100%;font:inherit;text-align:left;cursor:pointer}
 @keyframes cbshine{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
 @media (prefers-reduced-motion:reduce){.cbanner,.cb-badge,.cb-chip i,.cb-sym,.cb-shine{animation:none}.cb-shine{display:none}}
 .pcard{position:relative;display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.explore-empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px 18px}
+.explore-empty h2{margin:0;font-size:22px}.explore-empty p{margin:0;line-height:1.6}.ee-ic{font-size:40px}
 .chub-list{display:flex;flex-direction:column;gap:14px}
 .pcard .live-badge{top:4px;right:4px;z-index:3}
 .pc-img{border:0;padding:0;background:none;cursor:pointer;border-radius:18px;transition:transform .2s}
@@ -1138,7 +1140,7 @@ function freeExamSection(cid){
 }
 const freeLive=cid=>RSTATE==='ready'&&freeExams(cid).some(e=>e.date===todayISO()&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
 /* হোমের শ্রেণি-কার্ড থেকে খোলে: এই শ্রেণির কোর্স ও ফ্রী ব্যাচ (এক্সপ্লোরের বদলে এখানে) */
-const HUB_CLASSES=['c10'];
+const HUB_CLASSES=['c8','c9','c9h','c10','c10h','h11','h12'];
 function vCHub(){
   const cid=HUB_CLASSES.includes(S.chubCid)?S.chubCid:HUB_CLASSES[0], c=COURSES[cid];
   return `<div class="screen">${backTop(`${c.name} ${c.subj||''}`,'home')}
@@ -1197,22 +1199,16 @@ async function publishFree(){
   catch(e){ S.frBusy=false; render(); const el=document.getElementById('frErr'); if(el) el.textContent=e&&e.code==='permission_denied'?'প্রকাশের অনুমতি নেই। আবার অ্যাডমিন লগইন করুন।':'প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
 }
 function vPlay(){
-  const chev='<span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>';
-  const ids=sec=>sec.rows.flatMap(r=>r.kind==='primary'?['p5']:(r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer&&!HUB_CLASSES.includes(k));
-  const zone=['z1','z2','z3'];
+  const left=SECTIONS.flatMap(sec=>sec.rows.flatMap(r=>r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer&&!HUB_CLASSES.includes(k));
   return `<div class="screen">
     <div class="topbar"><span style="width:44px"></span><h1>এক্সপ্লোর</h1><span style="width:44px"></span></div>
-    <p class="muted" style="margin:0">যেসব কোর্স এখন চলছে, সেগুলো এখানে। কোর্সে চাপ দিলে বিস্তারিত, রুটিন ও পরীক্ষা দেখা যাবে।</p>
-    ${SECTIONS.map((sec,si)=>{ const list=ids(sec);
-      return `<section class="zone ${zone[si]||'z2'}"><h2>${sec.title} স্তর</h2>
-        ${list.length?[...new Set(list.map(k=>COURSES[k].subj||''))].map((sj,gi,all)=>{ const gl=list.filter(k=>(COURSES[k].subj||'')===sj).sort((a,b)=>(/^c9/.test(a)?1:/^c8/.test(a)?2:0)-(/^c9/.test(b)?1:/^c8/.test(b)?2:0));
-          return `${all.length>1&&sj?`<h3 class="prow-h">${esc(sj)}</h3>`:''}<div class="prow">${gl.map(k=>{ const c=COURSES[k];
-          return `<article class="pcard">${liveToday(k)?'<span class="live-badge"><i></i>লাইভ</span>':''}
-            <button class="pc-img" data-course="${k}" aria-label="${esc(ptitle(c))}">${courseBanner(k,'sm')}</button>
-            <b class="pc-title">${esc(ptitle(c))}</b>
-            <button class="pc-more" data-course="${k}">বিস্তারিত দেখো</button></article>`+(FREE_BATCH[k]?freeCard(k):''); }).join('')}</div>${gl.some(k=>FREE_BATCH[k])?'<p class="prow-hint">ডানে সরিয়ে আরও দেখো →</p>':''}`; }).join('')
-          :`<div class="empty soon-empty">কোর্স চালু নেই, শীঘ্রই চালু হবে।</div>`}
-      </section>`; }).join('')}
+    <section class="explore-empty">
+      <span class="ee-ic" aria-hidden="true">🎓</span>
+      <h2>শ্রেণি বেছে নাও</h2>
+      <p class="muted">সব কোর্স ও ফ্রী ব্যাচ এখন হোম পেজে নিজ নিজ শ্রেণির কার্ডে আছে। হোমে গিয়ে তোমার শ্রেণিতে চাপ দাও।</p>
+      <button class="btn" data-go="home">হোমে যাও</button>
+    </section>
+    ${left.length?`<div class="chub-list">${left.map(k=>`<article class="pcard"><button class="pc-img" data-course="${k}">${courseBanner(k,'sm')}</button><b class="pc-title">${esc(ptitle(COURSES[k]))}</b><button class="pc-more" data-course="${k}">বিস্তারিত দেখো</button></article>`).join('')}</div>`:''}
   </div>`;
 }
 function vQuiz(){
