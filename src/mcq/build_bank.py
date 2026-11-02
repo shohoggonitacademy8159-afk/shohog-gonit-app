@@ -32,6 +32,10 @@ bank['c8'] = {}
 for ch in range(1, 12):
     f = root / f'src/mcq/chk{ch}.json'
     if f.exists(): bank['c8'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+bank['c6'] = {}   # ৬ষ্ঠ শ্রেণি গণিত (gen_m.py)
+for ch in range(1, 9):
+    f = root / f'src/mcq/chm{ch}.json'
+    if f.exists(): bank['c6'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
 bank['c8s'] = {}   # ৮ম শ্রেণি বিজ্ঞান: প্রতি পাঠে 30টি (sci8/*.txt → build_sci8.py)
 for ch in range(1, 15):
     f = root / f'src/mcq/chs{ch}.json'
