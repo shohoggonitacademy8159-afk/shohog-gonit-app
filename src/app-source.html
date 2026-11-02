@@ -1220,7 +1220,7 @@ function vCHub(){
         <button class="pc-more" data-course="${cid}">বিস্তারিত দেখো</button></article>`:''}
       ${FREE_BATCH[cid]?freeCard(cid):''}
     </div>
-    ${c.bundle?`<h2 class="xa-h">বই, অধ্যায় ও পাঠ</h2><div class="subj-books">${bundleOf(cid).map((k,i)=>`<button class="sbook t-${COURSES[k].t}" style="--i:${i}" data-course="${k}" ${k===cid?'data-cview="1"':''}><span class="sb-art">${art(COURSES[k].art)}</span><span><b>${esc(COURSES[k].subj)}</b><small>${bn(COURSES[k].chapters.length)}টি অধ্যায় · ${COURSES[k].unitWord==='পাঠ'?'পাঠভিত্তিক':'অনুশীলনীভিত্তিক'}</small></span><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span></button>`).join('')}</div>`:''}
+    ${c.bundle&&CAN_EDIT?`<h2 class="xa-h">বই, অধ্যায় ও পাঠ <small class="muted" style="font-size:12.5px">(শুধু অ্যাডমিন দেখছেন)</small></h2><div class="subj-books">${bundleOf(cid).map((k,i)=>`<button class="sbook t-${COURSES[k].t}" style="--i:${i}" data-course="${k}" ${k===cid?'data-cview="1"':''}><span class="sb-art">${art(COURSES[k].art)}</span><span><b>${esc(COURSES[k].subj)}</b><small>${bn(COURSES[k].chapters.length)}টি অধ্যায় · ${COURSES[k].unitWord==='পাঠ'?'পাঠভিত্তিক':'অনুশীলনীভিত্তিক'}</small></span><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span></button>`).join('')}</div>`:''}
   </div>`;
 }
 function freeCard(cid){
