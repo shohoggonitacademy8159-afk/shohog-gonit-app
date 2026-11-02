@@ -63,6 +63,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g1{grid-template-columns:minmax(0,1fr)}
+.pay-lock{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:12px;background:var(--pink-bg);border:1.5px solid var(--pink-b);font-size:13.5px}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;cursor:pointer;color:var(--fg);font-size:13.5px;font-weight:600;line-height:1.3;min-height:100px}
 .tile.row{flex-direction:row;text-align:left;padding:12px;min-height:72px}
 .tile:hover{border-color:var(--accent)}
@@ -1375,7 +1376,8 @@ function pkgUntil(cid){ cid=pkgKey(cid); const e=S.enrolled&&S.enrolled[cid]; re
 const pkgActive=cid=>pkgUntil(cid)>Date.now();
 const pendingPay=cid=>Object.values(S.pays||{}).some(p=>p.course===pkgKey(cid)&&p.status==='pending');
 /* পেইড কোর্সের পরীক্ষায় প্যাকেজ লাগবে কি না (অ্যাডমিন সেটিং চালু থাকলে) */
-function needPay(e){ return !!(e&&payCfg().enforce&&e.kind!=='free'&&COURSES[e.course]&&COURSES[e.course].offer&&!pkgActive(e.course)&&!CAN_EDIT); }
+/* নিয়ম: প্যাকেজ ছাড়া পেইড কোর্সের দৈনিক/রিভিশন/বিশেষ পরীক্ষা (আবার দেওয়াসহ) দেওয়া যাবে না। ফ্রী ব্যাচের পরীক্ষা ও স্টাডি ম্যাটেরিয়াল সবার জন্য খোলা। */
+function needPay(e){ return !!(e&&e.kind!=='free'&&COURSES[e.course]&&COURSES[e.course].offer&&!pkgActive(e.course)&&!CAN_EDIT); }
 /* হোম: শিক্ষার্থীর চালু প্যাকেজ */
 function myPkgBar(){
   const ids=PKG_IDS();
@@ -1475,7 +1477,7 @@ function payPanel(){
       ${PAYM.map(([k,l])=>`<div class="field"><label>${l} পার্সোনাল নম্বর</label><input class="input" data-pcf="${k}" inputmode="tel" maxlength="14" value="${esc(pc[k])}" placeholder="খালি রাখলে এই মাধ্যম দেখাবে না"></div>`).join('')}
       <div class="field"><label>শিক্ষার্থীদের জন্য নির্দেশনা (ঐচ্ছিক)</label><textarea class="input area" data-pcf="note" maxlength="300" rows="2" placeholder="যেমন: শুধু Send Money করবেন, Cash Out নয়।">${esc(pc.note)}</textarea></div>
       <div class="field"><label>এক মাসের ফি দিলে প্যাকেজ কত দিন চালু থাকবে</label><input class="input" data-pcf="days" inputmode="numeric" maxlength="3" value="${esc(String(pc.days))}"></div>
-      <label class="pay-tog"><input type="checkbox" data-pcf="enforce" ${pc.enforce?'checked':''}><span>পেমেন্ট ছাড়া পেইড কোর্সের পরীক্ষা বন্ধ রাখুন<small>চালু করলে প্যাকেজ না থাকলে শিক্ষার্থী দৈনিক/রিভিশন/বিশেষ পরীক্ষা দিতে পারবে না (ফ্রী ব্যাচ খোলা থাকবে)।</small></span></label>
+      <p class="muted" style="margin:0;font-size:13px">🔒 নিয়ম (সবসময় চালু): প্যাকেজ ছাড়া কেউ পেইড কোর্সের পরীক্ষা দিতে পারবে না। শুধু ফ্রী ব্যাচের পরীক্ষা দেওয়া ও স্টাডি ম্যাটেরিয়াল দেখা যাবে।</p>
       <div class="error" role="alert">${esc(pc.err||'')}</div>
       <button class="btn" data-pcsave ${pc.busy?'disabled':''}>${pc.busy?'সংরক্ষণ হচ্ছে…':'সেটিং সংরক্ষণ কর'}</button></div></details>
     ${PAY_OK===false?`<div class="empty">পেমেন্ট তালিকা দেখা যাচ্ছে না। Firebase Rules-এ "payments" অংশটি যোগ করা হয়েছে কি না দেখুন।</div>`:''}
@@ -1919,6 +1921,7 @@ function examAction(e){
   const pool=examPool(e);
   if(!examChapters(e).length) return `<span class="muted" style="font-size:13.5px">এই দিনের জন্য কোনো অধ্যায় যুক্ত করা হয়নি, তাই অনলাইন পরীক্ষা নেই।</span>`;
   if(!pool.length) return `<span class="muted" style="font-size:13.5px">এই অধ্যায়ের প্রশ্ন এখনো যোগ হয়নি।</span>`;
+  if(needPay(e)) return `<div class="pay-lock"><span>🔒 এই পরীক্ষা দিতে প্যাকেজ নিতে হবে। স্টাডি ম্যাটেরিয়াল সবার জন্য খোলা।</span><button class="btn" data-buy="${pkgKey(e.course)}">প্যাকেজ নাও · ৳${bn(COURSES[e.course].offer.price)}/মাস</button></div>`;
   const n=Math.min(e.marks,pool.length);
   const nRes=leaderRows(k).length;
   return `<button class="btn" data-exstart="${k}">${e.date===today?'লাইভ পরীক্ষা দাও':'পরীক্ষা দাও (দেরিতে)'} · ${n}টি প্রশ্ন · ${e.mins} মিনিট</button>`;
