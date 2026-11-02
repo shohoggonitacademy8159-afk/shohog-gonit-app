@@ -439,6 +439,7 @@ button.pdf-row{width:100%;font:inherit;text-align:left;cursor:pointer}
 @keyframes cbshine{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
 @media (prefers-reduced-motion:reduce){.cbanner,.cb-badge,.cb-chip i,.cb-sym,.cb-shine{animation:none}.cb-shine{display:none}}
 .pcard{position:relative;display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.chub-list{display:flex;flex-direction:column;gap:14px}
 .pcard .live-badge{top:4px;right:4px;z-index:3}
 .pc-img{border:0;padding:0;background:none;cursor:pointer;border-radius:18px;transition:transform .2s}
 .pc-img:active{transform:scale(.98)}
@@ -933,7 +934,7 @@ function joinCard(){
 function vHome(){
   const chev='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
   const tile=(id,kind)=>{const c=COURSES[id];
-    return `<button class="ctile ${kind} t-${c.t}" data-course="${id}">${liveToday(id)?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${art(c.art)}
+    return `<button class="ctile ${kind} t-${c.t}" ${HUB_CLASSES.includes(id)?`data-chub="${id}"`:`data-course="${id}"`}>${liveToday(id)?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${art(c.art)}
       <span style="flex:1;min-width:0"><b>${c.name}</b>${c.sub?`<small>(${c.sub})</small>`:''}${c.subj?`<span class="subj">${c.subj}</span>`:''}${c.offer?`<span class="price-tag">মাসিক ৳${bn(c.offer.price)}</span>`:''}</span>
       <span class="arrow">${chev}</span></button>`;};
   return `<div class="screen home">
@@ -1136,6 +1137,21 @@ function freeExamSection(cid){
   </section>`;
 }
 const freeLive=cid=>RSTATE==='ready'&&freeExams(cid).some(e=>e.date===todayISO()&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
+/* হোমের শ্রেণি-কার্ড থেকে খোলে: এই শ্রেণির কোর্স ও ফ্রী ব্যাচ (এক্সপ্লোরের বদলে এখানে) */
+const HUB_CLASSES=['c10'];
+function vCHub(){
+  const cid=HUB_CLASSES.includes(S.chubCid)?S.chubCid:HUB_CLASSES[0], c=COURSES[cid];
+  return `<div class="screen">${backTop(`${c.name} ${c.subj||''}`,'home')}
+    <p class="muted" style="margin:0">এই শ্রেণির কোর্স ও ফ্রী ব্যাচ। কার্ডে চাপ দিলে বিস্তারিত, রুটিন ও পরীক্ষা দেখা যাবে।</p>
+    <div class="chub-list">
+      ${c.offer?`<article class="pcard">${liveToday(cid)?'<span class="live-badge"><i></i>লাইভ</span>':''}
+        <button class="pc-img" data-course="${cid}" aria-label="${esc(ptitle(c))}">${courseBanner(cid,'sm')}</button>
+        <b class="pc-title">${esc(ptitle(c))}</b>
+        <button class="pc-more" data-course="${cid}">বিস্তারিত দেখো</button></article>`:''}
+      ${FREE_BATCH[cid]?freeCard(cid):''}
+    </div>
+  </div>`;
+}
 function freeCard(cid){
   return `<article class="pcard">${freeLive(cid)?'<span class="live-badge"><i></i>লাইভ</span>':''}<button class="pc-img" data-free="${cid}" aria-label="${esc(FREE_BATCH[cid].title)}">${freeBanner(cid,'sm')}</button>
     <b class="pc-title">${esc(FREE_BATCH[cid].title)}</b><button class="pc-more" data-free="${cid}">বিস্তারিত দেখো</button></article>`;
@@ -1182,7 +1198,7 @@ async function publishFree(){
 }
 function vPlay(){
   const chev='<span class="arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>';
-  const ids=sec=>sec.rows.flatMap(r=>r.kind==='primary'?['p5']:(r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer);
+  const ids=sec=>sec.rows.flatMap(r=>r.kind==='primary'?['p5']:(r.ids||[])).filter(k=>COURSES[k]&&COURSES[k].offer&&!HUB_CLASSES.includes(k));
   const zone=['z1','z2','z3'];
   return `<div class="screen">
     <div class="topbar"><span style="width:44px"></span><h1>এক্সপ্লোর</h1><span style="width:44px"></span></div>
@@ -2844,14 +2860,14 @@ setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 
 const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','রিপোর্ট','report'],['downloads','ডাউনলোড','download'],['profile','আরো','grid']];
 function renderTabs(){
-  const active = S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view;
+  const active = S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view==='chub'?'home':S.view==='free'?(S.freeFrom==='play'?'play':'home'):S.view;
   const live=OFFER_IDS().some(liveToday);
   tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}</span>${l}</button>`).join('');
 }
 function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
-  const V={study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
   if(authed) renderTabs();
@@ -2952,7 +2968,7 @@ app.addEventListener('click',e=>{
     fr.routine.push({d:x.d,t:String(x.t).trim().slice(0,120),k:x.k||'study'}); fr.rd={d:x.d,t:'',k:x.k}; fr.dirty=true; render(); toast('রুটিনে যোগ হয়েছে · প্রকাশ চাপলে সংরক্ষণ হবে'); return; }
   if(t.dataset.frrm){ const fr=frInit(), [d,...tt]=t.dataset.frrm.split('|'), txt=tt.join('|'); const i=fr.routine.findIndex(x=>x.d===d&&x.t===txt); if(i>=0) fr.routine.splice(i,1); fr.dirty=true; render(); return; }
   if(t.hasAttribute('data-fxpast')){ S.fxPast=!S.fxPast; render(); return; }
-  if(t.dataset.free){ S.freeCid=t.dataset.free; S.freeFrom=S.view==='play'?'play':'home'; S.freeOpen=undefined; return go('free'); }
+  if(t.dataset.free){ S.freeCid=t.dataset.free; S.freeFrom=S.view==='play'?'play':S.view==='chub'?'chub':'home'; S.freeOpen=undefined; return go('free'); }
   if(t.dataset.freecat){ const k=t.dataset.freecat; S.freeOpen=(S.freeOpen===undefined?'sugg':S.freeOpen)===k?'':k; render(); return; }
   if(t.hasAttribute('data-frpublish')){ if(!S.frBusy) publishFree(); return; }
   if(t.dataset.hub){ S.hubCourse=t.dataset.hubc||hubCourse(); S.hubFrom=S.view==='course'?'course':S.view==='routine'?'routine':'exams'; if(t.dataset.hub==='routine') return go('routine'); S.wlim=20; return go(t.dataset.hub); }
@@ -3024,7 +3040,8 @@ app.addEventListener('click',e=>{
     return go('course',{course:'p5'});
   }
   if(t.hasAttribute('data-join')){ S.joined=true; persist(); render(); toast('ফ্রী ক্লাসে জয়েন হয়েছে'); return; }
-  if(t.dataset.course) return go('course',{course:t.dataset.course,courseFrom:S.view==='play'?'play':'home',featOpen:null});
+  if(t.dataset.chub) return go('chub',{chubCid:t.dataset.chub});
+  if(t.dataset.course) return go('course',{course:t.dataset.course,courseFrom:S.view==='play'?'play':S.view==='chub'?'chub':'home',featOpen:null});
   if(t.dataset.quiz) return startQuiz(t.dataset.quiz);
   if(t.dataset.chapter!==undefined){
     const k=S.course+':'+t.dataset.chapter;
