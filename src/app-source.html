@@ -32,6 +32,16 @@ button,input{font:inherit;color:inherit}
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .screen{flex:1;display:flex;flex-direction:column;gap:18px;padding-block:16px 110px}
 .screen.auth{padding-block:56px 32px}
+.au-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.au-tab{border:0;background:transparent;border-radius:10px;padding:10px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer;transition:background .25s,color .25s}
+.au-tab.on{background:var(--accent);color:#fff;box-shadow:0 4px 12px -4px var(--accent)}
+.au-form{display:flex;flex-direction:column;gap:12px;animation:ddin .3s ease}
+.au-pw{position:relative}
+.au-pw .input{padding-right:64px}
+.au-pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;padding:6px}
+.au-ok{background:#E6F7EC;border:1.5px solid #BFE8CD;color:#14632f;border-radius:12px;padding:10px 12px}
+.acct-card{display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
+.acct-card .s{color:var(--muted);font-size:13.5px;word-break:break-all}
 h1,h2,h3{margin:0;text-wrap:balance}
 .display{font-family:var(--font-display);font-weight:400}
 .muted{color:var(--muted)}
@@ -790,6 +800,7 @@ const ICONS = {
   download:'<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/>',
   wallet:'<rect x="3.5" y="6" width="17" height="13" rx="2.5"/><path d="M16 12.5h4.5M6.5 6l9-2.5 1 2.5"/>',
   flag:'<path d="M6 21V4M6 4h10.5l-2 4 2 4H6"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
   logout:'<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 8l-4 4 4 4M6 12h10"/>',
   archive:'<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v10a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V9M10 13h4"/>',
   star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
@@ -950,11 +961,16 @@ const S = {
   pays: saved.pays||{},
   examRun: saved.examRun||null,
   student: saved.student||null,
+  uid: saved.uid||null,          // শিক্ষার্থীর অ্যাকাউন্ট (Firebase uid)
+  acct: saved.acct||null,        // {name, phone, email, real}
+  lastUid: saved.lastUid||null,  // এই ফোনে শেষ যে অ্যাকাউন্ট ছিল
+  adminEmail: saved.adminEmail||'',
+  ntfOff: !!saved.ntfOff,
   dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -1394,6 +1410,7 @@ function vProfile(){
       ${item('data-go="routine"','calendar','c-blue','পরীক্ষার রুটিন')}
       ${item('data-go="report"','chart','c-blue','আমার লার্নিং রিপোর্ট')}
       ${item('data-go="downloads"','download','c-teal','ডাউনলোড','ফলাফল ফাইল ও এপের নতুন সংস্করণ')}
+      ${NTF&&NTF.native?item('data-ntftoggle','bell','c-amber',`নোটিফিকেশন: ${S.ntfOff?'বন্ধ':'চালু'}`,CAN_EDIT?'নতুন পেমেন্ট ও রিপোর্ট এলে জানানো হবে':'লাইভ পরীক্ষা নির্ধারিত হলে ও চলার দিন জানানো হবে'):''}
     </div>
     <h3 class="m-sec">সাহায্য এবং নীতি</h3>
     <div class="list">
@@ -1403,7 +1420,8 @@ function vProfile(){
     <h3 class="m-sec">অ্যাকাউন্ট</h3>
     <div class="list">
       <button class="item" data-logout><span class="ic c-violet">${svg('back')}</span><span class="t">লগ আউট</span></button>
-      ${item('data-stulogout','logout','c-red',S.stuOutArmed?'নিশ্চিত? আবার চাপলে লগ আউট হবে':'শিক্ষার্থী হিসেবে লগ আউট','এই ফোন থেকে তোমার নাম, ফলাফল ও প্যাকেজের তথ্য মুছে যাবে')}
+      ${S.uid?item('data-stulogout','logout','c-red',S.stuOutArmed?'নিশ্চিত? আবার চাপলে লগ আউট হবে':'লগ আউট',`${esc(S.acct&&S.acct.phone?bn(S.acct.phone):S.acct&&S.acct.real?S.acct.email:'')} · ফলাফল ও প্যাকেজ অ্যাকাউন্টে সংরক্ষিত থাকবে`)
+        :item('data-stulogout','logout','c-red',S.stuOutArmed?'নিশ্চিত? আবার চাপলে লগ আউট হবে':'শিক্ষার্থী হিসেবে লগ আউট','এই ফোন থেকে তোমার নাম, ফলাফল ও প্যাকেজের তথ্য মুছে যাবে')}
     </div>
   </div>`;
 }
@@ -1503,7 +1521,7 @@ async function refreshPays(){
 let PAY={}, payUnsub=null, PAY_OK=null;
 function watchPays(){
   if(payUnsub||!DB) return;
-  try{ payUnsub=DB.collection('payments').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); PAY=m; PAY_OK=true; softRender(); },()=>{ PAY_OK=false; payUnsub=null; softRender(); }); }catch(e){ PAY_OK=false; }
+  try{ payUnsub=DB.collection('payments').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); PAY=m; PAY_OK=true; adminNotify('pay',m); softRender(); },()=>{ PAY_OK=false; payUnsub=null; softRender(); }); }catch(e){ PAY_OK=false; }
 }
 function pcInit(){ if(!S.pc){ const c=payCfg(); S.pc=Object.assign({},c,{busy:false,err:''}); } return S.pc; }
 function payPanel(){
@@ -1652,7 +1670,7 @@ async function submitFeedback(){
 let REP={}, repUnsub=null, REP_OK=null;
 function watchReports(){
   if(repUnsub||!DB) return;
-  try{ repUnsub=DB.collection('reports').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); REP=m; REP_OK=true; softRender(); },()=>{ REP_OK=false; repUnsub=null; softRender(); }); }catch(e){ REP_OK=false; }
+  try{ repUnsub=DB.collection('reports').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); REP=m; REP_OK=true; adminNotify('rep',m); softRender(); },()=>{ REP_OK=false; repUnsub=null; softRender(); }); }catch(e){ REP_OK=false; }
 }
 function reportsPanel(){
   watchReports();
@@ -2373,6 +2391,235 @@ function sendResult(k){
 }
 function sendPendingResults(){ Object.keys(S.exams||{}).forEach(sendResult); }
 
+/* ---------- শিক্ষার্থীর অ্যাকাউন্ট ----------
+   • প্রথমবার: মোবাইল নম্বর বা ইমেইল + পাসওয়ার্ড দিয়ে রেজিস্ট্রেশন (Firebase Authentication)।
+     শুধু ফোন হলে লগইনের ইমেইল হয় <ফোন>@phone.sohog.app; ঐচ্ছিক রিকভারি ইমেইল দিলে সেটিই লগইনের ইমেইল।
+     ফোন → ইমেইল খোঁজার জন্য phones/{ফোন} = {uid, e}।
+   • লগইন থাকে যতক্ষণ না নিজে লগ আউট করে।
+   • এক অ্যাকাউন্ট একসাথে এক ফোনে: users/{uid}.device-এ শেষ লগইন করা ফোনের id; অন্য ফোনে লগইন হলে
+     আগের ফোন এই পরিবর্তন দেখে নিজে থেকেই লগ আউট হয়ে যায়।
+   • নাম, ফলাফল, প্রিয়, প্যাকেজ ইত্যাদি users/{uid}.blob-এ থাকে, তাই আবার লগইন করলে সব ফিরে আসে। */
+const PHONE_DOMAIN='phone.sohog.app';
+let AUTHBUSY=false, ACCT_UNSUB=null, CLOUD_T=null, AUTH_KNOWN=false;
+const normPhone=v=>{ const d=en(String(v||'')).replace(/[\s-]/g,'').replace(/^\+?88/,''); return /^01[3-9]\d{8}$/.test(d)?d:''; };
+const isEmail=v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(v||'').trim());
+const ACCT_KEYS=['exams','retakes','fav','favx','results','done','enrolled','pays'];
+function acctBlob(){ const o={}; ACCT_KEYS.forEach(k=>o[k]=S[k]||{}); o.joined=!!S.joined; o.reports=(S.reports||[]).slice(-50); return JSON.stringify(o); }
+function applyBlob(str,merge){
+  let d={}; try{ d=JSON.parse(str||'{}')||{}; }catch(e){ d={}; }
+  ACCT_KEYS.forEach(k=>{ const c=d[k]&&typeof d[k]==='object'?d[k]:{}; S[k]=merge?Object.assign({},c,S[k]||{}):c; });
+  S.joined=!!d.joined||(merge&&!!S.joined);
+  const r=Array.isArray(d.reports)?d.reports:[]; const rk=x=>x?String(x.at||'')+'|'+String(x.text||'').slice(0,40):''; S.reports=merge?r.concat((S.reports||[]).filter(x=>!r.some(y=>rk(y)===rk(x)))):r;
+}
+const clearPersonal=()=>Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},results:{},done:{},examRun:null,reports:[],joined:false});
+function cloudSoon(){ if(!S.uid||!DB||!DB.docSet||AUTHBUSY) return; clearTimeout(CLOUD_T); CLOUD_T=setTimeout(cloudSave,1500); }
+function cloudSave(){ if(!S.uid||!DB||AUTHBUSY) return;
+  const st=S.student||{};
+  DB.docSet('users',S.uid,{name:String(st.name||(S.acct&&S.acct.name)||'').slice(0,60),roll:String(st.roll||'').slice(0,20),blob:acctBlob(),savedAt:new Date().toISOString()},true).catch(()=>{}); }
+function watchAcct(uid){
+  if(ACCT_UNSUB){ try{ ACCT_UNSUB(); }catch(e){} ACCT_UNSUB=null; }
+  if(!uid||!DB||!DB.docWatch) return;
+  ACCT_UNSUB=DB.docWatch('users',uid,d=>{
+    if(!d||AUTHBUSY||S.uid!==uid) return;
+    if(d.device&&d.device!==S.dev){ S.otherDevice=true; acctLogout(true); }
+  },()=>{});
+}
+/* Firebase-এ শিক্ষার্থী লগইন অবস্থায় (অ্যাপ খোলার সময় বা লগইন/রেজিস্ট্রেশনের পরে) */
+function acctSignedIn(u){
+  AUTH_KNOWN=true;
+  if(AUTHBUSY) return;              // লগইন/রেজিস্ট্রেশন চলছে: সেখান থেকেই বাকি কাজ হবে
+  if(S.uid!==u.uid){                // এই ফোনে আগে অন্য অবস্থায় ছিল: সার্ভার থেকে তথ্য এনে বসাও
+    S.uid=u.uid; S.lastUid=u.uid;
+    DB.docGet('users',u.uid).then(d=>{ if(d){ applyBlob(d.blob,false); if(d.name) S.student={name:d.name,roll:d.roll||''}; S.acct=Object.assign({name:d.name||'',phone:d.phone||'',email:u.email,real:!String(u.email).endsWith('@'+PHONE_DOMAIN)},S.acct||{}); }
+      if(d&&d.device&&d.device!==S.dev){ S.otherDevice=true; return acctLogout(true); }
+      persist(); softRender(); },()=>{});
+  }
+  watchAcct(u.uid); softRender();
+}
+/* ===== লোকাল নোটিফিকেশন (সার্ভার ছাড়া; শুধু অ্যান্ড্রয়েড অ্যাপে) ===== */
+var NTF=window.SohogNotify||null, NTF_KEY='sohog-ntf';
+var NTF_ST=(()=>{ try{ return JSON.parse(localStorage.getItem(NTF_KEY))||{}; }catch(e){ return {}; } })(), NTF_T=null, NTF_TAP=false;
+const ntfSave=()=>{ try{ localStorage.setItem(NTF_KEY,JSON.stringify(NTF_ST)); }catch(e){} };
+const ntfId=s=>{ let h=7; for(const ch of String(s)) h=(h*31+ch.charCodeAt(0))|0; return Math.abs(h)%2000000000+1; };
+const ntfOn=()=>!!(NTF&&NTF.native)&&!S.ntfOff;
+/* কোন কোর্সের পরীক্ষার খবর দেওয়া হবে: চালু প্যাকেজ, ফ্রি ব্যাচ, আগে পরীক্ষা দেওয়া বা এখন বেছে রাখা কোর্স */
+function ntfCourses(){
+  const took=Object.keys(S.exams||{}).map(k=>k.split('_')[0]);
+  return OFFER_IDS().filter(k=>pkgActive(k)||FREE_BATCH[k]||took.includes(k)||S.hubCourse===k);
+}
+function ntfSyl(e){
+  if(e.kind==='friday') return bn((e.items||[]).map(i=>i.text).join(', '))||'সাপ্তাহিক রিভিশন';
+  const u=examChapters(e); if(u.length) return bn(u.map(x=>x.ex?exLabel(e.course,x.ex,!!COURSES[e.course].lessons):`অধ্যায় ${x.ch}`).join(', '));
+  return e.syllabus||'';
+}
+function ntfHead(e){ const c=COURSES[e.course]; return `${c.name.replace(' শ্রেণি','')} শ্রেণি · ${c.subj||''}`; }
+function scheduleExamNotifs(){ if(!NTF||!NTF.native) return; clearTimeout(NTF_T); NTF_T=setTimeout(scheduleExamNotifsNow,800); }
+async function scheduleExamNotifsNow(){
+  if(!NTF||!NTF.native||RSTATE!=='ready') return;
+  if(!NTF_TAP){ NTF_TAP=true; NTF.onTap(x=>{ if(x&&x.go==='admin'&&CAN_EDIT){ S.atab=x.tab||'pay'; return go('admin'); } if(x&&x.course&&COURSES[x.course]){ S.hubCourse=x.course; S.hubFrom='home'; go('exams'); } }); }
+  const old=NTF_ST.ids||[];
+  if(!ntfOn()||CAN_EDIT||!S.uid){ if(old.length){ await NTF.cancel(old); NTF_ST.ids=[]; ntfSave(); } return; }
+  const now=Date.now(), today=todayISO(), lim=isoD(addD(parseD(today),8)), list=[], fresh=[], seen=NTF_ST.seen||null, nowSeen=[];
+  ntfCourses().forEach(cid=>examsFor(cid).concat(FREE_BATCH[cid]?specialExams(cid,true):[]).forEach(e=>{
+    if(e.pending||e.date<today||e.date>lim||!examPool(e).length) return;
+    const k=examKey(e); nowSeen.push(k); if(S.exams[k]) return;
+    const nm=kindName(e);
+    const body=`${ntfHead(e)}\nসিলেবাস: ${ntfSyl(e)}`, ex={course:cid,key:k};
+    const eve=parseD(e.date); eve.setDate(eve.getDate()-1); eve.setHours(19,0,0,0);
+    const mor=parseD(e.date); mor.setHours(7,0,0,0);
+    const end=parseD(e.date); end.setHours(21,0,0,0);
+    if(eve.getTime()>now) list.push({id:ntfId(k+'#eve'),at:eve.getTime(),title:`📅 আগামীকাল ${nm}`,body,extra:ex});
+    if(mor.getTime()>now) list.push({id:ntfId(k+'#mor'),at:mor.getTime(),title:`🔴 LIVE: আজ ${nm} চলছে`,body:body+'\nসারাদিন যেকোনো সময় অংশ নিতে পারবে।',extra:ex});
+    else if(end.getTime()>now&&e.date===today&&(NTF_ST.today||{})[k]!==today) { list.push({id:ntfId(k+'#now'),title:`🔴 LIVE: ${nm} চলছে`,body:body+'\nএখনই অংশ নাও!',extra:ex}); NTF_ST.today=Object.assign({},NTF_ST.today,{[k]:today}); }
+    if(seen&&!seen.includes(k)&&e.date>today) fresh.push(e);
+  }));
+  if(fresh.length){ const e=fresh[0]; list.push({id:ntfId('new#'+examKey(e)),title:fresh.length>1?`🆕 ${bn(fresh.length)}টি নতুন পরীক্ষা নির্ধারিত হয়েছে`:`🆕 নতুন পরীক্ষা: ${bnD(parseD(e.date)).split(',')[0]}`,body:`${ntfHead(e)}\nসিলেবাস: ${ntfSyl(e)}`,extra:{course:e.course}}); }
+  const ids=list.filter(n=>n.at).map(n=>n.id), drop=old.filter(id=>!ids.includes(id));
+  if(drop.length) await NTF.cancel(drop);
+  const ok=await NTF.schedule(list);
+  if(ok||!list.length){ NTF_ST.ids=ids; NTF_ST.seen=nowSeen; ntfSave(); }
+}
+/* অ্যাডমিন: নতুন পেমেন্ট/রিপোর্ট এলে নোটিফিকেশন (অ্যাপ খোলা বা ব্যাকগ্রাউন্ডে থাকলে; খোলার পর না-দেখাগুলোর খবরও) */
+function adminNotify(kind,m){
+  if(!CAN_EDIT) return;
+  const key=kind==='pay'?'payIds':'repIds', isNew=kind==='pay'?(p=>p.status==='pending'):(r=>r.status!=='done');
+  const known=NTF_ST[key], fresh=Object.values(m).filter(x=>isNew(x)&&(!known||!known.includes(x.id)));
+  NTF_ST[key]=Object.keys(m); ntfSave();
+  if(!known||!fresh.length) return;
+  const t=kind==='pay'?`💳 নতুন পেমেন্ট${fresh.length>1?` (${bn(fresh.length)}টি)`:''}`:`🚩 নতুন রিপোর্ট${fresh.length>1?` (${bn(fresh.length)}টি)`:''}`;
+  const x=fresh[0], b=kind==='pay'?`${x.name||'শিক্ষার্থী'} · ${bn(x.amount||0)} টাকা · ${x.method||''} TrxID ${x.trx||''}`.trim():`${x.name||'শিক্ষার্থী'}: ${String(x.text||x.type||'').slice(0,80)}`;
+  toast(t);
+  if(NTF&&NTF.native&&!S.ntfOff) NTF.schedule([{id:ntfId(kind+'#'+x.id),title:t,body:b,channel:'admin',extra:{go:'admin',tab:kind==='pay'?'pay':'reports'}}]);
+}
+function adminWatchAll(){ if(!CAN_EDIT||!DB) return; watchPays(); watchReports(); if(NTF&&NTF.native) scheduleExamNotifs(); }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) scheduleExamNotifs(); });
+function acctSignedOut(){
+  AUTH_KNOWN=true;
+  if(AUTHBUSY) return;
+  if(S.uid){ if(ACCT_UNSUB){ try{ ACCT_UNSUB(); }catch(e){} ACCT_UNSUB=null; } clearTimeout(CLOUD_T); S.uid=null; S.acct=null; clearPersonal(); persist(); }
+  softRender();
+}
+function acctLogout(forced){
+  cloudSave();
+  if(ACCT_UNSUB){ try{ ACCT_UNSUB(); }catch(e){} ACCT_UNSUB=null; }
+  clearTimeout(CLOUD_T); S.uid=null; S.acct=null; clearPersonal(); persist();
+  S.au={mode:'login',msg:forced?'এই অ্যাকাউন্টে অন্য একটি ফোন থেকে লগইন করা হয়েছে, তাই এই ফোন থেকে লগ আউট হয়ে গেছে। আবার লগইন করলে অন্য ফোনটি লগ আউট হবে।':''};
+  const done=()=>{ go('home'); if(!forced) toast('লগ আউট হয়েছে'); };
+  (DB&&DB.signOut?DB.signOut():Promise.resolve()).then(done,done);
+}
+const authErr=c=>/email-already-in-use/.test(c)?'এই ইমেইলে আগেই অ্যাকাউন্ট খোলা হয়েছে। "লগইন" থেকে ঢুকুন।'
+  :/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)?'মোবাইল/ইমেইল বা পাসওয়ার্ড ঠিক নেই।'
+  :/weak-password/.test(c)?'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের দিন।'
+  :/invalid-email/.test(c)?'ইমেইলটি সঠিকভাবে লেখা হয়নি।'
+  :/too-many-requests/.test(c)?'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।'
+  :/network|unavailable/.test(c)?'ইন্টারনেট সংযোগ নেই।'
+  :/operation-not-allowed/.test(c)?'সার্ভারে Email/Password লগইন চালু নেই।'
+  :/permission/.test(c)?'সার্ভারের অনুমতি (Rules) হালনাগাদ করা হয়নি।'
+  :'সমস্যা হয়েছে, আবার চেষ্টা করুন।';
+/* লগইনের আইডি (ফোন/ইমেইল) থেকে Firebase-এর ইমেইল */
+async function loginEmailOf(id){
+  if(isEmail(id)) return String(id).trim().toLowerCase();
+  const ph=normPhone(id); if(!ph) return '';
+  const d=await DB.docGet('phones',ph).catch(e=>{ if(e&&e.code==='unavailable') throw e; return null; });
+  return d&&d.e?String(d.e):`${ph}@${PHONE_DOMAIN}`;
+}
+async function acctRegister(){
+  const au=S.au, v=id=>{ const x=document.getElementById(id); return x?x.value:''; };
+  const name=v('auName').trim().replace(/\s+/g,' '), roll=v('auRoll').trim(), id=v('auId').trim(), pw=v('auPw'), pw2=v('auPw2'), rec=v('auRec').trim().toLowerCase();
+  Object.assign(au,{name,roll,id,rec,err:''});
+  const ph=normPhone(id), em=isEmail(id)?id.toLowerCase():'';
+  if(name.length<2) au.err='তোমার নাম লেখো।';
+  else if(!ph&&!em) au.err='সঠিক মোবাইল নম্বর (০১ দিয়ে শুরু, ১১ অঙ্ক) বা ইমেইল লেখো।';
+  else if(pw.length<6) au.err='পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের দাও।';
+  else if(pw!==pw2) au.err='দুইবার লেখা পাসওয়ার্ড মেলেনি।';
+  else if(ph&&rec&&!isEmail(rec)) au.err='রিকভারি ইমেইলটি সঠিক নয় (না দিতে চাইলে ফাঁকা রাখো)।';
+  if(au.err) return render();
+  if(!DB||!DB.signUp){ au.err='অ্যাপটি এখনো সার্ভারের সাথে যুক্ত হয়নি। ইন্টারনেট চালু করে আবার চেষ্টা করো।'; return render(); }
+  au.busy=true; render(); AUTHBUSY=true;
+  try{
+    if(ph){ const ex=await DB.docGet('phones',ph).catch(e=>{ if(e&&e.code==='unavailable') throw e; return null; }); if(ex){ throw {code:'phone-taken'}; } }
+    const loginEmail=em||(ph&&rec)||`${ph}@${PHONE_DOMAIN}`;
+    const u=await DB.signUp(loginEmail,pw,name);
+    if(ph) await DB.docSet('phones',ph,{uid:u.uid,e:loginEmail,at:new Date().toISOString()});
+    const merge=!S.lastUid||S.lastUid===u.uid;   // এই ফোনের আগের (অ্যাকাউন্ট ছাড়া) অগ্রগতি নতুন অ্যাকাউন্টে যায়
+    if(!merge) clearPersonal();
+    S.uid=u.uid; S.lastUid=u.uid; S.student={name:name.slice(0,60),roll:roll.slice(0,20)};
+    S.acct={name,phone:ph,email:loginEmail,real:!loginEmail.endsWith('@'+PHONE_DOMAIN)};
+    const now=new Date().toISOString();
+    await DB.docSet('users',u.uid,{name:S.student.name,roll:S.student.roll,phone:ph,email:em||rec||'',device:S.dev,devAt:now,createdAt:now,blob:acctBlob(),savedAt:now});
+    AUTHBUSY=false; watchAcct(u.uid); S.au=null; persist(); go('home'); toast('স্বাগতম! অ্যাকাউন্ট খোলা হয়েছে');
+  }catch(e){
+    AUTHBUSY=false; au.busy=false; const c=(e&&e.code)||'';
+    au.err=c==='phone-taken'?'এই মোবাইল নম্বরে আগেই অ্যাকাউন্ট খোলা হয়েছে। "লগইন" থেকে ঢুকুন।':authErr(c);
+    if(S.uid==null&&DB&&DB.signOut&&c!=='phone-taken') DB.signOut().catch(()=>{});
+    render();
+  }
+}
+async function acctLogin(){
+  const au=S.au, id=(document.getElementById('auId')||{}).value||'', pw=(document.getElementById('auPw')||{}).value||'';
+  Object.assign(au,{id:id.trim(),err:'',msg:''});
+  if(!normPhone(id)&&!isEmail(id)) au.err='সঠিক মোবাইল নম্বর বা ইমেইল লেখো।';
+  else if(!pw) au.err='পাসওয়ার্ড লেখো।';
+  if(au.err) return render();
+  if(!DB||!DB.signIn){ au.err='অ্যাপটি এখনো সার্ভারের সাথে যুক্ত হয়নি। ইন্টারনেট চালু করে আবার চেষ্টা করো।'; return render(); }
+  au.busy=true; render(); AUTHBUSY=true;
+  try{
+    const email=await loginEmailOf(id);
+    const u=await DB.signIn(email,pw);
+    if(await DB.checkAdmin()===true){ AUTHBUSY=false; S.au=null; CAN_EDIT=true; S.adminEmail=u.email; persist(); go('admin'); toast('অ্যাডমিন হিসেবে লগইন হয়েছে'); return; }
+    const d=await DB.docGet('users',u.uid);
+    const merge=!S.lastUid||S.lastUid===u.uid;
+    if(d) applyBlob(d.blob,merge); else if(!merge) clearPersonal();
+    S.uid=u.uid; S.lastUid=u.uid;
+    S.student={name:(d&&d.name)||(S.student&&S.student.name)||'',roll:(d&&d.roll)||(S.student&&S.student.roll)||''}; if(!S.student.name) S.student=null;
+    S.acct={name:(d&&d.name)||'',phone:(d&&d.phone)||normPhone(id),email:u.email,real:!u.email.endsWith('@'+PHONE_DOMAIN)};
+    const now=new Date().toISOString();
+    await DB.docSet('users',u.uid,{device:S.dev,devAt:now,blob:acctBlob(),savedAt:now,name:S.student?S.student.name:'',roll:S.student?S.student.roll:''},true);
+    AUTHBUSY=false; watchAcct(u.uid); S.au=null; persist(); go('home'); toast('স্বাগতম! লগইন হয়েছে');
+  }catch(e){ AUTHBUSY=false; au.busy=false; au.err=authErr((e&&e.code)||''); if(!S.uid&&DB&&DB.signOut&&!CAN_EDIT) DB.signOut().catch(()=>{}); render(); }
+}
+async function acctForgot(){
+  const au=S.au, id=((document.getElementById('auId')||{}).value||'').trim(); Object.assign(au,{id,err:'',msg:''});
+  if(!normPhone(id)&&!isEmail(id)){ au.err='যে মোবাইল নম্বর বা ইমেইলে অ্যাকাউন্ট খুলেছিলে সেটি লেখো।'; return render(); }
+  au.busy=true; render();
+  try{
+    const email=await loginEmailOf(id);
+    if(email.endsWith('@'+PHONE_DOMAIN)){ au.busy=false; au.err='এই নম্বরের অ্যাকাউন্টে কোনো রিকভারি ইমেইল দেওয়া নেই, তাই রিসেট লিংক পাঠানো যাচ্ছে না। পাসওয়ার্ড বদলাতে "সমস্যা জানাও" বা শিক্ষকের সাথে যোগাযোগ করো।'; return render(); }
+    await DB.resetPassword(email);
+    au.busy=false; au.msg=`পাসওয়ার্ড বদলানোর লিংক ${email.replace(/^(.{2}).*(@.*)$/,'$1•••$2')} ঠিকানায় পাঠানো হয়েছে। ইমেইল খুলে লিংকে চাপ দিয়ে নতুন পাসওয়ার্ড দাও, তারপর লগইন করো।`; au.mode='login'; render();
+  }catch(e){ au.busy=false; au.err=/user-not-found/.test((e&&e.code)||'')?'এই তথ্যে কোনো অ্যাকাউন্ট নেই।':authErr((e&&e.code)||''); render(); }
+}
+/* রেজিস্ট্রেশন/লগইন দরকার কি না: সার্ভারের সাথে যুক্ত অ্যাপে, অ্যাডমিন নয়, অ্যাকাউন্ট নেই */
+const needAuth=()=>!!DB&&!!DB.signUp&&RSTATE!=='off'&&!CAN_EDIT&&!S.uid&&S.view!=='adminLogin';
+function vAuth(){
+  const au=S.au||(S.au={mode:'register'}), reg=au.mode==='register', fg=au.mode==='forgot';
+  const pw=(id,lab,ac)=>`<div class="field"><label for="${id}">${lab}</label><div class="au-pw"><input class="input" id="${id}" type="${au.show?'text':'password'}" autocomplete="${ac}" minlength="6"><button type="button" data-aushow>${au.show?'লুকাও':'দেখাও'}</button></div></div>`;
+  const phoneId=normPhone(au.id);
+  return `<div class="screen auth">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+      <div class="logo"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS.compass}</svg></div>
+      <h1 class="display" style="font-size:30px">সহগ গণিত একাডেমি</h1>
+      <p class="muted" style="margin:0;font-size:16px">${fg?'পাসওয়ার্ড ভুলে গেছ?':reg?'প্রথমবার? অ্যাকাউন্ট খুলে শুরু করো':'তোমার অ্যাকাউন্টে লগইন করো'}</p>
+    </div>
+    ${fg?'':`<div class="au-tabs" role="tablist"><button role="tab" class="au-tab ${reg?'on':''}" aria-selected="${reg}" data-aumode="register">নতুন অ্যাকাউন্ট</button><button role="tab" class="au-tab ${!reg?'on':''}" aria-selected="${!reg}" data-aumode="login">লগইন</button></div>`}
+    ${au.msg?`<div class="au-ok" role="status">${esc(au.msg)}</div>`:''}
+    <form id="auForm" class="au-form" novalidate>
+      ${reg?`<div class="field"><label for="auName">তোমার নাম</label><input class="input" id="auName" maxlength="60" autocomplete="name" value="${esc(au.name||'')}" placeholder="যেমন: রাফি আহমেদ"></div>`:''}
+      <div class="field"><label for="auId">মোবাইল নম্বর বা ইমেইল</label><input class="input" id="auId" autocomplete="username" inputmode="email" value="${esc(au.id||'')}" placeholder="০১XXXXXXXXX বা you@email.com" data-auid></div>
+      ${fg?'':pw('auPw','পাসওয়ার্ড',reg?'new-password':'current-password')}
+      ${reg?`${pw('auPw2','পাসওয়ার্ড আবার লেখো','new-password')}
+        ${!isEmail(au.id)?`<div class="field"><label for="auRec">রিকভারি ইমেইল (ঐচ্ছিক)</label><input class="input" id="auRec" type="email" autocomplete="email" value="${esc(au.rec||'')}" placeholder="পাসওয়ার্ড ভুলে গেলে রিসেট লিংক এখানে যাবে"><span class="muted" style="font-size:13px">শুধু মোবাইল নম্বরে খুললে এটি দিয়ে রাখা ভালো।${phoneId?'':' (মোবাইল নম্বর দিলে কাজে লাগবে)'}</span></div>`:''}
+        <div class="field"><label for="auRoll">রোল (ঐচ্ছিক)</label><input class="input" id="auRoll" maxlength="20" inputmode="numeric" value="${esc(au.roll||'')}"></div>`:''}
+      <div class="error" role="alert">${esc(au.err||'')}</div>
+      <button class="btn" type="submit" ${au.busy?'disabled':''}>${au.busy?'অপেক্ষা করো…':fg?'রিসেট লিংক পাঠাও':reg?'অ্যাকাউন্ট খোলো':'লগইন করো'}</button>
+    </form>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:15px">
+      ${fg?`<button class="link" data-aumode="login">← লগইনে ফিরে যাও</button>`:!reg?`<button class="link" data-aumode="forgot">পাসওয়ার্ড ভুলে গেছ?</button>`:''}
+      <span class="note" style="font-size:13px;text-align:center">${svg('shield','width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"')} একটি অ্যাকাউন্ট একসাথে একটি ফোনেই চলবে। অন্য ফোনে লগইন করলে আগের ফোন থেকে নিজে নিজে লগ আউট হবে।</span>
+      <button class="link muted" data-go="adminLogin" style="font-size:13px">অ্যাডমিন লগইন</button>
+    </div>
+  </div>`;
+}
 function vStudent(){
   const st=S.student||{name:'',roll:''};
   return `<div class="screen">
@@ -3073,6 +3320,7 @@ function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
   const V={chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const gate=needAuth(); if(gate){ tabbar.hidden=true; app.innerHTML=vAuth(); return; }
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
   if(authed) renderTabs();
@@ -3088,6 +3336,7 @@ function startQuiz(id){
 /* ---------- ইভেন্ট ---------- */
 app.addEventListener('submit',e=>{
   e.preventDefault();
+  if(e.target.id==='auForm'){ const m=(S.au||{}).mode; if((S.au||{}).busy) return; return m==='register'?acctRegister():m==='forgot'?acctForgot():acctLogin(); }
   if(e.target.id==='stuForm'){
     const nm=document.getElementById('stName').value.trim().replace(/\s+/g,' '), rl=document.getElementById('stRoll').value.trim();
     if(nm.length<2){ document.getElementById('stErr').textContent='তোমার নাম লেখো।'; return; }
@@ -3110,6 +3359,9 @@ app.addEventListener('submit',e=>{
 });
 app.addEventListener('click',e=>{
   const t=e.target.closest('button'); if(!t) return;
+  if(t.dataset.aumode){ const au=S.au||(S.au={}); const id=document.getElementById('auId'); if(id) au.id=id.value; Object.assign(au,{mode:t.dataset.aumode,err:'',msg:t.dataset.aumode==='forgot'?'':au.msg}); return render(); }
+  if(t.hasAttribute('data-aushow')){ const au=S.au||(S.au={}); ['auName','auId','auRec','auRoll'].forEach(k=>{ const x=document.getElementById(k); if(x) au[{auName:'name',auId:'id',auRec:'rec',auRoll:'roll'}[k]]=x.value; });
+    const vals={}; ['auPw','auPw2'].forEach(k=>{ const x=document.getElementById(k); if(x) vals[k]=x.value; }); au.show=!au.show; render(); Object.keys(vals).forEach(k=>{ const x=document.getElementById(k); if(x) x.value=vals[k]; }); return; }
   if(t.dataset.go){ if(t.dataset.rtc) S.rtc=t.dataset.rtc; return go(t.dataset.go); }
   if(t.dataset.chlist){ S.chFrom=S.view==='admin'?'admin':S.view==='course'?'course':'play'; return go('chapters',{course:t.dataset.chlist}); }
   if(t.dataset.openex){ return go('exercise',{exKey:t.dataset.openex}); }
@@ -3176,7 +3428,8 @@ app.addEventListener('click',e=>{
   if(t.dataset.repdel){ const id=t.dataset.repdel; if(S.repArmed===id){ S.repArmed=''; DB.collection('reports').doc(id).delete().then(()=>toast('রিপোর্ট মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); } else { S.repArmed=id; render(); } return; }
   if(t.hasAttribute('data-stulogout')){
     if(!S.stuOutArmed){ S.stuOutArmed=true; render(); setTimeout(()=>{ if(S.stuOutArmed){ S.stuOutArmed=false; render(); } },5000); return; }
-    S.stuOutArmed=false; Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
+    S.stuOutArmed=false; if(S.uid) return acctLogout(false);
+    Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},results:{},done:{},examRun:null,reports:[],dev:'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)});
     persist(); go('home'); toast('লগ আউট হয়েছে'); return; }
   if(t.hasAttribute('data-frpast')){ S.frPast=!S.frPast; render(); return; }
   if(t.dataset.frcourse){ if(S.fr&&S.fr.dirty&&S.fr.cid!==t.dataset.frcourse) toast('আগের ফ্রী ব্যাচের অপ্রকাশিত পরিবর্তন বাদ গেছে'); S.frCid=t.dataset.frcourse; S.fr=null; render(); return; }
@@ -3220,6 +3473,7 @@ app.addEventListener('click',e=>{
     return;
   }
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
+  if(t.hasAttribute('data-ntftoggle')){ S.ntfOff=!S.ntfOff; persist(); if(!S.ntfOff&&NTF) NTF.ready(); toast(S.ntfOff?'নোটিফিকেশন বন্ধ করা হয়েছে':'নোটিফিকেশন চালু করা হয়েছে'); render(); return; }
   if(t.hasAttribute('data-spublish')){ if(!S.spublishing) publishSyllabus(); return; }
   if(t.dataset.sdel){
     const sf=sfInit();

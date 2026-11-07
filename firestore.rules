@@ -47,6 +47,23 @@ service cloud.firestore {
         && request.resource.data.name is string && request.resource.data.name.size() <= 60
         && request.resource.data.amount is int && request.resource.data.amount > 0 && request.resource.data.amount <= 10000;
     }
+    // শিক্ষার্থীর অ্যাকাউন্ট: নিজের ডকুমেন্ট শুধু নিজে পড়বে/লিখবে (ফলাফল, প্যাকেজ, অগ্রগতি ও কোন ফোনে লগইন আছে); অ্যাডমিন দেখতে পারবেন
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name','roll','phone','email','device','devAt','createdAt','blob','savedAt'])
+        && (!('blob' in request.resource.data) || (request.resource.data.blob is string && request.resource.data.blob.size() < 800000));
+      allow delete: if isAdmin();
+    }
+    // ফোন নম্বর → লগইন: একটি নম্বরে একটিই অ্যাকাউন্ট; লগইনের আগে নম্বর দিয়ে খোঁজা যায় (তালিকা দেখা যায় না)
+    match /phones/{ph} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null && ph.matches('^01[3-9][0-9]{8}$')
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid','e','at']);
+      allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
     match /reports/{id} {
       allow read, update, delete: if isAdmin();
       allow create: if request.resource.data.keys().hasOnly(['type','text','improve','rating','exam','name','roll','phone','device','ua','at','status','ref'])
