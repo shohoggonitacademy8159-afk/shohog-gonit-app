@@ -460,6 +460,8 @@ button.pdf-row{width:100%;font:inherit;text-align:left;cursor:pointer}
 .heart svg{width:26px;height:26px;fill:#eef0f3;stroke:#c9ced6;stroke-width:1.5}
 .heart.on svg{fill:#e53950;stroke:#e53950}
 .xa-line{font-size:15.5px;line-height:1.9;color:var(--fg)}
+.res-note{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#e7f6ec;color:#1b7a3a;font-weight:700;font-size:14.5px;line-height:1.5}
+.xa-course{font-size:15.5px!important;font-weight:800;line-height:1.6!important;padding:3px 13px!important;border:1.5px solid var(--accent)!important;color:var(--accent);background:var(--accent-soft)!important}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:13.5px;line-height:1.7;background:var(--surface);vertical-align:middle;margin:1px 0}
 .xa-note{margin:0;font-size:15.5px;line-height:1.5}
 .xa-mat{background:var(--surface)!important;color:var(--fg)!important;border:1px solid var(--line)!important;font-weight:700!important}
@@ -968,6 +970,9 @@ Object.assign(COURSES.c8s,{offer:COURSES.c8.offer, pkg:'c8', exam:COURSES.c8.exa
 /* ৬ষ্ঠ শ্রেণি: গণিত ও বিজ্ঞান একটি প্যাকেজে, ৮ম শ্রেণির মতো */
 Object.assign(COURSES.c6,{offer:COURSES.c8.offer, exam:'৬ষ্ঠ শ্রেণির বার্ষিক', ptitle:'৬ষ্ঠ শ্রেণি গণিত ও বিজ্ঞান', bsubj:'গণিত ও বিজ্ঞান', bundle:['c6s'], banner:{badge:'Class 6', main:'গণিত ও বিজ্ঞান', sub:'প্রতি বিষয়ে সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
 Object.assign(COURSES.c6s,{offer:COURSES.c6.offer, pkg:'c6', exam:COURSES.c6.exam});
+/* ৭ম শ্রেণি: গণিত ও বিজ্ঞান একটি প্যাকেজে (ফি ৪৯ টাকা), ৬ষ্ঠ ও ৮ম শ্রেণির মতো */
+Object.assign(COURSES.c7,{offer:COURSES.c8.offer, exam:'৭ম শ্রেণির বার্ষিক', ptitle:'৭ম শ্রেণি গণিত ও বিজ্ঞান', bsubj:'গণিত ও বিজ্ঞান', bundle:['c7s'], banner:{badge:'Class 7', main:'গণিত ও বিজ্ঞান', sub:'প্রতি বিষয়ে সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
+Object.assign(COURSES.c7s,{offer:COURSES.c7.offer, pkg:'c7', exam:COURSES.c7.exam});
 const pkgKey=cid=>(COURSES[cid]&&COURSES[cid].pkg)||cid;
 const PKG_IDS=()=>Object.keys(COURSES).filter(k=>COURSES[k].offer&&!COURSES[k].pkg);
 Object.assign(COURSES.c9,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'এসএসসি ২০২৮', ptitle:'এসএসসি ২০২৮ সাধারণ গণিত', banner:{badge:'SSC 28', main:'সাধারণ গণিত', sub:'সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
@@ -978,7 +983,7 @@ Object.assign(COURSES.c10h,{offer:{price:99, daily:{marks:20, mins:15}, friday:{
 Object.assign(COURSES.c10,{ptitle:'এসএসসি ২০২৭ সাধারণ গণিত শেষ মুহূর্তের প্রস্তুতি', banner:{badge:'SSC 27', main:'সাধারণ গণিত', sub:'শেষ মুহূর্তের প্রস্তুতি'}});
 const SECTIONS = [
   {title:'প্রাথমিক', art:'boy', rows:[{kind:'primary'}]},
-  {title:'মাধ্যমিক', art:'cap', rows:[{cls:'g1', kind:'combo', ids:['c6']},{cls:'g2', kind:'stack', ids:['c7','c7s']},{cls:'g1', kind:'stack', ids:['jb']},{cls:'g1', kind:'combo', ids:['c8']},{cls:'g2', kind:'stack', ids:['c9','c9h']},{cls:'g2', kind:'stack', ids:['c10','c10h']}]},
+  {title:'মাধ্যমিক', art:'cap', rows:[{cls:'g1', kind:'combo', ids:['c6']},{cls:'g1', kind:'combo', ids:['c7']},{cls:'g1', kind:'stack', ids:['jb']},{cls:'g1', kind:'combo', ids:['c8']},{cls:'g2', kind:'stack', ids:['c9','c9h']},{cls:'g2', kind:'stack', ids:['c10','c10h']}]},
   {title:'উচ্চ মাধ্যমিক', art:'bookstack', rows:[{cls:'g3 hs', kind:'stack', ids:['h11','h12','adm']}]}
 ];
 
@@ -1237,7 +1242,7 @@ function courseFeatures(id){
     ['#e53935','report','মাসিক পরীক্ষা ও মডেল টেস্ট','রুটিনের বাইরে মাসিক পরীক্ষা ও মডেল টেস্ট। নম্বর, সময় ও সিলেবাস প্রতিবার আলাদাভাবে ঘোষণা করা হয়।'],
     ['#8e44ef','openbook','লেকচার শিট ও স্টাডি ম্যাটেরিয়াল',`অধ্যায় ও অনুশীলনীভিত্তিক নোট। প্রতিটি পরীক্ষার সিলেবাস অনুযায়ী নোট নিজে থেকে "স্টাডি ম্যাটেরিয়াল"-এ চলে আসে, পরীক্ষা দাও বোতামের ঠিক উপরে।`],
     ['#1e88e5','pencil',`${bn(nq)}+ প্রশ্নের প্রশ্নব্যাংক`,`${bn(bs.nch)}টি অধ্যায় ও ${bn(nex)}টি ${bs.uw} জুড়ে সহজ, মধ্যম ও কঠিন প্রশ্ন। প্রতিটি শিক্ষার্থী এলোমেলোভাবে আলাদা প্রশ্ন পায়, তাই দেখাদেখির সুযোগ কম।`],
-    ['#2e9e5b','check','তাৎক্ষণিক ফলাফল ও ব্যাখ্যা','খাতা জমা দিলেই নম্বর, প্রতিটি প্রশ্নের সঠিক উত্তর ও ব্যাখ্যা। উত্তর একবার দিলে আর বদলানো যায় না, তাই আসল পরীক্ষার অভ্যাস তৈরি হয়।'],
+    ['#2e9e5b','check','ফলাফল পরের দিন সকাল ৬টায়','যেকোনো পরীক্ষার ফলাফল পরের দিন সকাল ৬টায় প্রকাশিত হবে। তখন নম্বর, প্রতিটি প্রশ্নের সঠিক উত্তর ও ব্যাখ্যা দেখা যাবে। উত্তর একবার দিলে আর বদলানো যায় না, তাই আসল পরীক্ষার অভ্যাস তৈরি হয়।'],
     ['#f2b705','medal','মেধাতালিকা','প্রতিটি পরীক্ষার মেধাতালিকা সবাই দেখতে পারে। প্রথমবার দেওয়া নম্বরে মেধাক্রম, সমান নম্বর হলে যে আগে জমা দিয়েছে সে উপরে।'],
     ['#e0457b','xcircle','ভুল ও উত্তরহীন প্রশ্নের রিভিশন','নিজের ভুল করা আর উত্তর না দেওয়া প্রশ্নগুলো আলাদা করে সঠিক উত্তর ও ব্যাখ্যাসহ আবার দেখা যায়।'],
     ['#8e44ef','star','আবার পরীক্ষা ও প্রিয় প্রশ্ন','যেকোনো পরীক্ষা অনুশীলনের জন্য আবার দেওয়া যায় (মেধাতালিকায় যায় না)। দরকারি প্রশ্ন ☆ দিয়ে প্রিয়তে জমা রাখা যায়।'],
@@ -1253,7 +1258,7 @@ function vCourseOffer(){
     <div class="topbar"><button class="iconbtn" data-go="${S.courseFrom||'home'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1 class="cd-top">${esc(ptitle(c))}</h1><span style="width:44px"></span></div>
     ${courseBanner(id,'big')}
     <div><h2 class="cd-title">${esc(ptitle(c))}</h2>
-      <p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">${c.exam||'এসএসসি ২০২৭'} পরীক্ষার্থীদের জন্য ${c.name} ${c.bsubj||c.subj}-এর পুরো সিলেবাসে ${multi?'প্রতি বিষয়ে ':''}${freqOf(o).chip}${o.friday?', শুক্রবার রিভিশন পরীক্ষা':''} ও মডেল টেস্ট।</p></div>
+      <p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">${c.exam||'এসএসসি ২০২৭'} পরীক্ষার্থীদের জন্য ${c.name} ${c.bsubj||c.subj}-এর পুরো সিলেবাসে ${multi?'প্রতি বিষয়ে ':''}${freqOf(o).chip}${o.friday?', শুক্রবার রিভিশন পরীক্ষা':''} ও মডেল টেস্ট।</p><p class="res-note">🕕 যেকোনো পরীক্ষার ফলাফল পরের দিন সকাল ৬টায় প্রকাশিত হবে।</p></div>
     <div class="cd-stats"><div><b>${bn(bs.nch)}</b><span>অধ্যায়</span></div><div><b>${bn(nex)}</b><span>${bs.uw}</span></div><div><b>${bn(nq)}+</b><span>প্রশ্ন</span></div><div><b>${bn(freqOf(o).n*bs.mem.length)}</b><span>${freqOf(o).stat}</span></div></div>
     <h2 class="xa-h">কোর্সটি যেভাবে সাজানো হয়েছে</h2>
     <div class="feat-list">${f.map(([col,ic,t,d],i)=>`<button class="feat ${open===i?'open':''}" data-feat="${i}" aria-expanded="${open===i}" style="--fc:${col};--d:${i}">
@@ -1296,7 +1301,7 @@ function vCourse(){
   </div>`;
 }
 /* দশম শ্রেণি ফ্রী ব্যাচ: সাজেশন PDF, NCTB বই, টেস্ট পরীক্ষার প্রশ্ন সমাধান (অ্যাডমিন → ফ্রী ব্যাচ ট্যাব থেকে দেওয়া) */
-const FREE_BATCH={c6:{title:'৬ষ্ঠ শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৬ষ্ঠ শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c8:{title:'৮ম শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৮ম শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c9:{title:'নবম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c9h:{title:'নবম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},h11:{title:'একাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · একাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'১ম পত্র · ফ্রী ব্যাচ'}},h12:{title:'দ্বাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দ্বাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'২য় পত্র · ফ্রী ব্যাচ'}}};
+const FREE_BATCH={c6:{title:'৬ষ্ঠ শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৬ষ্ঠ শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c7:{title:'৭ম শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৭ম শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c8:{title:'৮ম শ্রেণি গণিত ও বিজ্ঞান ফ্রী ব্যাচ',banner:{badge:'ফ্রী · ৮ম শ্রেণি',main:'গণিত ও বিজ্ঞান',sub:'ফ্রী ব্যাচ'}},c9:{title:'নবম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c9h:{title:'নবম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · নবম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},c10:{title:'দশম শ্রেণি সাধারণ গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'সাধারণ গণিত',sub:'ফ্রী ব্যাচ'}},c10h:{title:'দশম শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দশম শ্রেণি',main:'উচ্চতর গণিত',sub:'ফ্রী ব্যাচ'}},h11:{title:'একাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · একাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'১ম পত্র · ফ্রী ব্যাচ'}},h12:{title:'দ্বাদশ শ্রেণি উচ্চতর গণিত ফ্রী ব্যাচ',banner:{badge:'ফ্রী · দ্বাদশ শ্রেণি',main:'উচ্চতর গণিত',sub:'২য় পত্র · ফ্রী ব্যাচ'}}};
 const FREE_CATS=[['sugg','ফ্রী সাজেশন PDF','📄','গুরুত্বপূর্ণ অধ্যায় ও প্রশ্নের সাজেশন'],['nctb','NCTB বই','📚','বোর্ডের পাঠ্যবই (অনলাইন সংস্করণ)'],['test','টেস্ট পরীক্ষার প্রশ্ন সমাধান','✅','বিভিন্ন স্কুলের টেস্ট পরীক্ষার প্রশ্ন ও সমাধান']];
 const NCTB_MATH={t:'নবম-দশম শ্রেণি গণিত বই ২০২৬ (NCTB অফিসিয়াল)',u:'https://nctb.gov.bd/pages/static-pages/695b99afc4774958d7b70612'};
 const FREE_DEFAULT={nctb:[NCTB_MATH]};
@@ -1338,7 +1343,7 @@ function freeExamSection(cid){
 }
 const freeLive=cid=>RSTATE==='ready'&&freeBatchExams(cid).some(e=>e.date===todayISO()&&!e.pending&&!S.exams[examKey(e)]&&examPool(e).length);
 /* হোমের শ্রেণি-কার্ড থেকে খোলে: এই শ্রেণির কোর্স ও ফ্রী ব্যাচ (এক্সপ্লোরের বদলে এখানে) */
-const HUB_CLASSES=['c6','c8','c9','c9h','c10','c10h','h11','h12'];
+const HUB_CLASSES=['c6','c7','c8','c9','c9h','c10','c10h','h11','h12'];
 function vCHub(){
   const cid=HUB_CLASSES.includes(S.chubCid)?S.chubCid:HUB_CLASSES[0], c=COURSES[cid];
   return `<div class="screen">${backTop(`${c.name} ${c.bsubj||c.subj||''}`,'home')}
@@ -1361,7 +1366,7 @@ function vFree(){
   const cid=S.freeCid||'c10', fb=FREE_BATCH[cid], items=freeItems(cid), open=S.freeOpen===undefined?'sugg':S.freeOpen;
   return `<div class="screen">${backTop(fb.title,S.freeFrom||'play')}
     ${freeBanner(cid,'big')}
-    <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। প্রতি সপ্তাহে একটি ফ্রী পরীক্ষা আর পড়ার রুটিন দিয়ে বোর্ড পরীক্ষার প্রস্তুতি।</p></div>
+    <div><h2 class="cd-title">${esc(fb.title)}</h2><p class="muted" style="margin:6px 0 0;font-size:14.5px;line-height:1.6">সবার জন্য একদম ফ্রী। প্রতি সপ্তাহে একটি ফ্রী পরীক্ষা আর পড়ার রুটিন দিয়ে বোর্ড পরীক্ষার প্রস্তুতি।</p><p class="res-note">🕕 যেকোনো পরীক্ষার ফলাফল পরের দিন সকাল ৬টায় প্রকাশিত হবে।</p></div>
     ${freeExamSection(cid)}
     ${freeRoutineSection(cid)}
     ${COURSES[cid]&&COURSES[cid].offer?`<article class="pcard"><b class="pc-title">নিয়মিত লাইভ পরীক্ষা দিয়ে পুরো প্রস্তুতি নিতে চাও?</b><button class="btn" data-course="${cid}">${esc(ptitle(COURSES[cid]))} দেখো</button></article>`:''}
@@ -2056,7 +2061,7 @@ function examCard(e,showCourse){
       <div class="exam-meta"><span class="exam-day">${DAYN[d.getDay()]}${isToday?' · আজ':''}</span>
         <span class="exam-kind">${esc(kindName(e))}</span></div>
       ${e.pending?`<span class="sched">শিক্ষার্থীরা দেখবে ${fmtDT(e.publishAt)} থেকে</span>`:''}
-      ${showCourse?`<span class="muted" style="font-size:13px">${COURSES[e.course].name} ${COURSES[e.course].subj||''}</span>`:''}
+      ${showCourse?`<span class="chip xa-course">${COURSES[e.course].name} · ${COURSES[e.course].subj||''}</span>`:''}
       <div class="exam-marks"><span>${e.marks} নম্বর</span><span>সময় ${e.mins} মিনিট</span></div>
       ${!fri&&(e.units||[]).length&&e.syllabus!==autoSyl(e.course,e.units)?`<span class="muted" style="font-size:13.5px">প্রশ্ন আসবে: ${esc(e.units.map(u=>unitLabel(e.course,u)).join(', '))}</span>`:''}
       ${syl}
@@ -2258,7 +2263,7 @@ function xaCard(e,showCourse){
     <div class="xa-top"><span class="xa-date">${bnD(d)}</span><span class="xa-chips"><span class="xa-pill st-${sk}">${sl}</span>
       <button class="heart ${fav?'on':''}" data-favx="${k}" aria-pressed="${fav}" aria-label="${fav?'প্রিয় থেকে সরাও':'প্রিয় পরীক্ষায় রাখো'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></div>
     <h3 class="xa-title">${esc(kindName(e))}${e.kind==='free'?' <span class="free-tag">ফ্রী</span>':''}</h3>
-    <div class="xa-line"><span class="chip">${esc(c.name)}${c.subj?' · '+esc(c.subj):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
+    <div class="xa-line"><span class="chip xa-course">${esc(c.name)}${c.subj?' · '+esc(c.subj):''}</span> মোট নম্বর: ${bn(e.marks)} · সময়: ${bn(e.mins)} মিনিট</div>
     ${units.length?`<div class="xa-line">বিষয়: ${shown.map(u=>`<span class="chip">${esc(unitChipLabel(e.course,u))}</span>`).join(' ')}${units.length>2||(e.kind==='friday'&&e.items.length)?` <button class="xa-more" data-xmore="${k}">${open?'কম দেখুন':'আরও দেখুন'}</button>`:''}</div>`:''}
     ${e.kind==='friday'?sylDropdown(e,false):''}
     ${note?`<p class="xa-note"><span aria-hidden="true">📝</span> ${esc(note)}</p>`:''}
