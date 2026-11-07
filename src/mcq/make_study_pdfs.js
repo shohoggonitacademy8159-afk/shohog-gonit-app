@@ -40,7 +40,14 @@ function pick(qs, key, mix = DEF_MIX) {
 }
 const face = w => ['bengali', 'latin', 'latin-ext'].filter(s => fs.existsSync(`${FD}/hind-siliguri-${s}-${w}-normal.woff2`))
   .map(s => `@font-face{font-family:'HS';font-weight:${w};src:url('file://${FD}/hind-siliguri-${s}-${w}-normal.woff2') format('woff2')}`).join('');
-const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const esc0 = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const MX_E='[^()\\[\\],|]+', MX_R=`\\(\\s*${MX_E}(?:\\s*,\\s*${MX_E})*\\s*\\)`, MX_RE=new RegExp(`([\\[|])\\s*(${MX_R}(?:\\s*,\\s*${MX_R})*)\\s*([\\]|])`,'g');
+const MX_DET=new RegExp(`\\|\\s*\\[\\s*(${MX_R}(?:\\s*,\\s*${MX_R})*)\\s*\\]\\s*\\|`,'g');
+function mxHTML(s){ return String(s).replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
+  const rows=body.match(new RegExp(MX_R,'g')).map(r=>r.trim().slice(1,-1).split(',').map(x=>x.trim())), n=rows[0].length;
+  if(rows.some(r=>r.length!==n)||(o==='|'&&(rows.length<2||n<2))||(rows.length<2&&n<2)) return m;
+  return `<span class="mx ${o==='['?'mx-m':'mx-d'}"><span class="mx-g" style="grid-template-columns:repeat(${n},auto)">${rows.flat().map(x=>`<span>${x}</span>`).join('')}</span></span>`; }); }
+const esc = s => mxHTML(esc0(s));
 const L = ['ক', 'খ', 'গ', 'ঘ'];
 function html(c, cid, title, sub, data) {
   return `<!doctype html><html lang="bn"><head><meta charset="utf-8"><style>
@@ -53,6 +60,11 @@ body{font-family:'HS','Noto Sans','DejaVu Sans',sans-serif;color:#10233F;font-si
 .info{display:flex;gap:16px;font-size:9.5pt;color:#4A5B73;margin-bottom:10px}
 .cols{column-count:2;column-gap:9mm;column-rule:0.5px solid #D6E3F3}
 .q{break-inside:avoid;margin:0 0 9px}
+.mx{display:inline-flex;align-items:stretch;vertical-align:middle;margin:2px 3px;line-height:1.25}
+.mx::before,.mx::after{content:'';flex:0 0 auto;border:1.2px solid #000}
+.mx-m::before{width:4px;border-right:0}.mx-m::after{width:4px;border-left:0}
+.mx-d::before{border-width:0 0 0 1.2px}.mx-d::after{border-width:0 1.2px 0 0}
+.mx-g{display:inline-grid;column-gap:.8em;padding:1px 5px;justify-items:center;align-items:center;white-space:nowrap}
 .q .t{font-weight:600}
 .q .lv{font-size:8pt;color:#4A5B73;font-weight:400}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:1px 10px;margin-top:2px}
