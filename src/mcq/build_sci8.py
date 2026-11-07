@@ -4,10 +4,10 @@
 ফরম্যাট: '## 1.1' দিয়ে পাঠ শুরু; প্রতিটি লাইন: স্তর|প্রশ্ন|সঠিক|ভুল১|ভুল২|ভুল৩  (স্তর: e/m/h)"""
 import json, random, pathlib, re, collections, sys
 SRC = sys.argv[1] if len(sys.argv) > 1 else 'sci8'
-PER, OUT = {'sci8': (30, 'chs'), 'sci6': (40, 'cht'), 'sci7': (40, 'chu')}[SRC]
+PER, OUT = {'sci8': (30, 'chs'), 'sci6': (40, 'cht'), 'sci7': (40, 'chu'), 'sci5': (50, 'chx')}[SRC]
 D = pathlib.Path(__file__).resolve().parent
 LV = {'e': 'সহজ', 'm': 'মধ্যম', 'h': 'কঠিন'}
-R = random.Random({'sci8': 8008, 'sci6': 6006, 'sci7': 7007}[SRC])
+R = random.Random({'sci8': 8008, 'sci6': 6006, 'sci7': 7007, 'sci5': 5005}[SRC])
 tot = 0
 for f in sorted((D / SRC).glob('ch*.txt'), key=lambda p: int(p.stem[2:])):
     ch = int(f.stem[2:]); items = []; ex = None; cnt = collections.Counter()
@@ -19,13 +19,15 @@ for f in sorted((D / SRC).glob('ch*.txt'), key=lambda p: int(p.stem[2:])):
         assert len(p) == 6 and p[0] in LV and ex, (f.name, ln, line)
         opts = p[2:]; assert len(set(opts)) == 4, (f.name, ln, line)
         c = opts[0]; o = opts[:]; R.shuffle(o)
-        items.append({'q': p[1], 'o': o, 'a': o.index(c), 'e': '', 'lv': LV[p[0]], 'ex': ex}); cnt[ex] += 1
+        it = {'q': p[1], 'o': o, 'a': o.index(c), 'e': '', 'lv': LV[p[0]], 'ex': ex}
+        if ex == '-': it.pop('ex')   # অধ্যায়ভিত্তিক (পাঠ নেই)
+        items.append(it); cnt[ex] += 1
     bad = {k: v for k, v in cnt.items() if v != PER}
     assert not bad, (f.name, bad)
     qs = [x['q'] + '|' + x['o'][x['a']] for x in items]; dup = [q for q, n in collections.Counter(qs).items() if n > 1]
     assert not dup, (f.name, dup)
     order = {'সহজ': 0, 'মধ্যম': 1, 'কঠিন': 2}
-    items.sort(key=lambda x: ([int(t) for t in x['ex'].split('.')], order[x['lv']]))
+    items.sort(key=lambda x: ([int(t) for t in x['ex'].split('.')] if x.get('ex') else [0], order[x['lv']]))
     for i, x in enumerate(items): x['n'] = i + 1
     (D / f'{OUT}{ch}.json').write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding='utf-8')
     tot += len(items); print(f.name, len(items), dict(cnt))

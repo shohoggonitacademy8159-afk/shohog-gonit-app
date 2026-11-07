@@ -15,8 +15,8 @@ function course(cid) {
   const ls = line.match(/lessons:(\{[^}]*\})/);
   return { chapters, exs: m ? eval('(' + m[1] + ')') : {}, lessons: ls ? eval('(' + ls[1] + ')') : null, subj: eval(line.match(/subj:('[^']*')/)[1]) };
 }
-const COURSES = { c7: course('c7'), c7s: course('c7s'), c8: course('c8'), c10: course('c10'), c10h: course('c10h'), h11: course('h11'), h12: course('h12') };
-const CLS = { c7: '৭ম শ্রেণি', c7s: '৭ম শ্রেণি', c8: '৮ম শ্রেণি', c10: 'দশম শ্রেণি (এসএসসি ২৭)', c10h: 'দশম শ্রেণি (এসএসসি ২৭)', h11: 'একাদশ শ্রেণি (এইচএসসি ২৮)', h12: 'দ্বাদশ শ্রেণি (এইচএসসি ২৭)' };
+const COURSES = { p5: course('p5'), p5s: course('p5s'), c7: course('c7'), c7s: course('c7s'), c8: course('c8'), c10: course('c10'), c10h: course('c10h'), h11: course('h11'), h12: course('h12') };
+const CLS = { p5: '৫ম শ্রেণি', p5s: '৫ম শ্রেণি', c7: '৭ম শ্রেণি', c7s: '৭ম শ্রেণি', c8: '৮ম শ্রেণি', c10: 'দশম শ্রেণি (এসএসসি ২৭)', c10h: 'দশম শ্রেণি (এসএসসি ২৭)', h11: 'একাদশ শ্রেণি (এইচএসসি ২৮)', h12: 'দ্বাদশ শ্রেণি (এইচএসসি ২৭)' };
 const exName = ex => String(ex).replace(/^(\d+)\.([A-Z])$/, '$1($2)');
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const BN = s => String(s).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
@@ -24,7 +24,7 @@ const BN = s => String(s).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d
 function rng(seed) { let x = seed >>> 0 || 1; return () => (x = (x * 1103515245 + 12345) >>> 0) / 4294967296; }
 function hash(s) { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.codePointAt(0), 16777619); return h >>> 0; }
 // প্রতি অংশে কয়টি প্রশ্ন: ৭ম বিজ্ঞানে প্রতি পাঠে ১০টি (সহজ ৩, মধ্যম ৫, কঠিন ২), বাকিগুলোতে ৪০টি
-const MIX = { c7: [['সহজ', 3], ['মধ্যম', 5], ['কঠিন', 2]], c7s: [['সহজ', 3], ['মধ্যম', 5], ['কঠিন', 2]] };
+const MIX = { p5: [['সহজ', 3], ['মধ্যম', 5], ['কঠিন', 2]], p5s: [['সহজ', 3], ['মধ্যম', 5], ['কঠিন', 2]], c7: [['সহজ', 3], ['মধ্যম', 5], ['কঠিন', 2]], c7s: [['সহজ', 3], ['মধ্যম', 5], ['কঠিন', 2]] };
 const DEF_MIX = [['সহজ', 12], ['মধ্যম', 20], ['কঠিন', 8]];
 function pick(qs, key, mix = DEF_MIX) {
   const r = rng(hash(key)), out = [], N = mix.reduce((t, x) => t + x[1], 0);
@@ -105,7 +105,7 @@ table.key td b{color:#1F5FBF}
         await p.setContent(html(c, cid, c.lessons ? title : `${title}: ${c.chapters[ch - 1]}`, `অধ্যায় ${BN(ch)}: ${c.chapters[ch - 1]}`, data));
         await p.evaluate(() => document.fonts.ready);
         await p.pdf({ path: path.join(outDir, file), format: 'A4', printBackground: true, displayHeaderFooter: true, headerTemplate: '<span></span>',
-          footerTemplate: `<div style="font-size:8px;width:100%;text-align:center;color:#4A5B73">Sohog Ganit Academy · ${cid === 'c10h' ? 'Higher Math' : cid === 'h11' ? 'HSC Higher Math 1st Paper' : cid === 'h12' ? 'HSC Higher Math 2nd Paper' : cid === 'c8' ? 'Class 8 Math' : cid === 'c7s' ? 'Class 7 Science' : cid === 'c7' ? 'Class 7 Math' : 'General Math'} · ${cid === 'c7s' ? 'Lesson ' + key : key.replace('ch', 'Chapter ')} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`,
+          footerTemplate: `<div style="font-size:8px;width:100%;text-align:center;color:#4A5B73">Sohog Ganit Academy · ${cid === 'c10h' ? 'Higher Math' : cid === 'h11' ? 'HSC Higher Math 1st Paper' : cid === 'h12' ? 'HSC Higher Math 2nd Paper' : cid === 'c8' ? 'Class 8 Math' : cid === 'c7s' ? 'Class 7 Science' : cid === 'c7' ? 'Class 7 Math' : cid === 'p5' ? 'Class 5 Math' : cid === 'p5s' ? 'Class 5 Science' : 'General Math'} · ${cid === 'c7s' ? 'Lesson ' + key : key.replace('ch', 'Chapter ')} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`,
           margin: { top: '14mm', bottom: '16mm', left: '13mm', right: '13mm' } });
         const kb = Math.round(fs.statSync(path.join(outDir, file)).size / 1024);
         index[cid][key] = { f: file, n: data.length, kb, ch, q: data.map(x => x.n) };

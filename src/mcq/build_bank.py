@@ -52,6 +52,14 @@ bank['c7'] = {}   # ৭ম শ্রেণি গণিত: প্রতি অ�
 for ch in range(1, 12):
     f = root / f'src/mcq/chv{ch}.json'
     if f.exists(): bank['c7'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+bank['p5'] = {}   # ৫ম শ্রেণি গণিত: প্রতি অধ্যায়ে 150টি (gen_w.py)
+for ch in range(1, 11):
+    f = root / f'src/mcq/chw{ch}.json'
+    if f.exists(): bank['p5'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+bank['p5s'] = {}   # ৫ম শ্রেণি বিজ্ঞান: প্রতি অধ্যায়ে 50টি (sci5/*.txt → build_sci8.py sci5)
+for ch in range(1, 14):
+    f = root / f'src/mcq/chx{ch}.json'
+    if f.exists(): bank['p5s'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')   # মূল ব্যাংক (PDF এটি থেকে)
 # বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
 import re as _re
