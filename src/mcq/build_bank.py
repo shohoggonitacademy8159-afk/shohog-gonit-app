@@ -44,6 +44,10 @@ bank['c6s'] = {}   # ৬ষ্ঠ শ্রেণি বিজ্ঞান: প�
 for ch in range(1, 15):
     f = root / f'src/mcq/cht{ch}.json'
     if f.exists(): bank['c6s'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+bank['c7s'] = {}   # ৭ম শ্রেণি বিজ্ঞান: প্রতি পাঠে 40টি (sci7/*.txt → build_sci8.py sci7)
+for ch in range(1, 15):
+    f = root / f'src/mcq/chu{ch}.json'
+    if f.exists(): bank['c7s'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')   # মূল ব্যাংক (PDF এটি থেকে)
 # বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
 import re as _re

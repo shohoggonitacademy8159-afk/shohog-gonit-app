@@ -4,10 +4,10 @@
 ফরম্যাট: '## 1.1' দিয়ে পাঠ শুরু; প্রতিটি লাইন: স্তর|প্রশ্ন|সঠিক|ভুল১|ভুল২|ভুল৩  (স্তর: e/m/h)"""
 import json, random, pathlib, re, collections, sys
 SRC = sys.argv[1] if len(sys.argv) > 1 else 'sci8'
-PER, OUT = {'sci8': (30, 'chs'), 'sci6': (40, 'cht')}[SRC]
+PER, OUT = {'sci8': (30, 'chs'), 'sci6': (40, 'cht'), 'sci7': (40, 'chu')}[SRC]
 D = pathlib.Path(__file__).resolve().parent
 LV = {'e': 'সহজ', 'm': 'মধ্যম', 'h': 'কঠিন'}
-R = random.Random(8008 if SRC == 'sci8' else 6006)
+R = random.Random({'sci8': 8008, 'sci6': 6006, 'sci7': 7007}[SRC])
 tot = 0
 for f in sorted((D / SRC).glob('ch*.txt'), key=lambda p: int(p.stem[2:])):
     ch = int(f.stem[2:]); items = []; ex = None; cnt = collections.Counter()
