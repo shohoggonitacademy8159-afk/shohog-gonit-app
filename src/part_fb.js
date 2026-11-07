@@ -26,7 +26,7 @@ setTimeout(function(){
       RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true); sendPendingReports(); refreshPays(); scheduleExamNotifs();
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
-      const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m; scheduleExamNotifs();
+      const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m; SYL_READY=true; scheduleExamNotifs();
       if(S.sf&&!S.sf.dirty) S.sf.vals=null; if(S.cf&&!S.cf.dirty) S.cf.vals=null; softRender();
     },()=>{});
   }catch(e){ clearTimeout(timer); RSTATE='off'; softRender(); }

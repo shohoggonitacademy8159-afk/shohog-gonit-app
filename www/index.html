@@ -143,7 +143,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabbar nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:72px;align-items:center}
+.tabbar nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));height:72px;align-items:center}
 .tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;line-height:1.15;text-align:center;padding:0 2px;color:var(--muted);cursor:pointer;min-height:56px;justify-content:center}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tab[aria-current="page"]{color:var(--accent);font-weight:700}
@@ -741,6 +741,42 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .qa-opts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:14.5px}
 .qa-opts li.ok{color:var(--good);font-weight:800}
 .qa-e{margin:0;font-size:14px}
+.tab-num{position:absolute;top:-5px;right:-9px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#e53935;color:#fff;font-style:normal;font-size:10.5px;font-weight:800;line-height:17px;text-align:center;border:2px solid var(--surface);box-sizing:content-box;animation:ctlive 1.6s ease-in-out infinite}
+.nb-form{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.nb-form h2{margin:0;font-size:18px}
+.nb-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.nb-pin{display:flex;align-items:center;gap:6px;font-weight:600;min-height:56px}
+.nb-list{display:flex;flex-direction:column;gap:12px}
+.nb{position:relative;background:var(--surface);border:1.5px solid var(--line);border-left:5px solid var(--accent);border-radius:16px;padding:14px 16px;animation:nbin .4s ease backwards;animation-delay:calc(var(--i)*60ms)}
+.nb.pin{border-left-color:#f59e0b;background:color-mix(in srgb,#f59e0b 9%,var(--surface))}
+.nb.new{border-left-color:#e53935;box-shadow:0 6px 18px -10px #e53935}
+.nb h3{margin:6px 0 4px;font-size:17px;line-height:1.35}
+.nb p{margin:0;line-height:1.65;word-break:break-word}
+.nb-top{display:flex;flex-wrap:wrap;gap:6px}
+.nb-tag{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--bg);border:1px solid var(--line)}
+.nb-tag.pin{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+.nb-tag.new{background:#e53935;border-color:#e53935;color:#fff;animation:ctlive 1.6s ease-in-out infinite}
+.nb-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted)}
+.nb-act{display:flex;gap:14px}
+.link.danger{color:#dc2626}
+@keyframes nbin{from{opacity:0;transform:translateY(10px)}}
+.cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:12px 0 6px}
+.cg{position:relative;overflow:hidden;border:0;border-radius:16px;padding:19px 6px 9px;min-height:66px;cursor:pointer;font:inherit;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 4px 12px -6px var(--c1);opacity:.86;transition:transform .25s cubic-bezier(.3,1.6,.5,1),opacity .25s,box-shadow .25s}
+.cg-anim .cg{animation:cgin .5s cubic-bezier(.3,1.5,.5,1) backwards;animation-delay:calc(var(--i)*55ms)}
+.cg-n{font-size:16px;line-height:1.15;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.cg-s{font-size:11.5px;font-weight:600;opacity:.95;line-height:1.2}
+.cg:hover{opacity:1;transform:translateY(-2px)}
+.cg:active{transform:scale(.94)}
+.cg.on{opacity:1;transform:translateY(-2px) scale(1.04);box-shadow:0 0 0 3px var(--surface),0 0 0 5.5px var(--c1),0 10px 22px -8px var(--c1)}
+.cg.on::after{content:'';position:absolute;top:0;bottom:0;left:-70%;width:50%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-18deg);animation:cgshine 2.8s ease-in-out infinite}
+.cg-ok{position:absolute;top:4px;left:5px;width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,.95);color:var(--c1);font-size:11px;font-weight:900;display:grid;place-items:center;animation:cgok .35s cubic-bezier(.3,1.8,.5,1) both}
+.cg.is-live{opacity:1}
+.cg .ctab-live{top:4px;right:4px;font-size:9px;padding:0 6px 0 4px;line-height:15px}
+@keyframes cgin{from{opacity:0;transform:translateY(14px) scale(.85)}}
+@keyframes cgshine{0%,55%{left:-70%}100%{left:130%}}
+@keyframes cgok{from{transform:scale(0)}to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.cg,.cg-anim .cg,.cg.on::after,.cg-ok{animation:none!important;transition:none}}
 .ctabs{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 6px;scrollbar-width:none;scroll-snap-type:x proximity}
 .ctabs::-webkit-scrollbar{display:none}
 .ctab{position:relative;flex-shrink:0;scroll-snap-align:start;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:14px;padding:9px 14px 9px 12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:background .25s,color .25s,border-color .25s,transform .25s,box-shadow .25s;animation:ctabin .35s both;animation-delay:calc(var(--i)*45ms)}
@@ -999,11 +1035,12 @@ const S = {
   lastUid: saved.lastUid||null,  // এই ফোনে শেষ যে অ্যাকাউন্ট ছিল
   adminEmail: saved.adminEmail||'',
   ntfOff: !!saved.ntfOff,
+  noticeSeen: saved.noticeSeen||'',
   dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: 'home',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,noticeSeen:S.noticeSeen,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -1806,7 +1843,7 @@ setTimeout(function(){
       RSTATE='ready'; softRender(); sendPendingResults(); watchResults(true); sendPendingReports(); refreshPays(); scheduleExamNotifs();
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     DB.collection('syllabus').onSnapshot(snap=>{
-      const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m; scheduleExamNotifs();
+      const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m; SYL_READY=true; scheduleExamNotifs();
       if(S.sf&&!S.sf.dirty) S.sf.vals=null; if(S.cf&&!S.cf.dirty) S.cf.vals=null; softRender();
     },()=>{});
   }catch(e){ clearTimeout(timer); RSTATE='off'; softRender(); }
@@ -2281,10 +2318,14 @@ function examTiles(cid){
 }
 /* শ্রেণির ট্যাব (পরীক্ষা ও রুটিন): প্রতিটি শ্রেণির নিজস্ব রং, আজ লাইভ পরীক্ষা থাকলে LIVE ব্যাজ */
 const tabLabel=k=>`${COURSES[k].name.replace(' শ্রেণি','')} · ${String(COURSES[k].subj||'').replace(' গণিত','').replace(/ (১ম|২য়) পত্র/,' $1')}`;
+/* শ্রেণির বাটন: সারি-কলামে রঙিন গ্রিড, লাইভ ব্যাজসহ (পরীক্ষা ও রুটিন পাতা) */
+const CG_COL=[['#2563eb','#60a5fa'],['#db2777','#f472b6'],['#059669','#34d399'],['#ea580c','#fb923c'],['#7c3aed','#a78bfa'],['#0891b2','#22d3ee'],['#ca8a04','#facc15'],['#dc2626','#f87171'],['#4f46e5','#818cf8'],['#16a34a','#86efac'],['#c026d3','#e879f9'],['#0d9488','#5eead4'],['#9333ea','#c084fc'],['#b45309','#f59e0b']];
+let CG_SEEN='';
 function classTabs(ids,active,attr,allLabel){
-  const items=(allLabel?[['all',allLabel]]:[]).concat(ids.map(k=>[k,tabLabel(k)]));
-  return `<div class="ctabs" role="tablist" aria-label="শ্রেণি">${items.map(([k,l],i)=>{ const on=k===active, live=k==='all'?false:liveToday(k);
-    return `<button role="tab" class="ctab ${k==='all'?'':'t-'+COURSES[k].t} ${on?'on':''}" style="--i:${i}" aria-selected="${on}" ${attr}="${k}">${live?'<span class="ctab-live" aria-label="লাইভ পরীক্ষা চলছে"><i></i>LIVE</span>':''}${esc(l)}</button>`; }).join('')}</div>`;
+  const items=(allLabel?[['all',allLabel,'']]:[]).concat(ids.map(k=>[k,COURSES[k].name.replace(' শ্রেণি',''),String(COURSES[k].subj||'').replace(/ (১ম|২য়) পত্র/,' $1')]));
+  const anim=CG_SEEN!==S.view+'|'+attr; CG_SEEN=S.view+'|'+attr;
+  return `<div class="cgrid ${anim?'cg-anim':''}" role="tablist" aria-label="শ্রেণি">${items.map(([k,n,sub],i)=>{ const on=k===active, live=k==='all'?false:liveToday(k), oi=OFFER_IDS().indexOf(k), c=k==='all'?['#334155','#64748b']:CG_COL[(oi<0?i:oi)%CG_COL.length];
+    return `<button role="tab" class="cg ${on?'on':''} ${live?'is-live':''}" style="--i:${i};--c1:${c[0]};--c2:${c[1]}" aria-selected="${on}" ${attr}="${k}">${live?'<span class="ctab-live" aria-label="লাইভ পরীক্ষা চলছে"><i></i>LIVE</span>':''}<b class="cg-n">${esc(n)}</b>${sub?`<span class="cg-s">${esc(sub)}</span>`:''}${on?'<span class="cg-ok" aria-hidden="true">✓</span>':''}</button>`; }).join('')}</div>`;
 }
 /* শুক্রবার রিভিশনের সিলেবাস: ড্রপডাউনে */
 function sylDropdown(e,open){
@@ -2499,6 +2540,50 @@ function acctSignedIn(u){
   }
   watchAcct(u.uid); softRender();
 }
+/* ===== নোটিশ বোর্ড: অ্যাডমিন লেখেন (syllabus সংগ্রহে type:'notice'), সবাই দেখে ===== */
+var SYL_READY=false;
+const noticeList=()=>Object.values(SYL).filter(r=>r.type==='notice'&&(CAN_EDIT||isLive(r))).sort((a,b)=>(!!b.pin-!!a.pin)||String(b.at).localeCompare(String(a.at)));
+const noticeMax=l=>l.reduce((m,n)=>String(n.at)>m?String(n.at):m,'');
+const noticeUnread=()=>CAN_EDIT?0:noticeList().filter(n=>String(n.at)>String(S.noticeSeen||'')).length;
+const nfInit=()=>S.nf||(S.nf={id:'',title:'',body:'',course:'all',pin:false,busy:false,err:''});
+const linkify=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g,'<br>');
+function vNotice(){
+  const list=noticeList(), seen=String(S.noticeSeen||''), mx=noticeMax(list);
+  if(!CAN_EDIT&&mx>seen){ S.noticeSeen=mx; persist(); setTimeout(renderTabs,0); }
+  const nf=nfInit(), ids=OFFER_IDS();
+  const form=CAN_EDIT?`<section class="nb-form" aria-label="নোটিশ লেখো">
+      <h2>${nf.id?'✏️ নোটিশ সম্পাদনা':'📢 নতুন নোটিশ দিন'}</h2>
+      <div class="field"><label for="nfTitle">শিরোনাম</label><input class="input" id="nfTitle" data-nf="title" maxlength="120" placeholder="যেমন: শুক্রবারের পরীক্ষা সকাল ১০টায়" value="${esc(nf.title)}"></div>
+      <div class="field"><label for="nfBody">বিস্তারিত</label><textarea class="input area" id="nfBody" data-nf="body" maxlength="2000" rows="4" style="min-height:110px" placeholder="নোটিশের পুরো লেখা…">${esc(nf.body)}</textarea></div>
+      <div class="nb-row"><div class="field" style="flex:1"><label for="nfCourse">কাদের জন্য</label><select class="input" id="nfCourse" data-nf="course"><option value="all">সব শ্রেণি</option>${ids.map(k=>`<option value="${k}" ${nf.course===k?'selected':''}>${esc(COURSES[k].name)} · ${esc(COURSES[k].subj||'')}</option>`).join('')}</select></div>
+        <label class="nb-pin"><input type="checkbox" data-nf="pin" ${nf.pin?'checked':''}> 📌 উপরে পিন করো</label></div>
+      ${nf.err?`<div class="error" role="alert">${esc(nf.err)}</div>`:''}
+      <div class="nb-row"><button class="btn" data-nfsave ${nf.busy?'disabled':''}>${nf.busy?'প্রকাশ হচ্ছে…':nf.id?'হালনাগাদ করো':'প্রকাশ করো'}</button>${nf.id?`<button class="btn ghost" data-nfcancel>বাতিল</button>`:''}</div>
+      <p class="muted" style="margin:0;font-size:13px">প্রকাশ করলেই সব শিক্ষার্থী নোটিশ পাতায় দেখবে, আর অ্যাপে নোটিফিকেশন পাবে।</p>
+    </section>`:'';
+  return `<div class="screen">
+    <div class="topbar"><span style="width:44px"></span><h1>নোটিশ বোর্ড</h1><span style="width:44px"></span></div>
+    ${form}
+    ${list.length?`<div class="nb-list">${list.map((n,i)=>{ const isNew=!CAN_EDIT&&String(n.at)>seen, c=COURSES[n.course];
+      return `<article class="nb ${n.pin?'pin':''} ${isNew?'new':''}" style="--i:${i}">
+        <div class="nb-top">${n.pin?'<span class="nb-tag pin">📌 পিন করা</span>':''}${isNew?'<span class="nb-tag new">নতুন</span>':''}<span class="nb-tag">${c?esc(c.name+' · '+(c.subj||'')):'সব শ্রেণি'}</span>${!isLive(n)?'<span class="nb-tag">প্রকাশের অপেক্ষায়</span>':''}</div>
+        <h3>${esc(n.title||'নোটিশ')}</h3>
+        ${n.body?`<p>${linkify(n.body)}</p>`:''}
+        <div class="nb-foot"><span>🕒 ${fmtDT(n.at)}</span>${CAN_EDIT?`<span class="nb-act"><button class="link" data-nfedit="${esc(n.id)}">সম্পাদনা</button><button class="link danger" data-nfdel="${esc(n.id)}">${S.nfArmed===n.id?'নিশ্চিত? আবার চাপো':'মুছুন'}</button></span>`:''}</div>
+      </article>`; }).join('')}</div>`
+    :`<div class="empty">📭 এখনো কোনো নোটিশ নেই।${CAN_EDIT?' উপরের ফর্মে লিখে প্রথম নোটিশ দিন।':' নতুন নোটিশ এলে এখানে দেখা যাবে।'}</div>`}
+  </div>`;
+}
+async function saveNotice(){
+  const nf=nfInit(), title=String(nf.title||'').trim(), body=String(nf.body||'').trim();
+  if(!title){ nf.err='শিরোনাম লিখুন।'; return render(); }
+  nf.busy=true; nf.err=''; render();
+  const id=nf.id||('notice_'+Date.now().toString(36)), old=SYL[id], now=new Date().toISOString();
+  try{ await DB.collection('syllabus').doc(id).set({type:'notice',title:title.slice(0,120),body:body.slice(0,2000),course:nf.course||'all',pin:!!nf.pin,at:old&&old.at||now,updatedAt:now});
+    S.nf=null; toast(old?'নোটিশ হালনাগাদ হয়েছে':'নোটিশ প্রকাশ হয়েছে'); }
+  catch(e){ nf.busy=false; nf.err='প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
+  render();
+}
 /* ===== লোকাল নোটিফিকেশন (সার্ভার ছাড়া; শুধু অ্যান্ড্রয়েড অ্যাপে) ===== */
 var NTF=window.SohogNotify||null, NTF_KEY='sohog-ntf';
 var NTF_ST=(()=>{ try{ return JSON.parse(localStorage.getItem(NTF_KEY))||{}; }catch(e){ return {}; } })(), NTF_T=null, NTF_TAP=false;
@@ -2519,7 +2604,13 @@ function ntfHead(e){ const c=COURSES[e.course]; return `${c.name.replace(' শ�
 function scheduleExamNotifs(){ if(!NTF||!NTF.native) return; clearTimeout(NTF_T); NTF_T=setTimeout(scheduleExamNotifsNow,800); }
 async function scheduleExamNotifsNow(){
   if(!NTF||!NTF.native||RSTATE!=='ready') return;
-  if(!NTF_TAP){ NTF_TAP=true; NTF.onTap(x=>{ if(x&&x.go==='admin'&&CAN_EDIT){ S.atab=x.tab||'pay'; return go('admin'); } if(x&&x.course&&COURSES[x.course]){ S.hubCourse=x.course; S.hubFrom='home'; go('exams'); } }); }
+  if(!NTF_TAP){ NTF_TAP=true; NTF.onTap(x=>{ if(x&&x.go==='notice') return go('notice'); if(x&&x.go==='admin'&&CAN_EDIT){ S.atab=x.tab||'pay'; return go('admin'); } if(x&&x.course&&COURSES[x.course]){ S.hubCourse=x.course; S.hubFrom='home'; go('exams'); } }); }
+  if(SYL_READY){ const nl=noticeList(), mx=noticeMax(nl);
+    if(NTF_ST.noticeAt===undefined) NTF_ST.noticeAt=mx;
+    else if(mx>NTF_ST.noticeAt){ const mine=ntfCourses(), fr=nl.filter(n=>String(n.at)>NTF_ST.noticeAt&&(n.course==='all'||mine.includes(n.course)));
+      if(fr.length&&ntfOn()&&!CAN_EDIT&&S.uid) NTF.schedule([{id:ntfId('notice#'+fr[0].id),title:`📢 ${fr.length>1?bn(fr.length)+'টি নতুন নোটিশ: ':''}${fr[0].title||'নতুন নোটিশ'}`,body:String(fr[0].body||'').slice(0,300),extra:{go:'notice'}}]);
+      NTF_ST.noticeAt=mx; }
+    ntfSave(); }
   const old=NTF_ST.ids||[];
   if(!ntfOn()||CAN_EDIT||!S.uid){ if(old.length){ await NTF.cancel(old); NTF_ST.ids=[]; ntfSave(); } return; }
   const now=Date.now(), today=todayISO(), lim=isoD(addD(parseD(today),8)), list=[], fresh=[], seen=NTF_ST.seen||null, nowSeen=[];
@@ -3373,16 +3464,16 @@ function vAdmin(){
 }
 setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 
-const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','রিপোর্ট','report'],['downloads','ডাউনলোড','download'],['profile','আরো','grid']];
+const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','রিপোর্ট','report'],['notice','নোটিশ','bell'],['downloads','ডাউনলোড','download'],['profile','আরো','grid']];
 function renderTabs(){
   const active = S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view==='chub'?'home':S.view==='free'?(S.freeFrom==='play'?'play':'home'):S.view;
-  const live=OFFER_IDS().some(liveToday);
-  tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}</span>${l}</button>`).join('');
+  const live=OFFER_IDS().some(liveToday), nun=noticeUnread();
+  tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}${v==='notice'&&nun?`<i class="tab-num" aria-label="${bn(nun)}টি নতুন নোটিশ">${nun>9?'৯+':bn(nun)}</i>`:''}</span>${l}</button>`).join('');
 }
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   const gate=needAuth(); if(gate){ tabbar.hidden=true; app.innerHTML=vAuth(); return; }
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
@@ -3556,6 +3647,10 @@ app.addEventListener('click',e=>{
     return;
   }
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
+  if(t.hasAttribute('data-nfsave')){ saveNotice(); return; }
+  if(t.hasAttribute('data-nfcancel')){ S.nf=null; render(); return; }
+  if(t.dataset.nfedit){ const n=SYL[t.dataset.nfedit]; if(n){ S.nf={id:n.id,title:n.title||'',body:n.body||'',course:n.course||'all',pin:!!n.pin,busy:false,err:''}; render(); window.scrollTo(0,0); } return; }
+  if(t.dataset.nfdel){ const id=t.dataset.nfdel; if(S.nfArmed===id){ S.nfArmed=''; DB.collection('syllabus').doc(id).delete().then(()=>toast('নোটিশ মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); } else { S.nfArmed=id; render(); } return; }
   if(t.hasAttribute('data-ntftoggle')){ S.ntfOff=!S.ntfOff; persist(); if(!S.ntfOff&&NTF) NTF.ready(); toast(S.ntfOff?'নোটিফিকেশন বন্ধ করা হয়েছে':'নোটিফিকেশন চালু করা হয়েছে'); render(); return; }
   if(t.hasAttribute('data-spublish')){ if(!S.spublishing) publishSyllabus(); return; }
   if(t.dataset.sdel){
@@ -3628,6 +3723,7 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('input',e=>{
   const t=e.target;
+  if(t.dataset.nf){ nfInit()[t.dataset.nf]=t.type==='checkbox'?t.checked:t.value; }
   if(t.dataset.payf&&S.buy){ S.buy[t.dataset.payf]=t.value; }
   if(t.dataset.pcf&&t.type!=='checkbox'){ pcInit()[t.dataset.pcf]=t.value; }
   if(t.dataset.rfday){ rfInit().vals[t.dataset.rfday]=t.value; }
