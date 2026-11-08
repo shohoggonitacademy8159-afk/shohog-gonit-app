@@ -2710,7 +2710,7 @@ const authErr=c=>/email-already-in-use/.test(c)?'এই ইমেইলে আ�
   :/too-many-requests/.test(c)?'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।'
   :/network|unavailable/.test(c)?'ইন্টারনেট সংযোগ নেই।'
   :/operation-not-allowed/.test(c)?'সার্ভারে Email/Password লগইন চালু নেই।'
-  :/permission/.test(c)?'সার্ভারের অনুমতি (Rules) হালনাগাদ করা হয়নি।'
+  :/permission/.test(c)?'সার্ভারে অ্যাকাউন্ট সংরক্ষণের অনুমতি এখনো চালু হয়নি। একাডেমিকে জানাও, চালু হলে আবার একই তথ্য দিয়ে চেষ্টা করো।'
   :'সমস্যা হয়েছে, আবার চেষ্টা করুন।';
 /* লগইনের আইডি (ফোন/ইমেইল) থেকে Firebase-এর ইমেইল */
 async function loginEmailOf(id){
@@ -2735,7 +2735,15 @@ async function acctRegister(){
   try{
     if(ph){ const ex=await DB.docGet('phones',ph).catch(e=>{ if(e&&e.code==='unavailable') throw e; return null; }); if(ex){ throw {code:'phone-taken'}; } }
     const loginEmail=em||(ph&&rec)||`${ph}@${PHONE_DOMAIN}`;
-    const u=await DB.signUp(loginEmail,pw,name);
+    let u;
+    try{ u=await DB.signUp(loginEmail,pw,name); }
+    catch(e){
+      /* আগের চেষ্টায় লগইন-অ্যাকাউন্ট তৈরি হয়েছিল কিন্তু তথ্য সংরক্ষণ হয়নি (যেমন Rules হালনাগাদ ছিল না): একই পাসওয়ার্ডে ঢুকে বাকি কাজ শেষ করি */
+      if(!/email-already-in-use/.test((e&&e.code)||'')) throw e;
+      u=await DB.signIn(loginEmail,pw).catch(()=>{ throw e; });
+      const old=await DB.docGet('users',u.uid).catch(()=>null);
+      if(old){ await DB.signOut().catch(()=>{}); throw e; }
+    }
     if(ph) await DB.docSet('phones',ph,{uid:u.uid,e:loginEmail,at:new Date().toISOString()});
     const merge=!S.lastUid||S.lastUid===u.uid;   // এই ফোনের আগের (অ্যাকাউন্ট ছাড়া) অগ্রগতি নতুন অ্যাকাউন্টে যায়
     if(!merge) clearPersonal();
