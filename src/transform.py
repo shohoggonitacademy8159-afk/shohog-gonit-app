@@ -80,6 +80,7 @@ img{max-width:100%}
 [hidden]{display:none!important}
 </style>
 <script src="config.js"></script>
+<script src="build.js"></script>
 <script src="db.js"></script>
 <script src="mcq.js"></script>
 """

@@ -14,6 +14,7 @@ img{max-width:100%}
 [hidden]{display:none!important}
 </style>
 <script src="config.js"></script>
+<script src="build.js"></script>
 <script src="db.js"></script>
 <script src="mcq.js"></script>
 <title>সহগ গণিত একাডেমি</title>
@@ -325,6 +326,10 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ex-act .btn{height:46px;font-size:15.5px}
 .ex-done{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px}
 .ex-done .link{min-height:36px;padding:0}
+.upd-bar{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;text-decoration:none;font-size:14px;line-height:1.4;margin-bottom:10px;box-shadow:0 10px 22px -12px #16a34a;animation:updpulse 2.4s ease-in-out infinite}
+.upd-bar svg{width:30px;height:30px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.upd-bar b{font-size:16px}
+.btn.upd-go{background:#16a34a}
+@keyframes updpulse{50%{box-shadow:0 10px 30px -6px #16a34a}}
 .exam-banner{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;border:0;background:var(--orange-a);color:#fff;cursor:pointer;text-align:left;font-size:14px;line-height:1.4}
 .exam-banner svg{width:30px;height:30px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .exam-banner b{font-size:16px}
@@ -1154,7 +1159,7 @@ function vHome(){
       <button class="iconbtn" data-go="report" aria-label="লার্নিং রিপোর্ট">${svg('growth','width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4"')}</button>
     </header>
     ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>অ্যাডমিন প্যানেল: রুটিন ও সিলেবাস প্রকাশ</span></button>`:''}
-    ${todayExamBanner()}
+    ${updBanner()}${todayExamBanner()}
     ${myPkgBar()}
     ${SECTIONS.map(sec=>`<section class="panel">
       <div class="panel-head">${art(sec.art)}<h2>${sec.title}</h2><span class="rule"></span>
@@ -1826,7 +1831,7 @@ function vDownloads(){
   const mine=Object.keys(S.exams||{}).length;
   return `<div class="screen">
     <div class="topbar"><span style="width:44px"></span><h1>ডাউনলোড</h1><span style="width:44px"></span></div>
-    <section class="dl-card"><span class="dl-ic">${svg('download')}</span><div style="flex:1;min-width:0"><b>এপের সর্বশেষ সংস্করণ</b><span class="muted">নতুন সুবিধা পেতে মাঝে মাঝে আপডেট করো</span></div><a class="btn" href="${APK_URL}" target="_blank" rel="noopener">নামাও</a></section>
+    <section class="dl-card"><span class="dl-ic">${svg('download')}</span><div style="flex:1;min-width:0"><b>${UPD?`নতুন সংস্করণ ${verName(UPD.n)} এসেছে`:'এপের সর্বশেষ সংস্করণ'}</b><span class="muted">${APP_BUILD?`তোমার ফোনে আছে ${verName(APP_BUILD)}${UPD?'':' · '+(NTF_ST.updLatest?'এটিই সর্বশেষ ✓':'যাচাই হয়নি')}`:'নতুন সুবিধা পেতে মাঝে মাঝে আপডেট করো'}</span>${APP_BUILD?`<button class="link" data-updcheck style="padding:0;margin-top:4px;text-align:left">${UPD_BUSY?'যাচাই হচ্ছে…':'↻ আপডেট আছে কি না দেখো'}</button>`:''}</div><a class="btn ${UPD?'upd-go':''}" href="${APK_URL}" target="_blank" rel="noopener">${UPD?'আপডেট করো':'নামাও'}</a></section>
     <section class="dl-card"><span class="dl-ic">${svg('report')}</span><div style="flex:1;min-width:0"><b>আমার ফলাফলের ফাইল</b><span class="muted">${mine?`${bn(mine)}টি পরীক্ষার নম্বর (Excel/CSV)`:'পরীক্ষা দিলে এখান থেকে নামানো যাবে'}</span></div><button class="btn ghost" data-mycsv ${mine?'':'disabled'}>নামাও</button></section>
     <h2 class="xa-h">স্টাডি ম্যাটেরিয়াল ${sg.length?`<small class="muted" style="font-size:14px">${bn(sg.length)}টি PDF</small>`:''}</h2>
     ${sg.length?pdfList(sg):`<div class="empty">পরীক্ষার সিলেবাস প্রকাশ হলে সেই অংশের PDF এখানে আসবে।</div>`}
@@ -2651,7 +2656,7 @@ function ntfHead(e){ const c=COURSES[e.course]; return `${c.name.replace(' শ�
 function scheduleExamNotifs(){ if(!NTF||!NTF.native) return; clearTimeout(NTF_T); NTF_T=setTimeout(scheduleExamNotifsNow,800); }
 async function scheduleExamNotifsNow(){
   if(!NTF||!NTF.native||RSTATE!=='ready') return;
-  if(!NTF_TAP){ NTF_TAP=true; NTF.onTap(x=>{ if(x&&x.go==='notice') return go('notice'); if(x&&x.go==='admin'&&CAN_EDIT){ S.atab=x.tab||'pay'; return go('admin'); } if(x&&x.course&&COURSES[x.course]){ S.hubCourse=x.course; S.hubFrom='home'; go('exams'); } }); }
+  if(!NTF_TAP){ NTF_TAP=true; NTF.onTap(x=>{ if(x&&x.go==='notice') return go('notice'); if(x&&x.go==='downloads') return go('downloads'); if(x&&x.go==='admin'&&CAN_EDIT){ S.atab=x.tab||'pay'; return go('admin'); } if(x&&x.course&&COURSES[x.course]){ S.hubCourse=x.course; S.hubFrom='home'; go('exams'); } }); }
   if(SYL_READY){ const nl=noticeList(), mx=noticeMax(nl);
     if(NTF_ST.noticeAt===undefined) NTF_ST.noticeAt=mx;
     else if(mx>NTF_ST.noticeAt){ const mine=ntfCourses(), fr=nl.filter(n=>String(n.at)>NTF_ST.noticeAt&&(n.course==='all'||mine.includes(n.course)));
@@ -2694,6 +2699,30 @@ function adminNotify(kind,m){
 }
 function adminWatchAll(){ if(!CAN_EDIT||!DB) return; watchPays(); watchReports(); if(NTF&&NTF.native) scheduleExamNotifs(); }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) scheduleExamNotifs(); });
+/* ===== অ্যাপ আপডেট: GitHub-এর সর্বশেষ রিলিজের সাথে মিলিয়ে দেখা (শুধু অ্যান্ড্রয়েড অ্যাপে; বিল্ড নম্বর CI দেয় build.js-এ) ===== */
+var APP_BUILD=+(window.SOHOG_BUILD||0), UPD=null, UPD_BUSY=false;
+const verName=n=>`১.০.${bn(n)}`;
+async function checkUpdate(force){
+  if(!APP_BUILD||UPD_BUSY) return;
+  if(!force&&NTF_ST.updLatest&&Date.now()-(+NTF_ST.updAt||0)<3*3600e3){ UPD=NTF_ST.updLatest>APP_BUILD?{n:NTF_ST.updLatest}:null; return; }
+  UPD_BUSY=true;
+  try{
+    const r=await fetch('https://api.github.com/repos/shohoggonitacademy8159-afk/shohog-gonit-app/releases/latest',{headers:{Accept:'application/vnd.github+json'},cache:'no-store'});
+    if(r.ok){ const j=await r.json(), n=+(String(j.tag_name||'').split('.').pop())||0;
+      NTF_ST.updAt=Date.now(); NTF_ST.updLatest=n; ntfSave();
+      const was=!!UPD; UPD=n>APP_BUILD?{n}:null;
+      if(UPD&&NTF_ST.updNotified!==n){ NTF_ST.updNotified=n; ntfSave();
+        if(NTF&&NTF.native&&!S.ntfOff) NTF.schedule([{id:ntfId('upd#'+n),title:'🆕 অ্যাপের নতুন সংস্করণ এসেছে',body:`সংস্করণ ${verName(n)} — চাপ দিয়ে এখনই আপডেট করো।`,extra:{go:'downloads'}}]); }
+      if(force&&!UPD) toast('তোমার অ্যাপ সর্বশেষ সংস্করণে আছে ✓');
+      if(was!==!!UPD||force) softRender(); }
+    else if(force) toast('এখন যাচাই করা গেল না, পরে আবার চেষ্টা করো');
+  }catch(e){ if(force) toast('ইন্টারনেট সংযোগ নেই'); }
+  UPD_BUSY=false;
+}
+const updBanner=()=>UPD?`<a class="upd-bar" href="${APK_URL}" target="_blank" rel="noopener">${svg('download')}<span><b>নতুন সংস্করণ ${verName(UPD.n)} এসেছে</b><br>চাপ দিয়ে নামাও, তারপর ফাইল খুলে Install/Update করো</span></a>`:'';
+setTimeout(()=>checkUpdate(false),4000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) checkUpdate(false); });
+
 function acctSignedOut(){
   AUTH_KNOWN=true;
   if(AUTHBUSY) return;
@@ -3524,7 +3553,7 @@ const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','e
 function renderTabs(){
   const active = S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view==='chub'?'home':S.view==='free'?(S.freeFrom==='play'?'play':'home'):S.view;
   const live=OFFER_IDS().some(liveToday), nun=noticeUnread();
-  tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}${v==='notice'&&nun?`<i class="tab-num" aria-label="${bn(nun)}টি নতুন নোটিশ">${nun>9?'৯+':bn(nun)}</i>`:''}</span>${l}</button>`).join('');
+  tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}${v==='downloads'&&UPD?'<i class="tab-dot" aria-label="অ্যাপের নতুন সংস্করণ"></i>':''}${v==='notice'&&nun?`<i class="tab-num" aria-label="${bn(nun)}টি নতুন নোটিশ">${nun>9?'৯+':bn(nun)}</i>`:''}</span>${l}</button>`).join('');
 }
 function render(){
   const authed=true;
@@ -3704,6 +3733,7 @@ app.addEventListener('click',e=>{
   }
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
   if(t.hasAttribute('data-xfbriti')){ const xf=xfInit(), c=COURSES[xf.course]; Object.assign(xf,{title:`বৃত্তি মডেল টেস্ট (${c.subj})`, marks:'50', mins:'50', units:c.chapters.map((_,i)=>String(i+1)), syllabus:'পূর্ণ সিলেবাস', aud:'paid'}); render(); toast('বৃত্তি মডেল টেস্ট ফর্মে বসানো হয়েছে; তারিখ দেখে প্রকাশ করুন'); return; }
+  if(t.hasAttribute('data-updcheck')){ checkUpdate(true); render(); return; }
   if(t.hasAttribute('data-nfsave')){ saveNotice(); return; }
   if(t.hasAttribute('data-nfcancel')){ S.nf=null; render(); return; }
   if(t.dataset.nfedit){ const n=SYL[t.dataset.nfedit]; if(n){ S.nf={id:n.id,title:n.title||'',body:n.body||'',course:n.course||'all',pin:!!n.pin,busy:false,err:''}; render(); window.scrollTo(0,0); } return; }

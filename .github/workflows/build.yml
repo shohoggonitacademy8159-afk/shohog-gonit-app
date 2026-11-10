@@ -49,6 +49,7 @@ jobs:
         run: |
           npm ci
           npm run build
+          echo "window.SOHOG_BUILD=${{ github.run_number }};" > www/build.js
           npx cap sync android
 
       - name: APK তৈরি ও সই
