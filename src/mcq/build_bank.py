@@ -60,6 +60,17 @@ bank['p5s'] = {}   # ৫ম শ্রেণি বিজ্ঞান: প্র�
 for ch in range(1, 14):
     f = root / f'src/mcq/chx{ch}.json'
     if f.exists(): bank['p5s'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+# ৬ষ্ঠ–৮ম শ্রেণি গণিতের পাটিগণিত অংশে সংখ্যা বাংলা অঙ্কে (৫ম শ্রেণির উৎস-ফাইলেই বাংলা)
+BN_ARITH = {'c6': ['1', '2', '3'], 'c7': ['1', '2', '3'], 'c8': ['1', '2', '3']}
+_BN = str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯')
+def bn_arith(bank):
+    for c, chs in BN_ARITH.items():
+        for ch in chs:
+            for x in bank.get(c, {}).get(ch, []):
+                x['q'] = x['q'].translate(_BN); x['o'] = [o.translate(_BN) for o in x['o']]
+                if x.get('e'): x['e'] = x['e'].translate(_BN)
+                assert len(set(x['o'])) == len(x['o']), (c, ch, x['q'])
+bn_arith(bank)
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')   # মূল ব্যাংক (PDF এটি থেকে)
 # বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
 import re as _re
@@ -82,5 +93,6 @@ for (c, ch), items in sorted(_add.items()):
         x = dict(x); x['n'] = n0 + 1 + i
         if not x.get('ex'): x.pop('ex', None)
         cur.append(x)
+bn_arith(bank)
 (root / 'www/mcq.js').write_text('// সহগ গণিত একাডেমি — MCQ প্রশ্নব্যাংক (src/mcq/build_bank.py থেকে তৈরি)\nwindow.SOHOG_MCQ = ' + json.dumps(bank, ensure_ascii=False) + ';\n', encoding='utf-8')
 print({k: len(v) for k, v in bank['c10'].items()}); print('c10h', {k: len(v) for k, v in bank['c10h'].items()}); print('h11', {k: len(v) for k, v in bank['h11'].items()}); print('h12', {k: len(v) for k, v in bank['h12'].items()})
