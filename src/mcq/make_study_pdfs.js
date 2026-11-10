@@ -47,7 +47,9 @@ function mxHTML(s){ return String(s).replace(MX_DET,'|$1|').replace(MX_RE,(m,o,b
   const rows=body.match(new RegExp(MX_R,'g')).map(r=>r.trim().slice(1,-1).split(',').map(x=>x.trim())), n=rows[0].length;
   if(rows.some(r=>r.length!==n)||(o==='|'&&(rows.length<2||n<2))||(rows.length<2&&n<2)) return m;
   return `<span class="mx ${o==='['?'mx-m':'mx-d'}"><span class="mx-g" style="grid-template-columns:repeat(${n},auto)">${rows.flat().map(x=>`<span>${x}</span>`).join('')}</span></span>`; }); }
-const esc = s => mxHTML(esc0(s));
+const FR_RE = /(^|[^০-৯0-9.\/])([০-৯]+)\/([০-৯]+)(?![০-৯0-9\/])/g;
+const frHTML = s => s.replace(FR_RE, (m, pre, a, b) => `${pre}<span class="frc"><span>${a}</span><span>${b}</span></span>`);
+const esc = s => mxHTML(frHTML(esc0(s)));
 const L = ['ক', 'খ', 'গ', 'ঘ'];
 function html(c, cid, title, sub, data) {
   return `<!doctype html><html lang="bn"><head><meta charset="utf-8"><style>
@@ -60,6 +62,7 @@ body{font-family:'HS','Noto Sans','DejaVu Sans',sans-serif;color:#10233F;font-si
 .info{display:flex;gap:16px;font-size:9.5pt;color:#4A5B73;margin-bottom:10px}
 .cols{column-count:2;column-gap:9mm;column-rule:0.5px solid #D6E3F3}
 .q{break-inside:avoid;margin:0 0 9px}
+.frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 2px;font-size:.9em}.frc>span{padding:0 2px}.frc>span:first-child{border-bottom:1.2px solid #000}
 .mx{display:inline-flex;align-items:stretch;vertical-align:middle;margin:2px 3px;line-height:1.25}
 .mx::before,.mx::after{content:'';flex:0 0 auto;border:1.2px solid #000}
 .mx-m::before{width:4px;border-right:0}.mx-m::after{width:4px;border-left:0}
@@ -97,7 +100,7 @@ table.key td b{color:#1F5FBF}
       const qs = (bank[cid] || {})[String(ch)] || [];
       if (!qs.length) continue;
       const exs = c.exs[ch] || [];
-      const units = exs.length ? exs.map(ex => [ex, qs.filter(q => q.ex === ex), c.lessons && c.lessons[ex] ? `${c.lessons[ex][0]}: ${c.lessons[ex][1]}` : `অনুশীলনী ${exName(ex)}`]) : [['ch' + ch, qs.filter(q => !q.ex).length ? qs.filter(q => !q.ex) : qs, `অধ্যায় ${ch}`]];
+      const units = exs.length ? exs.map(ex => [ex, qs.filter(q => q.ex === ex), c.lessons && c.lessons[ex] ? `${c.lessons[ex][0]}: ${c.lessons[ex][1]}` : `অনুশীলনী ${exName(ex)}`]) : [['ch' + ch, qs.filter(q => !q.ex).length ? qs.filter(q => !q.ex) : qs, `অধ্যায় ${BN(ch)}`]];
       for (const [key, pool, title] of units) {
         if (pool.length < 10) continue;
         const data = pick(pool, cid + key, MIX[cid]);

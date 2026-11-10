@@ -12,9 +12,10 @@ def _clean(t):
     t = _re.sub(r'\^(\d+)', lambda m: m.group(1).translate(str.maketrans('0123456789', '⁰¹²³⁴⁵⁶⁷⁸⁹')), t)
     t = _re.sub(r'(?<![\d.])(\d+)/1(?![\d.])', r'\1', t)
     return t
+_BN = str.maketrans('0123456789', '০১২৩৪৫৬৭৮৯')   # ৫ম শ্রেণি: সব সংখ্যা বাংলায়
 def save(ch, items):
     for x in items:
-        x['q'] = _clean(x['q']); x['o'] = [_clean(o) for o in x['o']]; x['e'] = _clean(x['e'])
+        x['q'] = _clean(x['q']).translate(_BN); x['o'] = [_clean(o).translate(_BN) for o in x['o']]; x['e'] = _clean(x['e']).translate(_BN)
         assert len(set(x['o'])) == 4, x
     _save(ch, items)
 import re as _rw
