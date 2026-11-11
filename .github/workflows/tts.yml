@@ -13,9 +13,9 @@ jobs:
       - run: pip install edge-tts
       - run: |
           mkdir -p out
-          for V in bn-BD-NabanitaNeural bn-IN-TanishaaNeural; do
-            i=0
-            while IFS= read -r l; do i=$((i+1)); edge-tts --voice $V --rate=-4% --text "$l" --write-media out/${V}_$i.mp3; done < lines.txt
+          for cfg in "A bn-BD-NabanitaNeural +12% +10Hz" "B bn-BD-NabanitaNeural +8% +4Hz" "C bn-IN-TanishaaNeural +10% +8Hz"; do
+            set -- $cfg; i=0
+            while IFS= read -r l; do i=$((i+1)); edge-tts --voice $2 --rate=$3 --pitch=$4 --text "$l" --write-media out/$1_$i.mp3; done < lines.txt
           done
           ls -la out
       - run: |
