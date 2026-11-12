@@ -2078,8 +2078,12 @@ function bankAll(cid,no){
   const built=(((window.SOHOG_MCQ||{})[cid]||{})[String(no)]||[]).map(q=>{ const f=SYL[qfixId(cid,no,q.n)];
     if(!f||f.type!=='qfix') return q;
     return Object.assign({},q,f.del?{del:true}:{q:String(f.q||q.q),o:Array.isArray(f.o)&&f.o.length===4?f.o.map(String):q.o,a:+f.a>=0&&+f.a<4?+f.a:q.a,e:String(f.e==null?q.e||'':f.e),lv:QLV.indexOf(f.lv)>=0?f.lv:q.lv,ex:f.ex!=null&&f.ex!==''?String(f.ex):q.ex},{fixed:true}); });
-  return built.concat(customQs(cid,no));
+  const all=built.concat(customQs(cid,no));
+  return bnArith(cid,no)?all.map(q=>Object.assign({},q,{q:bnDig(q.q),o:(q.o||[]).map(bnDig),e:bnDig(q.e||'')})):all;
 }
+/* পাটিগণিত অংশে (৬ষ্ঠ–৮ম শ্রেণি অধ্যায় ১–৩, ৫ম শ্রেণি গণিত সব) সংখ্যা সবসময় বাংলা অঙ্কে — অ্যাডমিনের যোগ/সম্পাদনা করা প্রশ্নেও */
+const bnArith=(cid,no)=>cid==='p5'||(['c6','c7','c8'].includes(cid)&&+no>=1&&+no<=3);
+const bnDig=t=>String(t==null?'':t).replace(/[0-9]/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
 const bankFor=(cid,no)=>bankAll(cid,no).filter(q=>!q.del);
 const bankQ=(cid,ref)=>bankAll(cid,ref.ch).find(x=>x.n===ref.n);
 function examChapters(e){ return e.kind==='friday'?(e.chapters||[]):(e.units||unitsOf(e)); }
