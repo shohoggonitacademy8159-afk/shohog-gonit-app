@@ -126,6 +126,32 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .skill:first-child{border-top:0}
 .skill .row{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
+.cls-home{display:flex;flex-direction:column;gap:10px}.cls-home h2{margin:0;font-size:19px}
+.cls-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.cls-btn{position:relative;display:flex;align-items:center;gap:10px;min-height:74px;padding:12px;border:0;border-radius:18px;color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.14);transition:transform .15s}
+.cls-btn:active{transform:scale(.97)}
+.cls-btn.live{background:linear-gradient(135deg,#dc2626,#f97316)}.cls-btn.rec{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.cls-btn.is-on{animation:clsPulse 1.6s ease-in-out infinite}
+@keyframes clsPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+.cls-btn .cls-ic{font-size:26px;line-height:1}.cls-btn b{display:block;font-size:17px}.cls-btn small{display:block;font-size:12.5px;opacity:.92;line-height:1.35}
+.cls-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.cls-switch button{border:0;border-radius:12px;padding:11px 6px;font:inherit;font-weight:700;font-size:15.5px;background:transparent;color:var(--fg);cursor:pointer}
+.cls-switch button.on{background:var(--accent);color:#fff}
+.cls-grid{display:flex;flex-direction:column;gap:12px}
+.cls-card{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line);animation:clsIn .4s calc(var(--i)*60ms) both}
+@keyframes clsIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.cls-card.on{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15)}.cls-card.done{opacity:.8}
+.cls-card h3{margin:0;font-size:17.5px}.cls-card p{margin:0;font-size:14px}.cls-note{background:rgba(127,127,127,.08);border-radius:10px;padding:8px 10px}
+.cls-top{display:flex;flex-wrap:wrap;gap:6px}
+.cls-tag{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;border-radius:999px;padding:3px 10px;background:rgba(127,127,127,.14)}
+.cls-tag.on{background:#e53935;color:#fff}.cls-tag.on i{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+.cls-tag.soon{background:#f59e0b;color:#1a1a1a}.cls-tag.up{background:rgba(37,99,235,.14);color:#2563eb}.cls-tag.free{background:rgba(22,163,74,.14);color:#16a34a}
+@keyframes blink{50%{opacity:.2}}
+.cls-thumb{position:relative;display:block;border-radius:14px;overflow:hidden;aspect-ratio:16/9;background:#000}
+.cls-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.cls-thumb span{position:absolute;inset:0;margin:auto;width:58px;height:58px;border-radius:50%;background:rgba(220,38,38,.92);color:#fff;display:grid;place-items:center;font-size:24px;padding-left:4px}
+.cls-act{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.cls-act .btn{flex:1;display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;min-width:170px}
+
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 .tabbar nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));height:72px;align-items:center}
@@ -1141,6 +1167,7 @@ function vHome(){
     ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>অ্যাডমিন প্যানেল: রুটিন ও সিলেবাস প্রকাশ</span></button>`:''}
     ${updBanner()}${todayExamBanner()}
     ${myPkgBar()}
+    <section class="cls-home"><h2>🎥 লাইভ ও রেকর্ড ক্লাস</h2>${classBtns(hubCourse())}</section>
     ${SECTIONS.map(sec=>`<section class="panel">
       <div class="panel-head">${art(sec.art)}<h2>${sec.title}</h2><span class="rule"></span>
         <span class="chev" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
@@ -1862,7 +1889,7 @@ function softRender(){
     },()=>{ clearTimeout(timer); RSTATE='error'; softRender(); });
     db.collection('syllabus').onSnapshot(snap=>{
       const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); SYL=m; SYL_READY=true;
-      if(S.sf&&!S.sf.dirty) S.sf.vals=null; if(S.cf&&!S.cf.dirty) S.cf.vals=null; softRender();
+      if(S.sf&&!S.sf.dirty) S.sf.vals=null; if(S.cf&&!S.cf.dirty) S.cf.vals=null; softRender(); if(typeof scheduleExamNotifs==='function') scheduleExamNotifs();
     },()=>{});
   }catch(e){ clearTimeout(timer); RSTATE='off'; softRender(); }
 })();
@@ -2315,7 +2342,7 @@ function qReview(cid,ref,q,my,extra){
 function examTiles(cid){
   const nRes=myFirst(cid).length, nW=wrongList(cid).length, nF=Object.keys(S.fav||{}).filter(k=>k.split('|')[0]===cid).length;
   const t=(v,ic,l,n)=>`<button class="hub-tile" data-hub="${v}" data-hubc="${cid}">${svg(ic)}<span>${l}${n?` <small>${bn(n)}</small>`:''}</span></button>`;
-  return `<div class="hub-grid">
+  return `${classBtns(cid)}<div class="hub-grid">
     ${t('routine','calendar','রুটিন')}${t('xresults','check','ফলাফল',nRes)}
     ${t('xarchive','archive','আর্কাইভ')}${t('xfav','star','প্রিয়',nF+Object.keys(S.favx||{}).filter(k=>keyParts(k).course===cid).length)}
     ${t('xsyl','syl','সিলেবাস')}${t('xmerit','medal','মেধাতালিকা')}
@@ -2327,11 +2354,11 @@ const tabLabel=k=>`${COURSES[k].name.replace(' শ্রেণি','')} · ${Str
 /* শ্রেণির বাটন: সারি-কলামে রঙিন গ্রিড, লাইভ ব্যাজসহ (পরীক্ষা ও রুটিন পাতা) */
 const CG_COL=[['#2563eb','#60a5fa'],['#db2777','#f472b6'],['#059669','#34d399'],['#ea580c','#fb923c'],['#7c3aed','#a78bfa'],['#0891b2','#22d3ee'],['#ca8a04','#facc15'],['#dc2626','#f87171'],['#4f46e5','#818cf8'],['#16a34a','#86efac'],['#c026d3','#e879f9'],['#0d9488','#5eead4'],['#9333ea','#c084fc'],['#b45309','#f59e0b']];
 let CG_SEEN='';
-function classTabs(ids,active,attr,allLabel){
+function classTabs(ids,active,attr,allLabel,liveFn){
   const items=(allLabel?[['all',allLabel,'']]:[]).concat(ids.map(k=>[k,COURSES[k].name.replace(' শ্রেণি',''),String(COURSES[k].subj||'').replace(/ (১ম|২য়) পত্র/,' $1')]));
   const anim=CG_SEEN!==S.view+'|'+attr; CG_SEEN=S.view+'|'+attr;
-  return `<div class="cgrid ${anim?'cg-anim':''}" role="tablist" aria-label="শ্রেণি">${items.map(([k,n,sub],i)=>{ const on=k===active, live=k==='all'?false:liveToday(k), oi=OFFER_IDS().indexOf(k), c=k==='all'?['#334155','#64748b']:CG_COL[(oi<0?i:oi)%CG_COL.length];
-    return `<button role="tab" class="cg ${on?'on':''} ${live?'is-live':''}" style="--i:${i};--c1:${c[0]};--c2:${c[1]}" aria-selected="${on}" ${attr}="${k}">${live?'<span class="ctab-live" aria-label="লাইভ পরীক্ষা চলছে"><i></i>LIVE</span>':''}<b class="cg-n">${esc(n)}</b>${sub?`<span class="cg-s">${esc(sub)}</span>`:''}${on?'<span class="cg-ok" aria-hidden="true">✓</span>':''}</button>`; }).join('')}</div>`;
+  return `<div class="cgrid ${anim?'cg-anim':''}" role="tablist" aria-label="শ্রেণি">${items.map(([k,n,sub],i)=>{ const on=k===active, live=k==='all'?false:(liveFn||liveToday)(k), oi=OFFER_IDS().indexOf(k), c=k==='all'?['#334155','#64748b']:CG_COL[(oi<0?i:oi)%CG_COL.length];
+    return `<button role="tab" class="cg ${on?'on':''} ${live?'is-live':''}" style="--i:${i};--c1:${c[0]};--c2:${c[1]}" aria-selected="${on}" ${attr}="${k}">${live?`<span class="ctab-live" aria-label="${liveFn?'লাইভ ক্লাস চলছে':'লাইভ পরীক্ষা চলছে'}"><i></i>LIVE</span>`:''}<b class="cg-n">${esc(n)}</b>${sub?`<span class="cg-s">${esc(sub)}</span>`:''}${on?'<span class="cg-ok" aria-hidden="true">✓</span>':''}</button>`; }).join('')}</div>`;
 }
 /* শুক্রবার রিভিশনের সিলেবাস: ড্রপডাউনে */
 function sylDropdown(e,open){
@@ -2590,6 +2617,105 @@ async function saveNotice(){
   catch(e){ nf.busy=false; nf.err='প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
   render();
 }
+/* ===== লাইভ ক্লাস ও রেকর্ড ক্লাস: প্রতিটি শ্রেণির জন্য (syllabus সংগ্রহে type:'cls'; অ্যাডমিন লিংক দেন, শিক্ষার্থী দেখে) =====
+   kind:'live' → at (শুরুর সময়), dur (মিনিট) · kind:'rec' → ch (অধ্যায়, ০ = সাধারণ) · lock:'paid' হলে শুধু প্যাকেজধারীরা লিংক পাবে */
+const CLS_PRE=15*60000, CLS_DUR=[30,45,60,90,120,150];
+const clsAll=()=>Object.values(SYL).filter(r=>r.type==='cls'&&r.url&&COURSES[r.course]);
+const clsOf=(cid,kind)=>clsAll().filter(r=>r.course===cid&&r.kind===kind);
+function clsState(r){ const s=Date.parse(r.at), e=s+(+r.dur||60)*60000, n=Date.now();
+  return isNaN(s)?'up':n>=e?'done':n>=s?'on':n>=s-CLS_PRE?'soon':'up'; }
+const liveClassNow=cid=>clsOf(cid,'live').some(r=>['on','soon'].includes(clsState(r)));
+const clsLocked=r=>r.lock==='paid'&&!CAN_EDIT&&COURSES[r.course].offer&&!isFreeC(r.course)&&!pkgActive(r.course);
+const ytId=u=>{ const m=String(u||'').match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/)([\w-]{11})/); return m?m[1]:''; };
+const clsHost=u=>{ const h=(String(u).match(/^https?:\/\/([^/]+)/)||[])[1]||''; return /youtu/.test(h)?'YouTube':/facebook|fb\./.test(h)?'Facebook':/zoom/.test(h)?'Zoom':/meet\.google/.test(h)?'Google Meet':/drive\.google/.test(h)?'Google Drive':h.replace(/^www\./,''); };
+const clsCourse=()=>{ const ids=OFFER_IDS(); return ids.includes(S.clsC)?S.clsC:hubCourse(); };
+const cfInitC=()=>S.clf||(S.clf={id:'',kind:'live',title:'',url:'',date:todayISO(),time:'19:00',dur:'60',ch:'0',lock:'all',note:'',busy:false,err:''});
+/* কোর্স/পরীক্ষা পাতায় দুটি বড় বাটন */
+function classBtns(cid){
+  const lv=clsOf(cid,'live').filter(r=>clsState(r)!=='done'), on=liveClassNow(cid), nr=clsOf(cid,'rec').length;
+  const nx=lv.filter(r=>clsState(r)==='up').sort((a,b)=>String(a.at).localeCompare(String(b.at)))[0];
+  return `<div class="cls-btns">
+    <button class="cls-btn live ${on?'is-on':''}" data-cls="live" data-clsc="${cid}">${on?'<span class="live-badge"><i></i>লাইভ</span>':''}<span class="cls-ic" aria-hidden="true">🔴</span>
+      <span><b>লাইভ ক্লাস</b><small>${on?'এখনই যোগ দাও':nx?bn(fmtDT(nx.at)):'সময়সূচি দেখো'}</small></span></button>
+    <button class="cls-btn rec" data-cls="rec" data-clsc="${cid}"><span class="cls-ic" aria-hidden="true">🎬</span>
+      <span><b>রেকর্ড ক্লাস</b><small>${nr?bn(nr)+'টি ভিডিও':'ক্লাসের ভিডিও'}</small></span></button>
+  </div>`;
+}
+function clsCard(r,i){
+  const live=r.kind==='live', st=live?clsState(r):'', lk=clsLocked(r), yt=!live&&ytId(r.url);
+  const tag=live?(st==='on'?'<span class="cls-tag on"><i></i>লাইভ চলছে</span>':st==='soon'?'<span class="cls-tag soon">⏰ শীঘ্রই শুরু</span>':st==='done'?'<span class="cls-tag">শেষ হয়েছে</span>':'<span class="cls-tag up">আসন্ন</span>'):'';
+  const btn=lk?`<button class="btn outline" data-buy="${r.course}">🔒 প্যাকেজ নিলে দেখতে পাবে</button>`
+    :live&&st==='up'&&!CAN_EDIT?`<button class="btn ghost" disabled>শুরুর ১৫ মিনিট আগে লিংক খুলবে</button>`
+    :live&&st==='done'&&!CAN_EDIT?'':`<a class="btn ${live&&st!=='done'?'':'outline'}" href="${esc(r.url)}" target="_blank" rel="noopener">${live?(st==='done'?'লিংক খুলুন':'▶ ক্লাসে যোগ দাও'):'▶ ভিডিও দেখো'}</a>`;
+  return `<article class="cls-card ${st}" style="--i:${i}">
+    ${yt&&!lk?`<a class="cls-thumb" href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="ভিডিও দেখো"><img src="https://i.ytimg.com/vi/${yt}/hqdefault.jpg" alt="" loading="lazy"><span>▶</span></a>`:''}
+    <div class="cls-top">${tag}${r.lock==='paid'&&COURSES[r.course].offer&&!isFreeC(r.course)?'<span class="cls-tag">🔒 প্যাকেজধারীদের জন্য</span>':'<span class="cls-tag free">সবার জন্য</span>'}</div>
+    <h3>${esc(r.title||'ক্লাস')}</h3>
+    <p class="muted">${live?`🗓️ ${bn(fmtDT(r.at))} · ⏱ ${bn(+r.dur||60)} মিনিট`:`${+r.ch?'অধ্যায় '+bn(r.ch)+': '+esc((COURSES[r.course].chapters||[])[r.ch-1]||''):'সাধারণ'}`} · ${esc(clsHost(r.url))}</p>
+    ${r.note?`<p class="cls-note">${linkify(r.note)}</p>`:''}
+    <div class="cls-act">${btn}${CAN_EDIT?`<span class="nb-act"><button class="link" data-clsedit="${esc(r.id)}">সম্পাদনা</button><button class="link danger" data-clsdel="${esc(r.id)}">${S.clsArmed===r.id?'নিশ্চিত? আবার চাপো':'মুছুন'}</button></span>`:''}</div>
+  </article>`;
+}
+function clsForm(cid,kind){
+  const f=cfInitC(); if(!f.id){ f.kind=kind; }
+  const c=COURSES[cid], paid=c.offer&&!isFreeC(cid);
+  return `<section class="nb-form" aria-label="ক্লাস যোগ">
+    <h2>${f.id?'✏️ ক্লাস সম্পাদনা':kind==='live'?'🔴 নতুন লাইভ ক্লাস দিন':'🎬 নতুন রেকর্ড ক্লাস দিন'} <small class="muted" style="font-size:14px">· ${esc(c.name)} ${esc(c.subj||'')}</small></h2>
+    <div class="field"><label for="clT">শিরোনাম</label><input class="input" id="clT" data-clf="title" maxlength="120" placeholder="${kind==='live'?'যেমন: ত্রিকোণমিতি — অনুশীলনী ৯.১':'যেমন: বীজগাণিতিক সূত্র — পর্ব ১'}" value="${esc(f.title)}"></div>
+    <div class="field"><label for="clU">লিংক (${kind==='live'?'Zoom / Google Meet / ফেসবুক বা ইউটিউব লাইভ':'ইউটিউব / ফেসবুক / গুগল ড্রাইভ ভিডিও'})</label><input class="input" id="clU" data-clf="url" type="url" inputmode="url" maxlength="500" placeholder="https://…" value="${esc(f.url)}"></div>
+    ${kind==='live'?`<div class="nb-row"><div class="field" style="flex:1"><label for="clD">তারিখ</label><input class="input" id="clD" type="date" data-clf="date" value="${esc(f.date)}"></div>
+      <div class="field" style="flex:1"><label for="clTm">শুরুর সময়</label><input class="input" id="clTm" type="time" data-clf="time" value="${esc(f.time)}"></div>
+      <div class="field" style="flex:1"><label for="clDu">সময়কাল</label><select class="input" id="clDu" data-clf="dur">${CLS_DUR.map(m=>`<option value="${m}" ${+f.dur===m?'selected':''}>${bn(m)} মিনিট</option>`).join('')}</select></div></div>`
+    :`<div class="field"><label for="clCh">অধ্যায়</label><select class="input" id="clCh" data-clf="ch"><option value="0">সাধারণ / নির্দিষ্ট অধ্যায় নয়</option>${(c.chapters||[]).map((n,j)=>`<option value="${j+1}" ${+f.ch===j+1?'selected':''}>${bn(j+1)}. ${esc(n)}</option>`).join('')}</select></div>`}
+    ${paid?`<div class="field"><label for="clL">কারা দেখবে</label><select class="input" id="clL" data-clf="lock"><option value="all" ${f.lock!=='paid'?'selected':''}>সবাই (ফ্রী)</option><option value="paid" ${f.lock==='paid'?'selected':''}>শুধু প্যাকেজ নেওয়া শিক্ষার্থী</option></select></div>`:''}
+    <div class="field"><label for="clN">নোট (ঐচ্ছিক)</label><input class="input" id="clN" data-clf="note" maxlength="300" placeholder="যেমন: খাতা-কলম নিয়ে বসবে, পাসওয়ার্ড 1234" value="${esc(f.note)}"></div>
+    ${f.err?`<div class="error" role="alert">${esc(f.err)}</div>`:''}
+    <div class="nb-row"><button class="btn" data-clsave="${kind}" data-clsc="${cid}" ${f.busy?'disabled':''}>${f.busy?'প্রকাশ হচ্ছে…':f.id?'হালনাগাদ করো':'প্রকাশ করো'}</button>${f.id?`<button class="btn ghost" data-clcancel>বাতিল</button>`:''}</div>
+    <p class="muted" style="margin:0;font-size:13px">${kind==='live'?'প্রকাশ করলেই এই শ্রেণির শিক্ষার্থীরা দেখবে, আর ক্লাস শুরুর ১০ মিনিট আগে অ্যাপে নোটিফিকেশন পাবে।':'প্রকাশ করলেই এই শ্রেণির শিক্ষার্থীরা রেকর্ড ক্লাসে ভিডিওটি দেখবে।'}</p>
+  </section>`;
+}
+function vClass(kind){
+  const ids=OFFER_IDS(), cid=clsCourse(), c=COURSES[cid], live=kind==='live';
+  const list=clsOf(cid,kind);
+  let body;
+  if(live){
+    const by=s=>list.filter(r=>clsState(r)===s);
+    const cur=by('on').concat(by('soon')), up=by('up').sort((a,b)=>String(a.at).localeCompare(String(b.at))),
+      past=by('done').filter(r=>CAN_EDIT||Date.now()-Date.parse(r.at)<3*DAYMS).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+    let i=0;
+    body=(cur.length?`<h2 class="xa-h">এখন চলছে</h2>${cur.map(r=>clsCard(r,i++)).join('')}`:'')
+      +(up.length?`<h2 class="xa-h">আসন্ন লাইভ ক্লাস</h2>${up.map(r=>clsCard(r,i++)).join('')}`:'')
+      +(past.length?`<h2 class="xa-h">শেষ হওয়া ক্লাস</h2>${past.map(r=>clsCard(r,i++)).join('')}<p class="muted" style="text-align:center;font-size:13.5px;margin:0">ক্লাসের ভিডিও পরে "রেকর্ড ক্লাস"-এ পাবে।</p>`:'');
+    if(!cur.length&&!up.length&&!past.length) body=`<div class="empty">📅 এই শ্রেণির জন্য এখনো কোনো লাইভ ক্লাস নির্ধারিত হয়নি।${CAN_EDIT?' উপরের ফর্মে লিংক দিয়ে প্রথম ক্লাস দিন।':' নতুন ক্লাস এলে এখানে আর নোটিফিকেশনে জানতে পারবে।'}</div>`;
+  } else {
+    const groups={}; list.forEach(r=>{ const k=+r.ch||0; (groups[k]=groups[k]||[]).push(r); });
+    const keys=Object.keys(groups).map(Number).sort((a,b)=>(a||999)-(b||999)); let i=0;
+    body=keys.length?keys.map(k=>`<h2 class="xa-h">${k?`অধ্যায় ${bn(k)}: ${esc((c.chapters||[])[k-1]||'')}`:'সাধারণ'}</h2><div class="cls-grid">${groups[k].sort((a,b)=>String(a.at||'').localeCompare(String(b.at||''))).map(r=>clsCard(r,i++)).join('')}</div>`).join('')
+      :`<div class="empty">🎬 এই শ্রেণির জন্য এখনো কোনো রেকর্ড ক্লাস যোগ হয়নি।${CAN_EDIT?' উপরের ফর্মে ভিডিওর লিংক দিয়ে যোগ করুন।':''}</div>`;
+  }
+  return `<div class="screen xa">
+    <div class="topbar"><button class="iconbtn" data-go="${S.clsFrom||'home'}" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>${live?'লাইভ ক্লাস':'রেকর্ড ক্লাস'}</h1><span style="width:44px"></span></div>
+    <div class="cls-switch" role="tablist"><button class="${live?'on':''}" data-cls="live" data-clsc="${cid}" role="tab" aria-selected="${live}">🔴 লাইভ ক্লাস</button><button class="${live?'':'on'}" data-cls="rec" data-clsc="${cid}" role="tab" aria-selected="${!live}">🎬 রেকর্ড ক্লাস</button></div>
+    <p style="margin:0;text-align:center;font-weight:600;color:var(--accent)">${c.name}${c.sub?' ('+c.sub+')':''} · ${c.subj||''}</p>
+    ${ids.length>1?classTabs(ids,cid,'data-clsc',null,live?liveClassNow:null):''}
+    ${CAN_EDIT?clsForm(cid,kind):''}
+    ${body}
+  </div>`;
+}
+async function saveClass(kind,cid){
+  const f=cfInitC(), title=String(f.title||'').trim(), url=String(f.url||'').trim();
+  if(!title){ f.err='শিরোনাম লিখুন।'; return render(); }
+  if(!/^https?:\/\/\S+\.\S+/.test(url)){ f.err='সঠিক লিংক দিন (https:// দিয়ে শুরু)।'; return render(); }
+  let at='';
+  if(kind==='live'){ const d=new Date(`${f.date}T${f.time||'00:00'}`); if(!f.date||isNaN(d)){ f.err='তারিখ ও সময় দিন।'; return render(); } at=d.toISOString(); }
+  f.busy=true; f.err=''; render();
+  const id=f.id||('cls_'+kind+'_'+Date.now().toString(36)), old=SYL[id], now=new Date().toISOString();
+  const doc={type:'cls',kind,course:old?old.course:cid,title:title.slice(0,120),url:url.slice(0,500),note:String(f.note||'').trim().slice(0,300),lock:f.lock==='paid'?'paid':'all',createdAt:old&&old.createdAt||now,updatedAt:now};
+  if(kind==='live'){ doc.at=at; doc.dur=+f.dur||60; } else { doc.ch=+f.ch||0; doc.at=old&&old.at||now; }
+  try{ await DB.collection('syllabus').doc(id).set(doc); S.clf=null; toast(old?'ক্লাস হালনাগাদ হয়েছে':'ক্লাস প্রকাশ হয়েছে'); }
+  catch(e){ f.busy=false; f.err='প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
+  render();
+}
 /* ===== লোকাল নোটিফিকেশন (সার্ভার ছাড়া; শুধু অ্যান্ড্রয়েড অ্যাপে) ===== */
 var NTF=window.SohogNotify||null, NTF_KEY='sohog-ntf';
 var NTF_ST=(()=>{ try{ return JSON.parse(localStorage.getItem(NTF_KEY))||{}; }catch(e){ return {}; } })(), NTF_T=null, NTF_TAP=false;
@@ -2610,7 +2736,7 @@ function ntfHead(e){ const c=COURSES[e.course]; return `${c.name.replace(' শ�
 function scheduleExamNotifs(){ if(!NTF||!NTF.native) return; clearTimeout(NTF_T); NTF_T=setTimeout(scheduleExamNotifsNow,800); }
 async function scheduleExamNotifsNow(){
   if(!NTF||!NTF.native||RSTATE!=='ready') return;
-  if(!NTF_TAP){ NTF_TAP=true; NTF.onTap(x=>{ if(x&&x.go==='notice') return go('notice'); if(x&&x.go==='downloads') return go('downloads'); if(x&&x.go==='admin'&&CAN_EDIT){ S.atab=x.tab||'pay'; return go('admin'); } if(x&&x.course&&COURSES[x.course]){ S.hubCourse=x.course; S.hubFrom='home'; go('exams'); } }); }
+  if(!NTF_TAP){ NTF_TAP=true; NTF.onTap(x=>{ if(x&&x.go==='notice') return go('notice'); if(x&&x.go==='lclass'){ S.clsC=x.course; S.clsFrom='home'; return go('lclass'); } if(x&&x.go==='downloads') return go('downloads'); if(x&&x.go==='admin'&&CAN_EDIT){ S.atab=x.tab||'pay'; return go('admin'); } if(x&&x.course&&COURSES[x.course]){ S.hubCourse=x.course; S.hubFrom='home'; go('exams'); } }); }
   if(SYL_READY){ const nl=noticeList(), mx=noticeMax(nl);
     if(NTF_ST.noticeAt===undefined) NTF_ST.noticeAt=mx;
     else if(mx>NTF_ST.noticeAt){ const mine=ntfCourses(), fr=nl.filter(n=>String(n.at)>NTF_ST.noticeAt&&(n.course==='all'||mine.includes(n.course)));
@@ -2634,6 +2760,9 @@ async function scheduleExamNotifsNow(){
     if(seen&&!seen.includes(k)&&e.date>today) fresh.push(e);
   }));
   if(fresh.length){ const e=fresh[0]; list.push({id:ntfId('new#'+examKey(e)),title:fresh.length>1?`🆕 ${bn(fresh.length)}টি নতুন পরীক্ষা নির্ধারিত হয়েছে`:`🆕 নতুন পরীক্ষা: ${bnD(parseD(e.date)).split(',')[0]}`,body:`${ntfHead(e)}\nসিলেবাস: ${ntfSyl(e)}`,extra:{course:e.course}}); }
+  ntfCourses().forEach(cid=>clsOf(cid,'live').forEach(r=>{ const st=Date.parse(r.at), at=st-10*60000;
+    if(isNaN(st)||clsLocked(r)||at<=now||st-now>8*DAYMS) return;
+    list.push({id:ntfId('cls#'+r.id+'#'+r.at),at,title:`🔴 ১০ মিনিট পর লাইভ ক্লাস: ${r.title||''}`,body:`${ntfHead({course:cid})}\nশুরু ${bn(fmtDT(r.at))} · এখনই প্রস্তুত হও!`,extra:{go:'lclass',course:cid}}); }));
   const ids=list.filter(n=>n.at).map(n=>n.id), drop=old.filter(id=>!ids.includes(id));
   if(drop.length) await NTF.cancel(drop);
   const ok=await NTF.schedule(list);
@@ -3505,14 +3634,14 @@ setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 
 const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','রিপোর্ট','report'],['notice','নোটিশ','bell'],['downloads','ডাউনলোড','download'],['profile','আরো','grid']];
 function renderTabs(){
-  const active = S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view==='chub'?'home':S.view==='free'?(S.freeFrom==='play'?'play':'home'):S.view;
+  const active = ['lclass','rclass'].includes(S.view)?(S.clsFrom==='exams'?'exams':S.clsFrom==='play'?'play':'home'):S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view==='chub'?'home':S.view==='free'?(S.freeFrom==='play'?'play':'home'):S.view;
   const live=OFFER_IDS().some(liveToday), nun=noticeUnread();
   tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}${v==='downloads'&&UPD?'<i class="tab-dot" aria-label="অ্যাপের নতুন সংস্করণ"></i>':''}${v==='notice'&&nun?`<i class="tab-num" aria-label="${bn(nun)}টি নতুন নোটিশ">${nun>9?'৯+':bn(nun)}</i>`:''}</span>${l}</button>`).join('');
 }
 function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
-  const V={notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={lclass:()=>vClass('live'),rclass:()=>vClass('rec'),notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   const gate=needAuth(); if(gate){ tabbar.hidden=true; app.innerHTML=vAuth(); return; }
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
@@ -3668,6 +3797,12 @@ app.addEventListener('click',e=>{
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
   if(t.hasAttribute('data-xfbriti')){ const xf=xfInit(), c=COURSES[xf.course]; Object.assign(xf,{title:`বৃত্তি মডেল টেস্ট (${c.subj})`, marks:'50', mins:'50', units:c.chapters.map((_,i)=>String(i+1)), syllabus:'পূর্ণ সিলেবাস', aud:'paid'}); render(); toast('বৃত্তি মডেল টেস্ট ফর্মে বসানো হয়েছে; তারিখ দেখে প্রকাশ করুন'); return; }
   if(t.hasAttribute('data-updcheck')){ checkUpdate(true); render(); return; }
+  if(t.dataset.cls){ S.clsC=t.dataset.clsc||S.clsC; if(!['lclass','rclass'].includes(S.view)) S.clsFrom=S.view; if(S.clf&&!S.clf.id) S.clf=null; return go(t.dataset.cls==='live'?'lclass':'rclass'); }
+  if(t.dataset.clsave){ saveClass(t.dataset.clsave,t.dataset.clsc); return; }
+  if(t.dataset.clsc){ S.clsC=t.dataset.clsc; if(S.clf&&!S.clf.id) S.clf=null; render(); return; }
+  if(t.hasAttribute('data-clcancel')){ S.clf=null; render(); return; }
+  if(t.dataset.clsedit){ const r=SYL[t.dataset.clsedit]; if(r){ const d=new Date(r.at||Date.now()), l=localDT(d); S.clsC=r.course; S.clf={id:r.id,kind:r.kind,title:r.title||'',url:r.url||'',date:l.slice(0,10),time:l.slice(11,16),dur:String(r.dur||60),ch:String(r.ch||0),lock:r.lock||'all',note:r.note||'',busy:false,err:''}; return go(r.kind==='live'?'lclass':'rclass'); } return; }
+  if(t.dataset.clsdel){ const id=t.dataset.clsdel; if(S.clsArmed===id){ S.clsArmed=''; DB.collection('syllabus').doc(id).delete().then(()=>toast('ক্লাস মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); } else { S.clsArmed=id; render(); } return; }
   if(t.hasAttribute('data-nfsave')){ saveNotice(); return; }
   if(t.hasAttribute('data-nfcancel')){ S.nf=null; render(); return; }
   if(t.dataset.nfedit){ const n=SYL[t.dataset.nfedit]; if(n){ S.nf={id:n.id,title:n.title||'',body:n.body||'',course:n.course||'all',pin:!!n.pin,busy:false,err:''}; render(); window.scrollTo(0,0); } return; }
@@ -3745,6 +3880,7 @@ app.addEventListener('click',e=>{
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.nf){ nfInit()[t.dataset.nf]=t.type==='checkbox'?t.checked:t.value; }
+  if(t.dataset.clf){ cfInitC()[t.dataset.clf]=t.value; }
   if(t.dataset.payf&&S.buy){ S.buy[t.dataset.payf]=t.value; }
   if(t.dataset.pcf&&t.type!=='checkbox'){ pcInit()[t.dataset.pcf]=t.value; }
   if(t.dataset.rfday){ rfInit().vals[t.dataset.rfday]=t.value; }
