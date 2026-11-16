@@ -53,19 +53,35 @@ const FR_TOK=/[0-9০-৯A-Za-zα-ωΑ-Ωθπ√′°!₀-₉ₐ-ₜ⁰-⁹ⁿ¹
 const FR_UN=/^(k?m|cm|mm|k?g|mg|k?J|k?W|N|Pa|mol|m?L|rad)$/, FR_UD=/^(s|s²|h|hr|min|m|m²|m³|cm|cm²|cm³|kg|g|L|mL|mol|K)$/;
 function frMatch(s,i,dir,o,c){ let d=0; for(let k=i;k>=0&&k<s.length;k+=dir){ if(s[k]===c) d++; else if(s[k]===o) d--; if(d===0) return k; } return -1; }
 function frLeft(s,i){ let j=i-1; if(j<0) return null;
-  if(s[j]===')'){ const k=frMatch(s,j,-1,'(',')'); if(k<0) return null; let a=k; while(a>0&&FR_TOK.test(s[a-1])&&s[a-1]!=='.') a--; return {L:a,t:a===k?s.slice(k+1,j):s.slice(a,j+1),g:a===k}; }
+  if(s[j]===')'&&!(s[frMatch(s,j,-1,'(',')')-1]==='^')){ const k=frMatch(s,j,-1,'(',')'); if(k<0) return null; let a=k; while(a>0&&FR_TOK.test(s[a-1])&&s[a-1]!=='.') a--; return {L:a,t:a===k?s.slice(k+1,j):s.slice(a,j+1),g:a===k}; }
   if(s[j]==='|'){ const k=s.lastIndexOf('|',j-1); if(k<0||j-k<2) return null; return {L:k,t:s.slice(k,j+1)}; }
-  let a=j; while(a>=0&&FR_TOK.test(s[a])&&s[a]!=='.'||a>=0&&s[a]==='.'&&/[0-9০-৯]/.test(s[a-1]||'')&&/[0-9০-৯]/.test(s[a+1]||'')) a--;
+  let a=j; for(;;){ if(a<0) break;
+    if(s[a]===')'){ const k=frMatch(s,a,-1,'(',')'); if(k>0&&s[k-1]==='^'){ a=k-2; continue; } break; }
+    if(s[a]==='^'&&a<j){ a--; continue; }
+    if(FR_TOK.test(s[a])&&s[a]!=='.'||s[a]==='.'&&/[0-9০-৯]/.test(s[a-1]||'')&&/[0-9০-৯]/.test(s[a+1]||'')){ a--; continue; } break; }
   if(a===j) return null; if(a>=0&&(s[a]==='/'||FR_BN.test(s[a]))) return null; return {L:a+1,t:s.slice(a+1,j+1)}; }
 function frRight(s,i){ let k=i+1; if(k>=s.length) return null; let sg='';
   if(s[k]==='−'||s[k]==='-'){ sg=s[k]; k++; }
   if(s[k]==='('){ const e=frMatch(s,k,1,')','('); if(e<0) return null; let z=e+1; while(z<s.length&&/[⁰-⁹²³¹ⁿ]/.test(s[z])) z++;
     const inner=frHTML(s.slice(k+1,e)); return z>e+1||sg?{R:z,t:sg+'('+inner+')'+s.slice(e+1,z)}:{R:z,t:inner,g:true}; }
   if(s[k]==='|'){ const e=s.indexOf('|',k+1); if(e<0||e-k<2) return null; return {R:e+1,t:sg+s.slice(k,e+1)}; }
-  let e=k; while(e<s.length&&(FR_TOK.test(s[e])&&s[e]!=='.'||s[e]==='.'&&/[0-9০-৯]/.test(s[e-1]||'')&&/[0-9০-৯]/.test(s[e+1]||''))) e++;
+  let e=k; while(e<s.length){
+    if(s[e]==='^'&&e>k){ if(s[e+1]==='('){ const z=frMatch(s,e+1,1,')','('); if(z<0) break; e=z+1; continue; } if(/[−\-0-9০-৯A-Za-zθπ]/.test(s[e+1]||'')){ e+=2; continue; } break; }
+    if(FR_TOK.test(s[e])&&s[e]!=='.'||s[e]==='.'&&/[0-9০-৯]/.test(s[e-1]||'')&&/[0-9০-৯]/.test(s[e+1]||'')){ e++; continue; } break; }
   if(e===k) return null;
   if(s[e]==='('&&/[A-Za-zθ]/.test(s[e-1])){ const z=frMatch(s,e,1,')','('); if(z>0){ const inner=frHTML(s.slice(e+1,z)); return {R:z+1,t:sg+s.slice(k,e)+'('+inner+')'}; } }
   if(e<s.length&&(s[e]==='/'||FR_BN.test(s[e]))) return null; return {R:e,t:sg+s.slice(k,e)}; }
+/* ঘাত: a^(1/n), 2^3, x^n → উপরে ছোট করে (sup) */
+const SUP_U='⁰¹²³⁴⁵⁶⁷⁸⁹⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ', SUP_A='0123456789−abcdefghijklmnoprstuvwxyz';
+const supU=t=>[...t].map(c=>SUP_A[[...SUP_U].indexOf(c)]).join('');
+function supHTML(s){ s=String(s).replace(/([⁰¹²³⁴-⁹⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ]+)\/([⁰¹²³⁴-⁹⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ]+)/g,(m,a,b)=>`<sup class="sp"><span class="frc"><span>${supU(a)}</span><span>${supU(b)}</span></span></sup>`); let i=0;
+  while((i=s.indexOf('^',i))!==-1){
+    if(i===0||/\s/.test(s[i-1])){ i++; continue; }
+    let e, t;
+    if(s[i+1]==='('){ const z=frMatch(s,i+1,1,')','('); if(z<0){ i++; continue; } e=z+1; t=s.slice(i+2,z); }
+    else { const m=s.slice(i+1).match(/^[−\-]?[0-9০-৯]+|^[A-Za-zθπ]/); if(!m){ i++; continue; } e=i+1+m[0].length; t=m[0]; }
+    const h=`<sup class="sp">${t}</sup>`; s=s.slice(0,i)+h+s.slice(e); i+=h.length; }
+  return s; }
 function frHTML(s){ s=String(s); let i=0;
   while((i=s.indexOf('/',i))!==-1){
     if(/\S*:\/\/\S*$/.test(s.slice(Math.max(0,i-80),i))){ i++; continue; }
@@ -77,7 +93,7 @@ function frHTML(s){ s=String(s); let i=0;
     s=s.slice(0,l.L)+h+s.slice(r.R); i=l.L+h.length;
   }
   return s; }
-const esc = s => mxHTML(frHTML(esc0(s)));
+const esc = s => mxHTML(supHTML(frHTML(esc0(s))));
 const L = ['ক', 'খ', 'গ', 'ঘ'];
 function html(c, cid, title, sub, data) {
   return `<!doctype html><html lang="bn"><head><meta charset="utf-8"><style>
@@ -90,7 +106,7 @@ body{font-family:'HS','Noto Sans','DejaVu Sans',sans-serif;color:#10233F;font-si
 .info{display:flex;gap:16px;font-size:9.5pt;color:#4A5B73;margin-bottom:10px}
 .cols{column-count:2;column-gap:9mm;column-rule:0.5px solid #D6E3F3}
 .q{break-inside:avoid;margin:0 0 9px}
-.frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 2px;font-size:.9em}.frc>span{padding:0 2px}.frc>span:first-child{border-bottom:1.2px solid #000}
+.sp{display:inline-block;font-size:.7em;line-height:1;vertical-align:.55em;margin-left:1px}.sp .frc{font-size:1em;vertical-align:bottom;line-height:1}.sp .frc>span:first-child{border-bottom-width:1px}.frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 2px;font-size:.9em}.frc>span{padding:0 2px}.frc>span:first-child{border-bottom:1.2px solid #000}
 .mx{display:inline-flex;align-items:stretch;vertical-align:middle;margin:2px 3px;line-height:1.25}
 .mx::before,.mx::after{content:'';flex:0 0 auto;border:1.2px solid #000}
 .mx-m::before{width:4px;border-right:0}.mx-m::after{width:4px;border-left:0}
