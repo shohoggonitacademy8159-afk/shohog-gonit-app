@@ -903,9 +903,36 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 /* ম্যাট্রিক্স [(9, 2, 1), (5, −1, 6)] → বন্ধনীসহ ছক; নির্ণায়ক |(9, 2), (5, −1)| → খাড়া দাগসহ ছক */
 const MX_E='[^()\\[\\],|]+', MX_R=`\\(\\s*${MX_E}(?:\\s*,\\s*${MX_E})*\\s*\\)`, MX_RE=new RegExp(`([\\[|])\\s*(${MX_R}(?:\\s*,\\s*${MX_R})*)\\s*([\\]|])`,'g');
 const MX_DET=new RegExp(`\\|\\s*\\[\\s*(${MX_R}(?:\\s*,\\s*${MX_R})*)\\s*\\]\\s*\\|`,'g');
-/* বাংলা অঙ্কের ভগ্নাংশ ৩/৫ → লব উপরে, হর নিচে (মাঝে দাগ) */
-const FR_RE=/(^|[^০-৯0-9.\/])([০-৯]+)\/([০-৯]+)(?![০-৯0-9\/])/g;
-const frHTML=s=>s.replace(FR_RE,(m,pre,a,b)=>`${pre}<span class="frc" role="math" aria-label="${a} ভাগ ${b}"><span>${a}</span><span>${b}</span></span>`);
+/* ভগ্নাংশ a/b → লব উপরে, হর নিচে (মাঝে দাগ)। সংখ্যা, চলক (x, sinθ, m₁m₂, R²), বন্ধনী (x+1)/(x−1), পরম মান |A| — সব।
+   বাংলা শব্দ (ও/বা, মি/সে), একক (km/h, m/s), তারিখ (১২/০৩/২০২৪) বাদ। */
+const FR_TOK=/[0-9০-৯A-Za-zα-ωΑ-Ωθπ√′°!₀-₉ₐ-ₜ⁰-⁹ⁿ¹²³⁺⁻·.]/, FR_BN=/[ঀ-৥ৰ-৿]/;
+const FR_UN=/^(k?m|cm|mm|k?g|mg|k?J|k?W|N|Pa|mol|m?L|rad)$/, FR_UD=/^(s|s²|h|hr|min|m|m²|m³|cm|cm²|cm³|kg|g|L|mL|mol|K)$/;
+function frMatch(s,i,dir,o,c){ let d=0; for(let k=i;k>=0&&k<s.length;k+=dir){ if(s[k]===c) d++; else if(s[k]===o) d--; if(d===0) return k; } return -1; }
+function frLeft(s,i){ let j=i-1; if(j<0) return null;
+  if(s[j]===')'){ const k=frMatch(s,j,-1,'(',')'); if(k<0) return null; let a=k; while(a>0&&FR_TOK.test(s[a-1])&&s[a-1]!=='.') a--; return {L:a,t:a===k?s.slice(k+1,j):s.slice(a,j+1),g:a===k}; }
+  if(s[j]==='|'){ const k=s.lastIndexOf('|',j-1); if(k<0||j-k<2) return null; return {L:k,t:s.slice(k,j+1)}; }
+  let a=j; while(a>=0&&FR_TOK.test(s[a])&&s[a]!=='.'||a>=0&&s[a]==='.'&&/[0-9০-৯]/.test(s[a-1]||'')&&/[0-9০-৯]/.test(s[a+1]||'')) a--;
+  if(a===j) return null; if(a>=0&&(s[a]==='/'||FR_BN.test(s[a]))) return null; return {L:a+1,t:s.slice(a+1,j+1)}; }
+function frRight(s,i){ let k=i+1; if(k>=s.length) return null; let sg='';
+  if(s[k]==='−'||s[k]==='-'){ sg=s[k]; k++; }
+  if(s[k]==='('){ const e=frMatch(s,k,1,')','('); if(e<0) return null; let z=e+1; while(z<s.length&&/[⁰-⁹²³¹ⁿ]/.test(s[z])) z++;
+    const inner=frHTML(s.slice(k+1,e)); return z>e+1||sg?{R:z,t:sg+'('+inner+')'+s.slice(e+1,z)}:{R:z,t:inner,g:true}; }
+  if(s[k]==='|'){ const e=s.indexOf('|',k+1); if(e<0||e-k<2) return null; return {R:e+1,t:sg+s.slice(k,e+1)}; }
+  let e=k; while(e<s.length&&(FR_TOK.test(s[e])&&s[e]!=='.'||s[e]==='.'&&/[0-9০-৯]/.test(s[e-1]||'')&&/[0-9০-৯]/.test(s[e+1]||''))) e++;
+  if(e===k) return null;
+  if(s[e]==='('&&/[A-Za-zθ]/.test(s[e-1])){ const z=frMatch(s,e,1,')','('); if(z>0){ const inner=frHTML(s.slice(e+1,z)); return {R:z+1,t:sg+s.slice(k,e)+'('+inner+')'}; } }
+  if(e<s.length&&(s[e]==='/'||FR_BN.test(s[e]))) return null; return {R:e,t:sg+s.slice(k,e)}; }
+function frHTML(s){ s=String(s); let i=0;
+  while((i=s.indexOf('/',i))!==-1){
+    if(/\S*:\/\/\S*$/.test(s.slice(Math.max(0,i-80),i))){ i++; continue; }
+    const l=frLeft(s,i), r=l&&frRight(s,i);
+    const tx=x=>String(x).replace(/<[^>]*>/g,''), bad=!l||!r||(!l.g&&FR_BN.test(tx(l.t)))||(!r.g&&FR_BN.test(tx(r.t)))||(FR_UN.test(l.t)&&FR_UD.test(r.t))||(l.L>0&&s[l.L-1]==='/');
+    if(bad){ i++; continue; }
+    const lab=(l.t+' ভাগ '+r.t).replace(/<[^>]*>/g,'').replace(/[()\[\],|"']/g,' ');
+    const h=`<span class="frc" role="math" aria-label="${lab}"><span>${l.t}</span><span>${r.t}</span></span>`;
+    s=s.slice(0,l.L)+h+s.slice(r.R); i=l.L+h.length;
+  }
+  return s; }
 function mxHTML(s){ return frHTML(String(s)).replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
   const rows=body.match(new RegExp(MX_R,'g')).map(r=>r.trim().slice(1,-1).split(',').map(x=>x.trim())), n=rows[0].length;
   if(rows.some(r=>r.length!==n)||(o==='|'&&(rows.length<2||n<2))||(rows.length<2&&n<2)) return m;
