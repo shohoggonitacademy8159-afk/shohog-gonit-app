@@ -145,6 +145,17 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .skill:first-child{border-top:0}
 .skill .row{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
+.pc-card{display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:20px;background:var(--surface);border:1.5px solid var(--line);text-align:center}
+.pc-ic{font-size:44px;line-height:1}
+.pc-link{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:14px;background:rgba(37,99,235,.08);border:1px dashed rgba(37,99,235,.4)}
+.pc-link span{flex:1;min-width:0;word-break:break-all;font-weight:700;font-size:14px;text-align:left;color:var(--accent)}
+.pc-link .btn{flex:none;min-height:40px;padding:0 16px}
+.pc-ok{font-weight:700;color:#16a34a}
+.pc-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.pc-step{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.pc-step b{display:block;margin-bottom:2px}.pc-step .muted{font-size:14px;line-height:1.5}
+.pc-n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+
 .cls-home{display:flex;flex-direction:column;gap:10px}.cls-home h2{margin:0;font-size:19px}
 .cls-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}
 .cls-btn{position:relative;display:flex;align-items:center;gap:10px;min-height:74px;padding:12px;border:0;border-radius:18px;color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.14);transition:transform .15s}
@@ -957,6 +968,7 @@ function mxHTML(s){ return supHTML(frHTML(String(s))).replace(MX_DET,'|$1|').rep
 const mq=s=>mxHTML(esc(s));
 
 const ICONS = {
+  monitor:'<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M9 20h6M12 16.5V20"/>',
   download:'<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/>',
   wallet:'<rect x="3.5" y="6" width="17" height="13" rx="2.5"/><path d="M16 12.5h4.5M6.5 6l9-2.5 1 2.5"/>',
   flag:'<path d="M6 21V4M6 4h10.5l-2 4 2 4H6"/>',
@@ -1603,6 +1615,8 @@ function vProfile(){
       ${item('data-go="downloads"','download','c-teal','ডাউনলোড','ফলাফল ফাইল ও এপের নতুন সংস্করণ')}
       ${NTF&&NTF.native?item('data-ntftoggle','bell','c-amber',`নোটিফিকেশন: ${S.ntfOff?'বন্ধ':'চালু'}`,CAN_EDIT?'নতুন পেমেন্ট ও রিপোর্ট এলে জানানো হবে':'লাইভ পরীক্ষা নির্ধারিত হলে ও চলার দিন জানানো হবে'):''}
     </div>
+    <h3 class="m-sec">কম্পিউটার</h3>
+    <div class="list">${item('data-go="pc"','monitor','c-blue','কম্পিউটারে (পিসি/ল্যাপটপ) খুলুন','লিংক, ইনস্টল ও লগইনের নিয়ম')}</div>
     <h3 class="m-sec">সাহায্য এবং নীতি</h3>
     <div class="list">
       ${item('data-go="feedback"','flag','c-red','সমস্যা সম্পর্কে বিস্তারিত লিখে জানাও…','সরাসরি শিক্ষকের কাছে যাবে')}
@@ -2711,6 +2725,35 @@ async function saveNotice(){
   catch(e){ nf.busy=false; nf.err='প্রকাশ করা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'; }
   render();
 }
+/* ===== কম্পিউটারে ব্যবহার: ওয়েব সংস্করণ (GitHub Pages) + "অ্যাপ হিসেবে ইনস্টল" ===== */
+const WEB_URL='https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/';
+let PWA_EVT=null;
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); PWA_EVT=e; if(S.view==='pc') render(); });
+window.addEventListener('appinstalled',()=>{ PWA_EVT=null; toast('কম্পিউটারে অ্যাপ ইনস্টল হয়েছে'); if(S.view==='pc') render(); });
+if(!isNative()&&'serviceWorker' in navigator&&location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(()=>{});
+const pcInstalled=()=>!isNative()&&(matchMedia('(display-mode: standalone)').matches||navigator.standalone);
+function vPc(){
+  const web=!isNative(), step=(n,t,d)=>`<li class="pc-step"><span class="pc-n">${bn(n)}</span><div><b>${t}</b><span class="muted">${d}</span></div></li>`;
+  return `<div class="screen">
+    <div class="topbar"><button class="iconbtn" data-go="profile" aria-label="ফিরে যাও">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><h1>কম্পিউটারে খুলুন</h1><span style="width:44px"></span></div>
+    <section class="pc-card">
+      <div class="pc-ic" aria-hidden="true">💻</div>
+      <p style="margin:0">একই অ্যাকাউন্ট দিয়ে কম্পিউটার বা ল্যাপটপের ব্রাউজার থেকে অ্যাপটি চালানো যায়। ফোনে যা করবেন, কম্পিউটারেও তাই দেখা যাবে।</p>
+      <div class="pc-link"><span>${WEB_URL.replace('https://','')}</span><button class="btn" data-paycopy="${WEB_URL}">কপি</button></div>
+      ${web?(pcInstalled()?`<div class="pc-ok">✅ এই কম্পিউটারে অ্যাপ হিসেবে চালু আছে</div>`
+        :PWA_EVT?`<button class="btn" data-pcinstall style="width:100%">🖥️ কম্পিউটারে অ্যাপ হিসেবে ইনস্টল করুন</button>`:'')
+        :`<button class="btn outline" data-pcshare style="width:100%">📤 লিংকটি শেয়ার / নিজেকে পাঠান</button>`}
+    </section>
+    <h2 class="xa-h">কীভাবে ঢুকবেন</h2>
+    <ol class="pc-steps">
+      ${step(1,'ব্রাউজার খুলুন','কম্পিউটারে Google Chrome বা Microsoft Edge খুলুন।')}
+      ${step(2,'লিংকে যান','উপরের লিংকটি ঠিকানার ঘরে লিখে Enter চাপুন। (লিংকটি কপি করে হোয়াটসঅ্যাপ/মেসেঞ্জারে নিজেকে পাঠিয়ে কম্পিউটারে খুললেও হবে।)')}
+      ${step(3,'লগইন করুন','ফোনের অ্যাপে যে মোবাইল নম্বর/ইমেইল ও পাসওয়ার্ড দিয়ে ঢোকেন, সেটাই দিন। শিক্ষক হলে "অ্যাডমিন লগইন" চাপুন।')}
+      ${step(4,'ডেস্কটপে আইকন রাখুন (ঐচ্ছিক)','Chrome/Edge-এর ঠিকানার ঘরের ডান পাশে ⊕ "ইনস্টল" চিহ্নে চাপুন (অথবা ⋮ মেনু → "Cast, save and share" → "Install page as app")। এরপর ডেস্কটপ/স্টার্ট মেনু থেকে সরাসরি খুলবে।')}
+    </ol>
+    <p class="muted" style="font-size:13.5px;text-align:center;margin:0">টিপস: কম্পিউটারে প্রশ্ন যোগ/সম্পাদনা, ফলাফল দেখা ও লম্বা লেখা টাইপ করা সহজ।</p>
+  </div>`;
+}
 /* ===== লাইভ ক্লাস ও রেকর্ড ক্লাস: প্রতিটি শ্রেণির জন্য (syllabus সংগ্রহে type:'cls'; অ্যাডমিন লিংক দেন, শিক্ষার্থী দেখে) =====
    kind:'live' → at (শুরুর সময়), dur (মিনিট) · kind:'rec' → ch (অধ্যায়, ০ = সাধারণ) · lock:'paid' হলে শুধু প্যাকেজধারীরা লিংক পাবে */
 const CLS_PRE=15*60000, CLS_DUR=[30,45,60,90,120,150];
@@ -3735,7 +3778,7 @@ function renderTabs(){
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={lclass:()=>vClass('live'),rclass:()=>vClass('rec'),notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={pc:vPc,lclass:()=>vClass('live'),rclass:()=>vClass('rec'),notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   const gate=needAuth(); if(gate){ tabbar.hidden=true; app.innerHTML=vAuth(); return; }
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
@@ -3910,6 +3953,9 @@ app.addEventListener('click',e=>{
   }
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
   if(t.hasAttribute('data-xfbriti')){ const xf=xfInit(), c=COURSES[xf.course]; Object.assign(xf,{title:`বৃত্তি মডেল টেস্ট (${c.subj})`, marks:'50', mins:'50', units:c.chapters.map((_,i)=>String(i+1)), syllabus:'পূর্ণ সিলেবাস', aud:'paid'}); render(); toast('বৃত্তি মডেল টেস্ট ফর্মে বসানো হয়েছে; তারিখ দেখে প্রকাশ করুন'); return; }
+  if(t.hasAttribute('data-pcinstall')){ if(PWA_EVT){ PWA_EVT.prompt(); PWA_EVT.userChoice.finally(()=>{ PWA_EVT=null; render(); }); } return; }
+  if(t.hasAttribute('data-pcshare')){ const d={title:'সহগ গণিত একাডেমি — কম্পিউটারে খুলুন',text:'কম্পিউটারে সহগ গণিত একাডেমি:',url:WEB_URL};
+    (navigator.share?navigator.share(d):Promise.reject()).catch(()=>{ (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(WEB_URL):Promise.reject()).then(()=>toast('লিংক কপি হয়েছে'),()=>{}); }); return; }
   if(t.hasAttribute('data-updcheck')){ checkUpdate(true); render(); return; }
   if(t.dataset.cls){ S.clsC=t.dataset.clsc||S.clsC; if(!['lclass','rclass'].includes(S.view)) S.clsFrom=S.view; if(S.clf&&!S.clf.id) S.clf=null; return go(t.dataset.cls==='live'?'lclass':'rclass'); }
   if(t.dataset.clsave){ saveClass(t.dataset.clsave,t.dataset.clsc); return; }
