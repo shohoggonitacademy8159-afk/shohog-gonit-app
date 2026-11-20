@@ -94,6 +94,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .q-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:14px}
 .q-head{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
 .q-text{font-size:21px;font-weight:600;line-height:1.4}
+.sb{font-size:.7em;vertical-align:-.25em;line-height:0}
 .sp{display:inline-block;font-size:.7em;line-height:1;vertical-align:.55em;margin-left:1px}.sp .frc{font-size:1em;vertical-align:bottom;line-height:1}.sp .frc>span:first-child{border-bottom-width:1px}
 .frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.08;margin:0 2px;font-size:.9em}
 .frc>span{padding:0 3px}.frc>span:first-child{border-bottom:1.6px solid currentColor}
@@ -923,12 +924,12 @@ function frRight(s,i){ let k=i+1; if(k>=s.length) return null; let sg='';
 const SUP_U='⁰¹²³⁴⁵⁶⁷⁸⁹⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ', SUP_A='0123456789−abcdefghijklmnoprstuvwxyz';
 const supU=t=>[...t].map(c=>SUP_A[[...SUP_U].indexOf(c)]).join('');
 function supHTML(s){ s=String(s).replace(/([⁰¹²³⁴-⁹⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ]+)\/([⁰¹²³⁴-⁹⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ]+)/g,(m,a,b)=>`<sup class="sp"><span class="frc"><span>${supU(a)}</span><span>${supU(b)}</span></span></sup>`); let i=0;
-  while((i=s.indexOf('^',i))!==-1){
+  for(;;){ const k=s.slice(i).search(/\^|_\(/); if(k<0) break; i+=k;
     if(i===0||/\s/.test(s[i-1])){ i++; continue; }
-    let e, t;
+    let e, t; const sub=s[i]==='_';
     if(s[i+1]==='('){ const z=frMatch(s,i+1,1,')','('); if(z<0){ i++; continue; } e=z+1; t=s.slice(i+2,z); }
     else { const m=s.slice(i+1).match(/^[−\-]?[0-9০-৯]+|^[A-Za-zθπ]/); if(!m){ i++; continue; } e=i+1+m[0].length; t=m[0]; }
-    const h=`<sup class="sp">${t}</sup>`; s=s.slice(0,i)+h+s.slice(e); i+=h.length; }
+    const h=sub?`<sub class="sb">${t}</sub>`:`<sup class="sp">${t}</sup>`; s=s.slice(0,i)+h+s.slice(e); i+=h.length; }
   return s; }
 function frHTML(s){ s=String(s); let i=0;
   while((i=s.indexOf('/',i))!==-1){
@@ -941,7 +942,31 @@ function frHTML(s){ s=String(s); let i=0;
     s=s.slice(0,l.L)+h+s.slice(r.R); i=l.L+h.length;
   }
   return s; }
-function mxHTML(s){ return supHTML(frHTML(String(s))).replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
+/* গুগল/ChatGPT থেকে কপি করা LaTeX (\( x=\frac{180^{\circ}}{4} \)) → অ্যাপের নিজস্ব লেখা (x = 180°/4), তারপর ভগ্নাংশ/ঘাত স্বাভাবিকভাবে উপর-নিচে দেখায় */
+const TEX_SYM={times:'×',div:'÷',cdot:'·',pm:'±',mp:'∓',le:'≤',leq:'≤',ge:'≥',geq:'≥',neq:'≠',ne:'≠',approx:'≈',infty:'∞',pi:'π',theta:'θ',alpha:'α',beta:'β',gamma:'γ',delta:'δ',Delta:'Δ',lambda:'λ',mu:'μ',sigma:'σ',omega:'ω',phi:'φ',rho:'ρ',
+  angle:'∠',triangle:'△',therefore:'∴',because:'∵',Rightarrow:'⇒',Leftrightarrow:'⇔',rightarrow:'→',to:'→',leftarrow:'←',sum:'Σ',int:'∫',in:'∈',notin:'∉',cup:'∪',cap:'∩',subset:'⊂',subseteq:'⊆',perp:'⊥',parallel:'∥',
+  circ:'°',degree:'°',cdots:'⋯',ldots:'…',dots:'…',sim:'∼',equiv:'≡',propto:'∝',emptyset:'∅',varnothing:'∅',cong:'≅',sqrt:'√',
+  sin:'sin',cos:'cos',tan:'tan',cot:'cot',sec:'sec',csc:'cosec',cosec:'cosec',log:'log',ln:'ln',lim:'lim',max:'max',min:'min'};
+function texArg(s,i){ while(s[i]===' ') i++; if(s[i]!=='{') return s[i]?[s[i],i+1]:['',i];
+  let d=0; for(let k=i;k<s.length;k++){ if(s[k]==='{') d++; else if(s[k]==='}'&&--d===0) return [s.slice(i+1,k),k+1]; } return [s.slice(i+1),s.length]; }
+const texWrap=t=>/^[0-9০-৯A-Za-zθπα-ω.°′]+$/.test(t)?t:'('+t+')';
+function texConv(s){ s=String(s); if(!/\\[a-zA-Z()[\]{}]|\^\{|_\{/.test(s)) return s;
+  s=s.replace(/\\[()[\]]/g,' ').replace(/\$\$?/g,'').replace(/\\(left|right|big|Big|bigg|displaystyle)\b\.?/g,'').replace(/\\[,;:! ]|\\q?quad\b/g,' ')
+     .replace(/\\\{/g,'\u0001').replace(/\\\}/g,'\u0002').replace(/\^\s*\{\s*\\circ\s*\}|\^\s*\\circ\b/g,'°');
+  let out='', i=0;
+  while(i<s.length){ const c=s[i];
+    if(c==='\\'){ const m=s.slice(i+1).match(/^[a-zA-Z]+/); if(!m){ out+=s[i+1]||''; i+=2; continue; } const w=m[0]; i+=1+w.length;
+      if(/^[dt]?frac$/.test(w)){ const [a,j]=texArg(s,i), [b,k]=texArg(s,j); out+=texWrap(texConv(a))+'/'+texWrap(texConv(b)); i=k; continue; }
+      if(w==='sqrt'){ let n=''; if(s[i]==='['){ const e=s.indexOf(']',i); n=s.slice(i+1,e); i=e+1; } const [a,j]=texArg(s,i); i=j; out+=(n==='3'?'∛':n?'^('+n+')√':'√')+texWrap(texConv(a)); continue; }
+      if(/^(text|mathrm|mathbf|mathit|textbf|operatorname|boxed)$/.test(w)){ const [a,j]=texArg(s,i); out+=texConv(a); i=j; continue; }
+      if(w==='overline'||w==='bar'){ const [a,j]=texArg(s,i); out+=texConv(a)+'̅'; i=j; continue; }
+      if(w==='vec'||w==='overrightarrow'){ const [a,j]=texArg(s,i); out+=texConv(a)+'⃗'; i=j; continue; }
+      out+=(TEX_SYM[w]!=null?TEX_SYM[w]:w)+(/^(sin|cos|tan|cot|sec|csc|cosec|log|ln|lim)$/.test(w)&&/[A-Za-zθα-ω0-9]/.test(s[i]||'')?'':''); continue; }
+    if(c==='^'||c==='_'){ out=out.replace(/ +$/,''); const [a,j]=texArg(s,i+1); const t=texConv(a); out+=c+(t.length===1&&c==='^'?t:'('+t+')'); i=j; continue; }
+    if(c==='{'||c==='}'){ i++; continue; }
+    out+=c; i++; }
+  return out.replace(/\u0001/g,'{').replace(/\u0002/g,'}').replace(/[ \t]{2,}/g,' ').replace(/\s*\n\s*/g,'\n').trim(); }
+function mxHTML(s){ return supHTML(frHTML(texConv(s))).replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
   const rows=body.match(new RegExp(MX_R,'g')).map(r=>r.trim().slice(1,-1).split(',').map(x=>x.trim())), n=rows[0].length;
   if(rows.some(r=>r.length!==n)||(o==='|'&&(rows.length<2||n<2))||(rows.length<2&&n<2)) return m;
   return `<span class="mx ${o==='['?'mx-m':'mx-d'}" role="math" aria-label="${o==='['?'ম্যাট্রিক্স':'নির্ণায়ক'}"><span class="mx-g" style="grid-template-columns:repeat(${n},auto)">${rows.flat().map(x=>`<span>${x}</span>`).join('')}</span></span>`; }); }
