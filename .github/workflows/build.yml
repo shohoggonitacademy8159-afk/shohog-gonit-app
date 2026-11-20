@@ -99,8 +99,6 @@ jobs:
       - run: |
           npm ci
           npm run build
-      - name: Job Exam Coach ওয়েব সংস্করণ যুক্ত করা (/jec/)
-        run: cp -r jec-web www/jec
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
