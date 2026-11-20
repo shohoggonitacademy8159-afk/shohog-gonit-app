@@ -21,7 +21,7 @@ const splash = (w, h) => {
   const s = Math.min(w, h) * 0.32;
   return `<div style="width:${w}px;height:${h}px;background:linear-gradient(180deg,${BLUE2},${BLUE});display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${s * 0.12}px;font-family:'BN','Noto Sans Bengali',sans-serif;color:#fff">
     <svg width="${s}" height="${s}" viewBox="0 0 64 64">${LOGO}</svg>
-    <div style="font-size:${s * 0.2}px;font-weight:700">সহগ গণিত একাডেমি</div></div>`;
+    <div style="font-size:${s * 0.2}px;font-weight:700">অংকবাড়ি</div></div>`;
 };
 
 (async () => {

@@ -1,6 +1,6 @@
 {
   "appId": "com.sohogganit.academy",
-  "appName": "সহগ গণিত একাডেমি",
+  "appName": "অংকবাড়ি",
   "webDir": "www",
   "android": { "allowMixedContent": false },
   "server": { "androidScheme": "https" }

@@ -40,7 +40,7 @@ MOCK = r"""
 </script>
 """
 BANNER = """<div class="demo-bar" role="note">প্রিভিউ: এখানে করা কিছুই সংরক্ষণ হয় না। নতুন অ্যাকাউন্ট খুলে দেখতে পারেন; অ্যাডমিন অংশ দেখতে "অ্যাডমিন লগইন"-এ যেকোনো ইমেইল ও পাসওয়ার্ড দিন।</div>"""
-title = re.search(r'<title>.*?</title>', s, re.S).group(0).replace('সহগ গণিত একাডেমি', 'সহগ গণিত একাডেমি প্রিভিউ')
+title = re.search(r'<title>.*?</title>', s, re.S).group(0).replace('অংকবাড়ি', 'অংকবাড়ি প্রিভিউ')
 head = s[s.index('<head>')+6:s.index('</head>')]
 head = re.sub(r'<title>.*?</title>\n?', '', head, flags=re.S)
 head = re.sub(r'<meta charset[^>]*>\n?|<meta name="viewport"[^>]*>\n?|<meta name="theme-color"[^>]*>\n?|<link rel="manifest"[^>]*>\n?|<link rel="icon"[^>]*>\n?|<link rel="apple-touch-icon"[^>]*>\n?', '', head)

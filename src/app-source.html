@@ -1,4 +1,4 @@
-<title>সহগ গণিত একাডেমি</title>
+<title>অংকবাড়ি</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Tiro+Bangla&display=swap">
 <style>
@@ -1143,7 +1143,7 @@ function vLogin(){
   return `<div class="screen auth">
     <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
       <div class="logo"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS.compass}</svg></div>
-      <h1 class="display" style="font-size:32px">সহগ গণিত একাডেমি</h1>
+      <h1 class="display" style="font-size:36px">অংকবাড়ি</h1><p style="margin:-6px 0 0;font-weight:600;color:var(--accent);font-size:15px">সহগ গণিত একাডেমি</p>
       <p class="muted" style="margin:0;font-size:17px">আপনার গণিত যাত্রায় স্বাগতম</p>
     </div>
     <form id="loginForm" novalidate style="display:flex;flex-direction:column;gap:14px;margin-top:20px">
@@ -1217,7 +1217,7 @@ function vHome(){
   return `<div class="screen home ${anim?'enter':''}">
     <header class="hero">
       <span class="logo-art">${art('logo')}</span>
-      <div class="ttl"><h1>সহগ গণিত একাডেমি</h1><p>ভাবি · শিখি · সমাধান করি</p></div>
+      <div class="ttl"><h1>অংকবাড়ি</h1><p>ভাবি · শিখি · সমাধান করি</p></div>
       <button class="iconbtn" data-go="report" aria-label="লার্নিং রিপোর্ট">${svg('growth','width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4"')}</button>
     </header>
     ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>অ্যাডমিন প্যানেল: রুটিন ও সিলেবাস প্রকাশ</span></button>`:''}
@@ -3006,7 +3006,7 @@ function vAuth(){
   return `<div class="screen auth">
     <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
       <div class="logo"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS.compass}</svg></div>
-      <h1 class="display" style="font-size:30px">সহগ গণিত একাডেমি</h1>
+      <h1 class="display" style="font-size:34px">অংকবাড়ি</h1><p style="margin:-6px 0 0;font-weight:600;color:var(--accent);font-size:14px">সহগ গণিত একাডেমি</p>
       <p class="muted" style="margin:0;font-size:16px">${fg?'পাসওয়ার্ড ভুলে গেছ?':reg?'প্রথমবার? অ্যাকাউন্ট খুলে শুরু করো':'তোমার অ্যাকাউন্টে লগইন করো'}</p>
     </div>
     ${fg?'':`<div class="au-tabs" role="tablist"><button role="tab" class="au-tab ${reg?'on':''}" aria-selected="${reg}" data-aumode="register">নতুন অ্যাকাউন্ট</button><button role="tab" class="au-tab ${!reg?'on':''}" aria-selected="${!reg}" data-aumode="login">লগইন</button></div>`}
@@ -3884,7 +3884,7 @@ app.addEventListener('click',e=>{
   if(t.dataset.atab){ S.atab=t.dataset.atab; render(); return; }
   if(t.hasAttribute('data-xfbriti')){ const xf=xfInit(), c=COURSES[xf.course]; Object.assign(xf,{title:`বৃত্তি মডেল টেস্ট (${c.subj})`, marks:'50', mins:'50', units:c.chapters.map((_,i)=>String(i+1)), syllabus:'পূর্ণ সিলেবাস', aud:'paid'}); render(); toast('বৃত্তি মডেল টেস্ট ফর্মে বসানো হয়েছে; তারিখ দেখে প্রকাশ করুন'); return; }
   if(t.hasAttribute('data-pcinstall')){ if(PWA_EVT){ PWA_EVT.prompt(); PWA_EVT.userChoice.finally(()=>{ PWA_EVT=null; render(); }); } return; }
-  if(t.hasAttribute('data-pcshare')){ const d={title:'সহগ গণিত একাডেমি — কম্পিউটারে খুলুন',text:'কম্পিউটারে সহগ গণিত একাডেমি:',url:WEB_URL};
+  if(t.hasAttribute('data-pcshare')){ const d={title:'অংকবাড়ি — কম্পিউটারে খুলুন',text:'কম্পিউটারে অংকবাড়ি (সহগ গণিত একাডেমি):',url:WEB_URL};
     (navigator.share?navigator.share(d):Promise.reject()).catch(()=>{ (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(WEB_URL):Promise.reject()).then(()=>toast('লিংক কপি হয়েছে'),()=>{}); }); return; }
   if(t.hasAttribute('data-updcheck')){ checkUpdate(true); render(); return; }
   if(t.dataset.cls){ S.clsC=t.dataset.clsc||S.clsC; if(!['lclass','rclass'].includes(S.view)) S.clsFrom=S.view; if(S.clf&&!S.clf.id) S.clf=null; return go(t.dataset.cls==='live'?'lclass':'rclass'); }
