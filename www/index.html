@@ -3422,7 +3422,7 @@ function parseBulk(text){
     else if(q.o.some(x=>!x)) errs.push(`${no} নম্বর প্রশ্ন: ক, খ, গ, ঘ চারটি অপশনই লাগবে`);
     else if(new Set(q.o).size<4) errs.push(`${no} নম্বর প্রশ্ন: দুটি অপশন একই রকম`);
     else if(q.a<0) errs.push(`${no} নম্বর প্রশ্ন: "উত্তর: গ" এভাবে সঠিক উত্তর লিখুন`);
-    else out.push({q:q.q.join(' '),o:q.o,a:q.a,e:q.e,lv:q.lv});
+    else out.push({q:q.q.join('\n'),o:q.o,a:q.a,e:q.e,lv:q.lv});
   });
   return {qs:out,errs,blocks:blocks.length};
 }
