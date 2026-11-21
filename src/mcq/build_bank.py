@@ -14,6 +14,11 @@ if f9b.exists():
     base = [x for x in bank['c10']['9'] if x['n'] <= 200]
     extra = json.loads(f9b.read_text(encoding='utf-8'))
     for i, x in enumerate(extra): x['n'] = 201 + i
+    f9c = root / 'src/mcq/ch9c.json'   # ২য় সেট (অভেদ ও মান নির্ণয়), gen_trig9c.py
+    if f9c.exists():
+        more = json.loads(f9c.read_text(encoding='utf-8'))
+        for i, x in enumerate(more): x['n'] = 201 + len(extra) + i
+        extra = extra + more
     bank['c10']['9'] = base + extra
 # অধ্যায় ১৭ (পরিসংখ্যান): নিজস্ব অতিরিক্ত প্রশ্ন (gen_stat17.py → ch17b.json), নম্বর আগের প্রশ্নের পর থেকে
 f17 = root / 'src/mcq/ch17b.json'
