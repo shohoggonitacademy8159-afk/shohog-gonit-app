@@ -1691,7 +1691,23 @@ const payName=m=>(PAYM.find(x=>x[0]===m)||['',m])[1];
 const payCfg=()=>{ const r=SYL.paycfg||{}; return {bkash:String(r.bkash||''),nagad:String(r.nagad||''),rocket:String(r.rocket||''),note:String(r.note||''),enforce:!!r.enforce,days:Math.min(366,Math.max(1,+r.days||30))}; };
 const payMethods=()=>{ const c=payCfg(); return PAYM.filter(([k])=>c[k]); };
 const DAYMS=86400000;
-function pkgUntil(cid){ cid=pkgKey(cid); const e=S.enrolled&&S.enrolled[cid]; return e&&e.until?+e.until:0; }
+/* প্যাকেজের মেয়াদ: শিক্ষার্থীর নিজের ফোনে রাখা তথ্যে নয় — সার্ভারে অ্যাডমিনের অনুমোদিত পেমেন্ট দেখে যাচাই (পেমেন্ট শুধু অ্যাডমিন অনুমোদন করতে পারেন) */
+let PAYV={}, PAYV_OK=false, PAYV_BUSY=false, PAYV_UID=null;
+function pkgUntil(cid){ cid=pkgKey(cid);
+  if(PAYV_OK) return Object.values(PAYV).filter(v=>pkgKey(v.course)===cid).reduce((m,v)=>Math.max(m,v.until),0);
+  // যাচাইয়ের আগে (অ্যাপ খোলার প্রথম কয়েক সেকেন্ড/ইন্টারনেট নেই): শুধু আগে-অনুমোদিত পেমেন্টের সাথে যুক্ত মেয়াদ
+  const e=S.enrolled&&S.enrolled[cid], p=e&&e.pay&&S.pays&&S.pays[e.pay];
+  return e&&e.until&&p&&p.status==='approved'?Math.min(+e.until,+p.until||0):0; }
+async function verifyPays(force){
+  if(!DB||!S.uid||PAYV_BUSY) return; if(PAYV_OK&&PAYV_UID===S.uid&&!force) return;
+  const ids=Object.keys(S.pays||{}); PAYV_BUSY=true; const v={}; let ok=true;
+  for(const id of ids){ try{ const d=await DB.collection('payments').doc(id).get();
+      if(d&&d.status==='approved'&&+d.until&&d.course&&(!d.uid||d.uid===S.uid)) v[id]={course:d.course,until:+d.until}; }catch(e){ ok=false; } }
+  PAYV_BUSY=false; if(!ok) return;
+  const before=JSON.stringify(PAYV)+PAYV_OK; PAYV=v; PAYV_OK=true; PAYV_UID=S.uid;
+  if(before!==JSON.stringify(PAYV)+PAYV_OK) softRender(); }
+setTimeout(()=>verifyPays(),3000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) verifyPays(true); });
 const pkgActive=cid=>pkgUntil(cid)>Date.now();
 const isFreeC=cid=>{ const k=pkgKey(cid); return !!(COURSES[k]&&COURSES[k].offer&&COURSES[k].offer.free); };
 const feeTag=(o,extra)=>o.free?'সম্পূর্ণ ফ্রী':`মাসিক ৳${bn(o.price)}${extra||''}`;
@@ -1756,7 +1772,8 @@ async function sendPay(){
   const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
   const r={course:f.cid,method:f.m,amount:c.offer.price*f.months,months:f.months,sender,trx,name:name.slice(0,60),roll:S.student&&S.student.roll?String(S.student.roll).slice(0,20):'',device:S.dev,at:new Date().toISOString(),status:'pending'};
   try{
-    await DB.collection('payments').doc(id).set(r);
+    try{ await DB.collection('payments').doc(id).set(S.uid?Object.assign({uid:S.uid},r):r); }
+    catch(e1){ if(!S.uid||!(e1&&e1.code==='permission_denied')) throw e1; await DB.collection('payments').doc(id).set(r); }   // পুরোনো Rules-এ uid নেই
     S.pays=S.pays||{}; S.pays[id]=Object.assign({},r); if(!S.student) S.student={name:r.name,roll:''};
     persist(); S.buy=null; toast('জমা হয়েছে · যাচাইয়ের পর প্যাকেজ চালু হবে'); go('pay');
   }catch(e){ fail(e&&e.code==='permission_denied'?'পেমেন্ট জমা নেওয়া যাচ্ছে না (Firebase Rules-এ "payments" অংশ যোগ হয়নি)। শিক্ষককে জানাও।':'জমা দেওয়া যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করো।'); }
@@ -1775,7 +1792,7 @@ async function refreshPays(){
     }catch(e){}
   }
   payChecking=false;
-  if(changed){ persist(); softRender(); }
+  if(changed){ persist(); verifyPays(true); softRender(); }
 }
 /* অ্যাডমিন */
 let PAY={}, payUnsub=null, PAY_OK=null;
@@ -1827,7 +1844,7 @@ async function decidePay(id,status){
   const r=Object.assign({},p); delete r.id;
   r.status=status; r.decidedAt=new Date().toISOString();
   if(status==='approved'){
-    const prev=Object.values(PAY).filter(x=>x.id!==id&&x.status==='approved'&&x.course===p.course&&x.device===p.device&&x.until).reduce((m,x)=>Math.max(m,+x.until),0);
+    const prev=Object.values(PAY).filter(x=>x.id!==id&&x.status==='approved'&&x.course===p.course&&(p.uid?x.uid===p.uid:x.device===p.device)&&x.until).reduce((m,x)=>Math.max(m,+x.until),0);
     const start=Math.max(Date.now(),prev); r.until=start+payCfg().days*(+p.months||1)*DAYMS;
   } else if(status==='pending'){ delete r.until; delete r.decidedAt; }
   else delete r.until;
@@ -2703,12 +2720,13 @@ const isEmail=v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(v||'').trim());
 const ACCT_KEYS=['exams','retakes','fav','favx','results','done','enrolled','pays'];
 function acctBlob(){ const o={}; ACCT_KEYS.forEach(k=>o[k]=S[k]||{}); o.joined=!!S.joined; o.reports=(S.reports||[]).slice(-50); return JSON.stringify(o); }
 function applyBlob(str,merge){
+  PAYV_OK=false; PAYV={}; setTimeout(()=>verifyPays(true),50);
   let d={}; try{ d=JSON.parse(str||'{}')||{}; }catch(e){ d={}; }
   ACCT_KEYS.forEach(k=>{ const c=d[k]&&typeof d[k]==='object'?d[k]:{}; S[k]=merge?Object.assign({},c,S[k]||{}):c; });
   S.joined=!!d.joined||(merge&&!!S.joined);
   const r=Array.isArray(d.reports)?d.reports:[]; const rk=x=>x?String(x.at||'')+'|'+String(x.text||'').slice(0,40):''; S.reports=merge?r.concat((S.reports||[]).filter(x=>!r.some(y=>rk(y)===rk(x)))):r;
 }
-const clearPersonal=()=>Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},results:{},done:{},examRun:null,reports:[],joined:false});
+const clearPersonal=()=>(PAYV={},PAYV_OK=false,Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},results:{},done:{},examRun:null,reports:[],joined:false}));
 function cloudSoon(){ if(!S.uid||!DB||!DB.docSet||AUTHBUSY) return; clearTimeout(CLOUD_T); CLOUD_T=setTimeout(cloudSave,1500); }
 function cloudSave(){ if(!S.uid||!DB||AUTHBUSY) return;
   const st=S.student||{};

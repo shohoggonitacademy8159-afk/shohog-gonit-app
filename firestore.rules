@@ -35,11 +35,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
-    // পেমেন্ট: শিক্ষার্থী শুধু "pending" অনুরোধ তৈরি করবে, নিজের id জানলে অবস্থা পড়বে; অ্যাডমিন তালিকা দেখবে ও অনুমোদন দেবে
+    // পেমেন্ট: শিক্ষার্থী শুধু "pending" অনুরোধ তৈরি করবে (নিজের uid দিয়ে — অন্যের নামে নয়); প্যাকেজ চালু হয় শুধু অ্যাডমিনের অনুমোদনে, নিজের id জানলে অবস্থা পড়বে; অ্যাডমিন তালিকা দেখবে ও অনুমোদন দেবে
     match /payments/{id} {
       allow get: if true;
       allow list, update, delete: if isAdmin();
-      allow create: if request.resource.data.keys().hasOnly(['course','method','amount','months','sender','trx','name','roll','device','at','status'])
+      allow create: if request.resource.data.keys().hasOnly(['uid','course','method','amount','months','sender','trx','name','roll','device','at','status'])
+        && (!('uid' in request.resource.data) || (request.auth != null && request.resource.data.uid == request.auth.uid))
         && request.resource.data.status == 'pending'
         && request.resource.data.method in ['bkash','nagad','rocket']
         && request.resource.data.trx is string && request.resource.data.trx.size() >= 8 && request.resource.data.trx.size() <= 12
