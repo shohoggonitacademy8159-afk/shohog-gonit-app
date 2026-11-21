@@ -8,6 +8,13 @@ bank = json.loads((root / 'src/mcq/mcq.json').read_text(encoding='utf-8'))
 for ch in ('2', '3', '4', '5', '6', '7', '9', '10', '11', '12', '13', '14', '15', '16', '17'):
     f = root / f'src/mcq/ch{ch}.json'
     if f.exists(): bank['c10'][ch] = json.loads(f.read_text(encoding='utf-8'))
+# অধ্যায় ১৭ (পরিসংখ্যান): নিজস্ব অতিরিক্ত প্রশ্ন (gen_stat17.py → ch17b.json), নম্বর আগের প্রশ্নের পর থেকে
+f17 = root / 'src/mcq/ch17b.json'
+if f17.exists():
+    base = [x for x in bank['c10']['17'] if x['n'] <= 200]
+    extra = json.loads(f17.read_text(encoding='utf-8'))
+    for i, x in enumerate(extra): x['n'] = 201 + i
+    bank['c10']['17'] = base + extra
 # অধ্যায় 8: আগের 100টি (অনুশীলনী-ট্যাগ ছাড়া, PDF-এর সাথে মেলানো) অপরিবর্তিত রেখে অনুশীলনীভিত্তিক প্রশ্ন যোগ
 f8 = root / 'src/mcq/ch8x.json'
 if f8.exists():

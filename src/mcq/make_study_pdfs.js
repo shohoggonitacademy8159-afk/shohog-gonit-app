@@ -115,7 +115,7 @@ function statTable(s){ s=String(s);
     if(!rng&&!/সারণি|উপাত্ত|গণসংখ্যা/.test(str.slice(Math.max(0,off-60),off))) return m;
     return stHTML([[rng?'শ্রেণি':'মান',...pairs.map(p=>stRange(p[1].trim()))],['গণসংখ্যা',...pairs.map(p=>p[2])]]);
   }).replace(/\s*[—–-]\s*(<span class="stbl-w">)/g,':$1').replace(/(<span class="stbl-w">[\s\S]*?<\/span><\/span><\/span>)\s*।\s*/g,'$1'); }
-const esc = s => mxHTML(supHTML(frHTML(statTable(esc0(s)))));
+const esc = s => mxHTML(supHTML(frHTML(statTable(esc0(s))))).replace(/\n/g, '<br>');
 const L = ['ক', 'খ', 'গ', 'ঘ'];
 function html(c, cid, title, sub, data) {
   return `<!doctype html><html lang="bn"><head><meta charset="utf-8"><style>
