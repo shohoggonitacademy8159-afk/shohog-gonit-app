@@ -31,6 +31,13 @@ bank['h11'] = {}
 for ch in range(1, 11):
     f = root / f'src/mcq/chi{ch}.json'
     if f.exists(): bank['h11'][str(ch)] = json.loads(f.read_text(encoding='utf-8'))
+# একাদশ অধ্যায় ১ (ম্যাট্রিক্স): নিজস্ব অতিরিক্ত প্রশ্ন (gen_mat11.py → chi1b.json), অনুশীলনী 1.A, নম্বর 201 থেকে
+fi1 = root / 'src/mcq/chi1b.json'
+if fi1.exists():
+    base = [x for x in bank['h11']['1'] if x['n'] <= 200]
+    extra = json.loads(fi1.read_text(encoding='utf-8'))
+    for i, x in enumerate(extra): x['n'] = 201 + i
+    bank['h11']['1'] = base + extra
 bank['h12'] = {}
 for ch in range(1, 11):
     f = root / f'src/mcq/chj{ch}.json'
