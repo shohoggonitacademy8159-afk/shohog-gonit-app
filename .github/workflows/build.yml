@@ -29,9 +29,20 @@ jobs:
             echo "::error::KEYSTORE_PASSWORD নামের Secret যোগ করা হয়নি। Settings > Secrets and variables > Actions থেকে যোগ করুন।"
             exit 1
           fi
-          got=$(printf '%s' "$KEYSTORE_PASSWORD" | tr -d '[:space:]' | sha256sum | cut -c1-64)
-          if [ "$got" != "63b442f9421e5b0a1f2db5871e8102c58f1736aa26fd3ccd45a9475d957710ae" ]; then
-            echo "::error title=Secret mismatch::KEYSTORE_PASSWORD Secret-এর পাসওয়ার্ড মেলেনি। Secret-টি মুছে ঠিক পাসওয়ার্ড দিয়ে আবার যোগ করুন।"
+
+      # সই করার চাবি রিপোতে রাখা হয় না: KEYSTORE_B64 Secret (base64) থেকে বিল্ডের সময় তৈরি হয়, কাজ শেষে মুছে যায়
+      - name: সই করার চাবি প্রস্তুত
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          mkdir -p signing
+          if [ -n "$KEYSTORE_B64" ]; then
+            printf '%s' "$KEYSTORE_B64" | tr -d '[:space:]' | base64 -d > signing/sohog-release.p12
+            echo "চাবি Secret থেকে নেওয়া হয়েছে"
+          elif [ -f signing/sohog-release.p12 ]; then
+            echo "::warning::KEYSTORE_B64 Secret নেই — রিপোর ফাইল ব্যবহার হচ্ছে। Secret যোগ করে রিপো থেকে ফাইলটি সরান।"
+          else
+            echo "::error::KEYSTORE_B64 নামের Secret যোগ করা হয়নি। Settings > Secrets and variables > Actions থেকে যোগ করুন।"
             exit 1
           fi
 
