@@ -151,6 +151,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .skill:first-child{border-top:0}
 .skill .row{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
+.q-import{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
 .pc-card{display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:20px;background:var(--surface);border:1.5px solid var(--line);text-align:center}
 .pc-ic{font-size:44px;line-height:1}
 .pc-link{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:14px;background:rgba(37,99,235,.08);border:1px dashed rgba(37,99,235,.4)}
@@ -3397,6 +3398,11 @@ function customQs(cid,no){
     .sort((a,b)=>String(a.createdAt||'')<String(b.createdAt||'')?-1:1)
     .map(r=>({n:'x:'+r.id,q:String(r.q),o:r.o.map(String),a:+r.a,e:String(r.e||''),lv:QLV.indexOf(r.lv)>=0?r.lv:'মধ্যম',ex:r.ex?String(r.ex):'',custom:true,id:r.id}));
 }
+/* অ্যাপের সাথে দেওয়া প্রস্তুত প্রশ্নসেট (www/import/) — অ্যাডমিন এক চাপে "একসাথে অনেক"-এ এনে Firestore-এ যোগ করতে পারেন */
+let IMPORT_SETS=null;
+fetch('import/sets.json').then(r=>r.ok?r.json():[]).then(j=>{ IMPORT_SETS=Array.isArray(j)?j:[]; if(S.view==='admin') softRender(); }).catch(()=>{ IMPORT_SETS=[]; });
+function qLoadBulk(text,ex){ const qf=qfInit(); qf.bulk=String(text||'').replace(/\r/g,''); if(ex!==undefined) qf.ex=ex; qf.parsed=parseBulk(qf.bulk); qf.err=qf.parsed.blocks?'':'ফাইলে কোনো প্রশ্ন পাওয়া যায়নি।'; render();
+  toast(qf.parsed.qs.length?`${qf.parsed.qs.length}টি প্রশ্ন আনা হয়েছে — নিচে "যোগ কর" চাপুন`:'প্রশ্ন পাওয়া যায়নি'); }
 function qfInit(){
   if(!S.qf) S.qf={course:CH_COURSES()[0], ch:1, ex:'', mode:'one', q:'', o:['','','',''], a:-1, e:'', lv:'সহজ', bulk:'', parsed:null, editId:null, armed:'', busy:false, msg:'', showAll:false};
   return S.qf;
@@ -3464,7 +3470,12 @@ function qbankPanel(){
     <button class="btn" data-qsave style="width:100%" ${qf.busy?'disabled':''}>${qf.busy?'সংরক্ষণ হচ্ছে…':qf.editId||qf.editRef!=null?'পরিবর্তন সংরক্ষণ কর':'প্রশ্ন যোগ কর'}</button>
     ${qf.editId||qf.editRef!=null?`<button class="btn ghost" data-qcancel style="width:100%">সম্পাদনা বাতিল</button>`:''}`;
   const pr=qf.parsed;
-  const bulk=`<div class="field"><label for="qfBulk">প্রশ্নগুলো পেস্ট করুন</label>
+  const sets=(IMPORT_SETS||[]).filter(x=>x.course===qf.course&&+x.ch===+qf.ch);
+  const bulk=`<div class="q-import">
+      ${sets.map(x=>`<button class="btn" data-qimport="${esc(x.f)}" style="width:100%">⬇️ প্রস্তুত প্রশ্নসেট আনুন: ${esc(x.t)}</button>`).join('')}
+      <label class="btn ghost" style="width:100%;cursor:pointer">📄 ফোন/কম্পিউটারের .txt ফাইল থেকে আনুন<input type="file" accept=".txt,text/plain" data-qfile hidden></label>
+    </div>
+    <div class="field"><label for="qfBulk">অথবা প্রশ্নগুলো পেস্ট করুন</label>
     <textarea class="input area" id="qfBulk" data-qf="bulk" rows="12" placeholder="1. √49 = কত?&#10;ক) 5&#10;খ) 6&#10;গ) 7&#10;ঘ) 8&#10;উত্তর: গ&#10;ব্যাখ্যা: 7 × 7 = 49&#10;স্তর: সহজ&#10;&#10;2. পরের প্রশ্ন…">${esc(qf.bulk)}</textarea></div>
     <details class="fmt"><summary>লেখার নিয়ম</summary><p>প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। প্রথমে প্রশ্ন, তারপর ক) খ) গ) ঘ) চারটি অপশন, তারপর "উত্তর: গ"। "ব্যাখ্যা:" ও "স্তর: সহজ/মধ্যম/কঠিন" ঐচ্ছিক; স্তর না দিলে মধ্যম ধরা হবে। ক. বা (ক) লিখলেও চলবে।</p></details>
     <button class="btn ghost" data-qparse style="width:100%">যাচাই কর</button>
@@ -3927,6 +3938,7 @@ app.addEventListener('click',e=>{
   if(t.hasAttribute('data-qsave')){ if(!qfInit().busy) qSaveOne(); return; }
   if(t.hasAttribute('data-qcancel')){ Object.assign(qfInit(),{q:'',o:['','','',''],a:-1,e:'',editId:null,editRef:null,err:''}); return render(); }
   if(t.hasAttribute('data-qparse')){ const qf=qfInit(); qf.parsed=parseBulk(qf.bulk); qf.err=qf.parsed.blocks?'':'কোনো প্রশ্ন পাওয়া যায়নি।'; return render(); }
+  if(t.dataset.qimport){ const set=(IMPORT_SETS||[]).find(x=>x.f===t.dataset.qimport); fetch('import/'+t.dataset.qimport).then(r=>{ if(!r.ok) throw 0; return r.text(); }).then(txt=>qLoadBulk(txt,set&&set.ex)).catch(()=>toast('প্রশ্নসেট খোলা যায়নি')); return; }
   if(t.hasAttribute('data-qbulksave')){ if(!qfInit().busy) qSaveBulk(); return; }
   if(t.hasAttribute('data-qall')){ qfInit().showAll=true; return render(); }
   if(t.dataset.qedit2){ const qf=qfInit(), [k,id]=t.dataset.qedit2.split('|');
@@ -4135,6 +4147,7 @@ app.addEventListener('input',e=>{
 app.addEventListener('change',e=>{
   const t=e.target;
   if(t.dataset.pcf==='enforce'){ pcInit().enforce=t.checked; return; }
+  if(t.hasAttribute('data-qfile')){ const f=t.files&&t.files[0]; t.value=''; if(f){ const rd=new FileReader(); rd.onload=()=>qLoadBulk(rd.result); rd.onerror=()=>toast('ফাইল পড়া যায়নি'); rd.readAsText(f,'utf-8'); } return; }
   if(t.dataset.pdffile){ const f=t.files&&t.files[0]; t.value=''; if(f) uploadPdf(t.dataset.pdffile,f); return; }
   if(t.dataset.rf==='week'&&t.value){ const rf=rfInit(); rf.week=isoD(weekStartOf(parseD(t.value))); rf.vals=null; pendingRender=false; render(); }
   if(t.dataset.when){ const st=stFor(t.dataset.when); st.when=t.value; if(t.value==='later'&&!st.at){ const d=new Date(Date.now()+3600000); d.setMinutes(0); st.at=localDT(d); } pendingRender=false; render(); }
