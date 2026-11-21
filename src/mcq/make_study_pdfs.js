@@ -163,7 +163,7 @@ table.key td b{color:#1F5FBF}
   for (const cid of Object.keys(COURSES).filter(k => !ONLY || ONLY.includes(k))) {
     const c = COURSES[cid]; index[cid] = {};
     for (let ch = 1; ch <= c.chapters.length; ch++) {
-      const qs = (bank[cid] || {})[String(ch)] || [];
+      const qs = ((bank[cid] || {})[String(ch)] || []).filter(q => !q.del);
       if (!qs.length) continue;
       const exs = c.exs[ch] || [];
       const units = exs.length ? exs.map(ex => [ex, qs.filter(q => q.ex === ex), c.lessons && c.lessons[ex] ? `${c.lessons[ex][0]}: ${c.lessons[ex][1]}` : `অনুশীলনী ${exName(ex)}`]) : [['ch' + ch, qs.filter(q => !q.ex).length ? qs.filter(q => !q.ex) : qs, `অধ্যায় ${BN(ch)}`]];

@@ -71,6 +71,24 @@ def bn_arith(bank):
                 if x.get('e'): x['e'] = x['e'].translate(_BN)
                 assert len(set(x['o'])) == len(x['o']), (c, ch, x['q'])
 bn_arith(bank)
+
+def drop_repeats(qs, keep=2):
+    """একই ধাঁচের প্রশ্ন (শুধু সংখ্যা আলাদা) একটি অনুশীলনীতে সর্বোচ্চ `keep`টি; বাকিগুলো del=1
+    (মুছে না ফেলে লুকানো — পুরোনো পরীক্ষার খাতায় প্রশ্ন n দিয়ে খুঁজে পাওয়া যায়)।
+    উল্টো ক্রমে লেখা একই প্রশ্ন (cos 60° − sin 30° / sin 30° − cos 60°) এবং একই উত্তরের পুনরাবৃত্তিও বাদ।"""
+    import re
+    tpl = lambda t: re.sub(r'√?\d+(\.\d+)?(/\d+)?°?', '#', re.sub(r'\s+', ' ', t))
+    ana = lambda q: (''.join(sorted(re.sub(r'\s+', '', q['q']))), q['o'][q['a']])
+    seen, kept, gone = {}, set(), 0
+    for q in sorted(qs, key=lambda x: x['n']):
+        q.pop('del', None)
+        k = (q.get('ex'), tpl(q['q'])); g = seen.setdefault(k, [])
+        if ana(q) in kept or len(g) >= keep or any(x['o'][x['a']] == q['o'][q['a']] for x in g):
+            q['del'] = 1; gone += 1; continue
+        g.append(q); kept.add(ana(q))
+    return gone
+
+print('ch9 repeats hidden:', drop_repeats(bank['c10']['9']))   # নবম ও দশম (c9 একই ব্যাংক ব্যবহার করে)
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')   # মূল ব্যাংক (PDF এটি থেকে)
 # বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
 import re as _re
