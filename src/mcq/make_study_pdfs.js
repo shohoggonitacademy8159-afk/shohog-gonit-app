@@ -93,7 +93,29 @@ function frHTML(s){ s=String(s); let i=0;
     s=s.slice(0,l.L)+h+s.slice(r.R); i=l.L+h.length;
   }
   return s; }
-const esc = s => mxHTML(supHTML(frHTML(esc0(s))));
+/* পরিসংখ্যানের সারণি: "10-19: 5, 20-29: 3, …" অথবা "শ্রেণি | 31-40 | 41-50 …" (প্রতি সারি নতুন লাইনে) → বই-এর মতো ঘর-কাটা অনুভূমিক সারণি */
+const ST_N='[0-9০-৯.]+', ST_RG=`${ST_N}\\s*[-–—−]\\s*${ST_N}`, ST_K=`(?:${ST_RG}|${ST_N})`;
+const ST_RUN=new RegExp(`(${ST_K})\\s*:\\s*(${ST_N})(?:\\s*,\\s*${ST_K}\\s*:\\s*${ST_N}){2,}`,'g');
+const stRange=t=>t.replace(/\s*[-–—−]\s*/,'–');
+function stHTML(rows){ const w=Math.max(...rows.map(r=>r.length));
+  return `<span class="stbl-w"><span class="stbl" role="table">${rows.map((r,i)=>`<span class="st-r" role="row">${Array.from({length:w},(_,j)=>`<span class="st-c${j===0?' st-h':''}" role="${j===0?'rowheader':'cell'}">${r[j]==null?'':r[j]}</span>`).join('')}</span>`).join('')}</span></span>`; }
+function statTable(s){ s=String(s);
+  // ১) লাইনে লাইনে "|" দিয়ে আলাদা করা সারণি (অ্যাডমিন সহজে লিখতে পারবেন)
+  if(s.includes('|')&&s.includes('\n')){
+    const L=s.split('\n'), out=[]; let buf=[];
+    const isRow=l=>/^[^|]+(\|[^|]+){2,}$/.test(l.trim())&&!/^\|/.test(l.trim());
+    const flush=()=>{ if(buf.length>=2) out.push(stHTML(buf)); else out.push(...buf.map(r=>r.raw)); buf=[]; };
+    L.forEach(l=>{ if(isRow(l)){ const r=l.split('|').map(c=>c.trim()); r.raw=l; buf.push(Object.assign(r.map((c,j)=>j&&new RegExp(`^${ST_RG}$`).test(c)?stRange(c):c),{raw:l})); } else { flush(); out.push(l); } });
+    flush(); s=out.join('\n').replace(/\n?(<span class="stbl-w">)/g,'$1').replace(/(<\/span><\/span><\/span>)\n/g,'$1');
+  }
+  // ২) "শ্রেণি: গণসংখ্যা" জোড়ার তালিকা (কমপক্ষে ৩টি)
+  return s.replace(ST_RUN,(m,k0,v0,off,str)=>{
+    const pairs=[...m.matchAll(new RegExp(`(${ST_K})\\s*:\\s*(${ST_N})`,'g'))];
+    const rng=pairs.every(p=>new RegExp(`^${ST_RG}$`).test(p[1].trim()));
+    if(!rng&&!/সারণি|উপাত্ত|গণসংখ্যা/.test(str.slice(Math.max(0,off-60),off))) return m;
+    return stHTML([[rng?'শ্রেণি':'মান',...pairs.map(p=>stRange(p[1].trim()))],['গণসংখ্যা',...pairs.map(p=>p[2])]]);
+  }).replace(/\s*[—–-]\s*(<span class="stbl-w">)/g,':$1').replace(/(<span class="stbl-w">[\s\S]*?<\/span><\/span><\/span>)\s*।\s*/g,'$1'); }
+const esc = s => mxHTML(supHTML(frHTML(statTable(esc0(s)))));
 const L = ['ক', 'খ', 'গ', 'ঘ'];
 function html(c, cid, title, sub, data) {
   return `<!doctype html><html lang="bn"><head><meta charset="utf-8"><style>
@@ -106,7 +128,7 @@ body{font-family:'HS','Noto Sans','DejaVu Sans',sans-serif;color:#10233F;font-si
 .info{display:flex;gap:16px;font-size:9.5pt;color:#4A5B73;margin-bottom:10px}
 .cols{column-count:2;column-gap:9mm;column-rule:0.5px solid #D6E3F3}
 .q{break-inside:avoid;margin:0 0 9px}
-.sp{display:inline-block;font-size:.7em;line-height:1;vertical-align:.55em;margin-left:1px}.sp .frc{font-size:1em;vertical-align:bottom;line-height:1}.sp .frc>span:first-child{border-bottom-width:1px}.frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 2px;font-size:.9em}.frc>span{padding:0 2px}.frc>span:first-child{border-bottom:1.2px solid #000}
+.stbl-w{display:block;overflow-x:auto;margin:8px 0 6px;padding-bottom:4px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;white-space:normal}.stbl{display:table;border-collapse:collapse;font-size:.86em;line-height:1.3}.st-r{display:table-row}.st-c{display:table-cell;border:1.5px solid currentColor;padding:5px 7px;text-align:center;white-space:nowrap;min-width:2.4em;font-weight:500}.st-h{font-weight:700;text-align:left;background:rgba(127,127,127,.12)}.sp{display:inline-block;font-size:.7em;line-height:1;vertical-align:.55em;margin-left:1px}.sp .frc{font-size:1em;vertical-align:bottom;line-height:1}.sp .frc>span:first-child{border-bottom-width:1px}.frc{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 2px;font-size:.9em}.frc>span{padding:0 2px}.frc>span:first-child{border-bottom:1.2px solid #000}
 .mx{display:inline-flex;align-items:stretch;vertical-align:middle;margin:2px 3px;line-height:1.25}
 .mx::before,.mx::after{content:'';flex:0 0 auto;border:1.2px solid #000}
 .mx-m::before{width:4px;border-right:0}.mx-m::after{width:4px;border-left:0}
