@@ -5,3 +5,8 @@ www/db.js
 __pycache__/
 src/mcq/logs/
 src/mcq/__pycache__/
+
+# সই করার চাবি কখনো রিপোতে নয় (GitHub Secret KEYSTORE_B64 থেকে আসে)
+signing/*.p12
+*.jks
+*.keystore
