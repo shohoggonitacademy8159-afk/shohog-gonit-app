@@ -957,6 +957,11 @@ function texArg(s,i){ while(s[i]===' ') i++; if(s[i]!=='{') return s[i]?[s[i],i+
   let d=0; for(let k=i;k<s.length;k++){ if(s[k]==='{') d++; else if(s[k]==='}'&&--d===0) return [s.slice(i+1,k),k+1]; } return [s.slice(i+1),s.length]; }
 const texWrap=t=>/^[0-9০-৯A-Za-zθπα-ω.°′]+$/.test(t)?t:'('+t+')';
 function texConv(s){ s=String(s); if(!/\\[a-zA-Z()[\]{}]|\^\{|_\{/.test(s)) return s;
+  // ম্যাট্রিক্স/নির্ণায়ক: \begin{bmatrix} a & b \\ c & d \end{bmatrix} → [(a, b), (c, d)], vmatrix → |(a, b), (c, d)|
+  s=s.replace(/\\begin\{([bBpvV]?matrix|array)\}(?:\{[^}]*\})?([\s\S]*?)\\end\{\1\}/g,(m,env,body)=>{
+    const rows=body.split(/\\\\/).map(r=>r.trim()).filter(Boolean).map(r=>'('+r.split('&').map(c=>texConv(c.trim())||'0').join(', ')+')');
+    if(!rows.length) return m; const inner=rows.join(', ');
+    return /^[vV]matrix$/.test(env)?'|'+inner+'|':'['+inner+']'; });
   s=s.replace(/\\[()[\]]/g,' ').replace(/\$\$?/g,'').replace(/\\(left|right|big|Big|bigg|displaystyle)\b\.?/g,'').replace(/\\[,;:! ]|\\q?quad\b/g,' ')
      .replace(/\\\{/g,'\u0001').replace(/\\\}/g,'\u0002').replace(/\^\s*\{\s*\\circ\s*\}|\^\s*\\circ\b/g,'°');
   let out='', i=0;
@@ -994,7 +999,12 @@ function statTable(s){ s=String(s);
     if(!rng&&!/সারণি|উপাত্ত|গণসংখ্যা/.test(str.slice(Math.max(0,off-60),off))) return m;
     return stHTML([[rng?'শ্রেণি':'মান',...pairs.map(p=>stRange(p[1].trim()))],['গণসংখ্যা',...pairs.map(p=>p[2])]]);
   }).replace(/\s*[—–-]\s*(<span class="stbl-w">)/g,':$1').replace(/(<span class="stbl-w">[\s\S]*?<\/span><\/span><\/span>)\s*।\s*/g,'$1'); }
-function mxHTML(s){ return supHTML(frHTML(statTable(texConv(s)))).replace(/\n/g,'<br>').replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
+/* সহজে টাইপ করা ম্যাট্রিক্স: [4 2; −8 −4] বা [4, 2; −8, −4] (সারি ; দিয়ে আলাদা) → [(4, 2), (−8, −4)] */
+function mxSemi(s){ return String(s).replace(/([\[|])([^\[\]|()]*;[^\[\]|()]*)([\]|])/g,(m,o,body,c)=>{ if((o==='['&&c!==']')||(o==='|'&&c!=='|')) return m;
+  const rows=body.split(';').map(r=>r.trim()).filter(Boolean).map(r=>r.split(/\s*,\s*|\s+(?![+−\-×÷=]\s)(?<![+−\-×÷=]\s)/).filter(Boolean));
+  if(rows.length<2||rows[0].length<2||rows.some(r=>r.length!==rows[0].length)) return m;
+  const inner=rows.map(r=>'('+r.join(', ')+')').join(', '); return o==='|'?'|'+inner+'|':'['+inner+']'; }); }
+function mxHTML(s){ return supHTML(frHTML(statTable(mxSemi(texConv(s))))).replace(/\n/g,'<br>').replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
   const rows=body.match(new RegExp(MX_R,'g')).map(r=>r.trim().slice(1,-1).split(',').map(x=>x.trim())), n=rows[0].length;
   if(rows.some(r=>r.length!==n)||(o==='|'&&(rows.length<2||n<2))||(rows.length<2&&n<2)) return m;
   return `<span class="mx ${o==='['?'mx-m':'mx-d'}" role="math" aria-label="${o==='['?'ম্যাট্রিক্স':'নির্ণায়ক'}"><span class="mx-g" style="grid-template-columns:repeat(${n},auto)">${rows.flat().map(x=>`<span>${x}</span>`).join('')}</span></span>`; }); }
