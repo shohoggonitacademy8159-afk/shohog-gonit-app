@@ -180,6 +180,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qp-cols{flex:1;min-height:0;display:grid;grid-template-columns:repeat(var(--qc,1),minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
 .qp-col{overflow:hidden;min-width:0}.qp-col:not(:first-child){border-left:1px solid #bbb;padding-left:14px}.qp-col:not(:last-child){padding-right:14px}
 .qp-foot{height:22px;text-align:center;font-size:11px;color:#666;border-top:1px solid #ccc;padding-top:4px;font-family:'Hind Siliguri',sans-serif}
+.qp-foot{position:relative}.qp-mark{position:absolute;right:0;top:4px;font-size:10px;color:#999;letter-spacing:.02em}
 .qp-head{text-align:center;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:10px}
 .qp-brand{font-size:13px;color:#444;font-weight:600}.qp-head h1{font-size:1.47em;margin:4px 0 6px;color:#111;line-height:1.3}
 .qp-inst{font-size:1.75em;font-weight:700;line-height:1.25;color:#111}.qp-inst2{font-size:.9em;color:#333;margin-top:1px}.qp-inst~h1{font-size:1.27em}
@@ -3026,9 +3027,11 @@ function qmFillPreview(el){
   const oid=el.dataset.qmo||'', o=qmPrevOrder(oid); if(!o) return;
   const d=qmD(oid); el.innerHTML='';
   const [pg]=qmLayout(el,o,false,d,1); if(!pg) return;
-  pg.querySelector('.qp-foot').textContent=`${d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি'} — পৃষ্ঠা ১`;
+  qmFoot(pg,d,1,1,true);
   const sc=(el.clientWidth||300)/794; pg.style.transform=`scale(${sc})`; el.style.height=Math.round(1123*sc)+'px';
 }
+function qmFoot(p,d,i,n,one){ const f=p.querySelector('.qp-foot');
+  f.innerHTML=`${esc(d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি')} — পৃষ্ঠা ${bn(i)}${one?'':'/'+bn(n)}${d.inst?'<span class="qp-mark">অংকবাড়ি</span>':''}`; }
 const qmPreviewAll=()=>app.querySelectorAll('.qp-prev').forEach(qmFillPreview);
 function vQmPaper(){
   const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
@@ -3210,7 +3213,7 @@ async function qmMakePdf(id,answers){
     const d=Object.assign(qmDef(),o.d||{});
     if(document.fonts&&document.fonts.load){ try{ await Promise.all([document.fonts.load(`${d.fs}px ${QM_FONTS[d.font][1]}`,'অআকখ১২'),document.fonts.load(`700 ${d.fs}px ${QM_FONTS[d.font][1]}`,'অআকখ')]); }catch(e){} }
     const pages=qmLayout(host,o,answers,d,0);
-    pages.forEach((p,i)=>{ p.querySelector('.qp-foot').textContent=`${d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি'} — পৃষ্ঠা ${bn(i+1)}/${bn(pages.length)}`; });
+    pages.forEach((p,i)=>qmFoot(p,d,i+1,pages.length));
     if(document.fonts&&document.fonts.ready) await document.fonts.ready;
     const pdf=await lib.render(pages,(k,n)=>toast(`PDF তৈরি হচ্ছে… ${bn(k)}/${bn(n)} পৃষ্ঠা`));
     const name=`${o.title.replace(/[\\/:*?"<>|]+/g,' ').trim()||'prosnopotro'}${answers?' - uttor':''}.pdf`;
