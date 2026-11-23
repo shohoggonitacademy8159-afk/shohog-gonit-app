@@ -2934,7 +2934,7 @@ function vQm(){
   const card=(x,i)=>{ const on=isSel(x), no=m.page*PER+i+1;
     const body=m.t==='m'?`<div class="qm-q">${mq(x.q)}</div><div class="qm-o">${(x.o||[]).map((o,j)=>`<span>${'কখগঘ'[j]}) ${mq(o)}</span>`).join('')}</div>`
       :m.t==='s'?`<div class="qm-q">${x.ex||x.lv?`<span class="qm-tag">${x.ex?'অনু. '+bn(exName(x.ex)):''}${x.ex&&x.lv?' · ':''}${x.lv?esc(x.lv):''}</span> `:''}${mq(x.q)}</div>`
-      :`<div class="qm-q">${x.lv?`<span class="qm-tag">${esc(x.lv)}</span> `:''}<b>উদ্দীপক:</b> ${mq(x.stem)}</div><div class="qm-cq">${(x.p||[]).map((p,j)=>`<span>${'কখগঘ'[j]}) ${mq(p)}</span>`).join('')}</div>`;
+      :`<div class="qm-q">${x.lv?`<span class="qm-tag">${esc(x.lv)}</span> `:''}<b>উদ্দীপক:</b> ${mq(x.stem)}</div><div class="qm-cq">${(x.p||[]).map((p,j)=>`<span>${'কখগঘ'[j]}) ${mq(p)} <small class="muted">[${bn(qmCqMarks(x)[j])}]</small></span>`).join('')}</div>`;
     return `<label class="qm-card ${on?'on':''}"><input type="checkbox" data-qmpick="${esc(String(x.n))}" ${on?'checked':''}><span class="qm-no">${bn(no)}</span><div class="qm-body">${body}</div>${CAN_EDIT&&m.t!=='m'&&ownN.has(String(x.n))?`<button class="link danger" data-qmdel="${esc(String(x.n))}" style="align-self:flex-start">মুছুন</button>`:''}</label>`; };
   return `<div class="screen qm">
     ${backTop('কাস্টম প্রশ্ন তৈরি','home')}
@@ -3144,11 +3144,13 @@ function vQmOrders(){
 function qmAdminAdd(m){
   const s=m.t==='s';
   return `<details class="nb-form qm-adm"><summary><b>＋ ${QM_T[m.t][0]} যোগ করুন (অ্যাডমিন)</b></summary>
-    <p class="muted" style="font-size:13px;margin:6px 0">প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। ${s?'বিন্যাস: <code>প্রশ্ন: …</code> এবং ঐচ্ছিক <code>উত্তর: …</code>':'বিন্যাস: <code>উদ্দীপক: …</code>, তারপর <code>ক) … খ) … গ) … ঘ) …</code> আলাদা লাইনে, ঐচ্ছিক <code>উত্তর: …</code>'}</p>
-    <textarea class="input area" rows="7" data-qmf="adm" placeholder="${s?'প্রশ্ন: 2x + 3 = 11 হলে x এর মান কত?\nউত্তর: 2x = 8, তাই x = 4':'উদ্দীপক: একটি ত্রিভুজের বাহুগুলো 5, 12 ও 13 সে.মি.।\nক) ত্রিভুজটির পরিসীমা নির্ণয় কর।\nখ) দেখাও যে ত্রিভুজটি সমকোণী।\nগ) ক্ষেত্রফল নির্ণয় কর।\nঘ) পরিবৃত্তের ব্যাসার্ধ নির্ণয় কর।\nউত্তর: ক) 30 সে.মি. …'}">${esc(m.adm||'')}</textarea>
+    <p class="muted" style="font-size:13px;margin:6px 0">প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। ${s?'বিন্যাস: <code>প্রশ্ন: …</code> এবং ঐচ্ছিক <code>উত্তর: …</code>':'বিন্যাস: <code>উদ্দীপক: …</code>, তারপর <code>ক) … খ) … গ) …</code> আলাদা লাইনে (মান ক = ২, খ = ৪, গ = ৪), ঐচ্ছিক <code>উত্তর: …</code>'}</p>
+    <textarea class="input area" rows="7" data-qmf="adm" placeholder="${s?'প্রশ্ন: 2x + 3 = 11 হলে x এর মান কত?\nউত্তর: 2x = 8, তাই x = 4':'উদ্দীপক: একটি ত্রিভুজের বাহুগুলো 5, 12 ও 13 সে.মি.।\nক) ত্রিভুজটির পরিসীমা নির্ণয় কর।\nখ) দেখাও যে ত্রিভুজটি সমকোণী।\nগ) ক্ষেত্রফল নির্ণয় কর।\nউত্তর: ক) 30 সে.মি. …'}">${esc(m.adm||'')}</textarea>
     <div class="error" role="alert">${esc(m.admErr||'')}</div>
     <button class="btn" data-qmadmsave>যোগ করুন</button></details>`;
 }
+/* সৃজনশীলের মান বণ্টন: তিন অংশ হলে ক ২, খ ৪, গ ৪ (পুরোনো চার অংশের প্রশ্নে ১, ২, ৩, ৪) */
+const qmCqMarks=x=>(x.p||[]).length===4?[1,2,3,4]:[2,4,4];
 function qmParse(text,t){
   const out=[], errs=[]; String(text||'').replace(/\r/g,'').split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean).forEach((b,i)=>{
     const lines=b.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>l.replace(/^\d+\s*[\.\)।]\s*/,''));
@@ -3160,8 +3162,9 @@ function qmParse(text,t){
       q.push(l.replace(/^(প্রশ্ন|উদ্দীপক)\s*[:：]\s*/,'')); });
     const qt=q.join('\n').trim();
     if(!qt) return errs.push(`${bn(i+1)} নম্বরে প্রশ্ন/উদ্দীপক নেই`);
-    if(t==='c'&&[0,1,2,3].some(k=>!parts[k])) return errs.push(`${bn(i+1)} নম্বরে ক, খ, গ, ঘ — চারটি অংশ লাগবে`);
-    out.push(t==='s'?{q:qt.slice(0,1500),a:ans.join('\n').slice(0,3000)}:{stem:qt.slice(0,3000),p:parts.slice(0,4).map(x=>x.slice(0,600)),a:ans.join('\n').slice(0,6000)}); });
+    if(t==='c'&&parts[3]) return errs.push(`${bn(i+1)} নম্বরে ঘ অংশ আছে — সৃজনশীলে ক, খ, গ তিনটি অংশ হয়`);
+    if(t==='c'&&[0,1,2].some(k=>!parts[k])) return errs.push(`${bn(i+1)} নম্বরে ক, খ, গ — তিনটি অংশ লাগবে`);
+    out.push(t==='s'?{q:qt.slice(0,1500),a:ans.join('\n').slice(0,3000)}:{stem:qt.slice(0,3000),p:parts.slice(0,3).map(x=>x.slice(0,600)),a:ans.join('\n').slice(0,6000)}); });
   return {out,errs};
 }
 async function qmAdminSave(){
@@ -3199,7 +3202,7 @@ function qmBlocks(o,answers,d){
     L.forEach(x=>{ no++;
       if(t==='m'){ const os=(x.o||[]).map(mq); B.push(`<div class="qp-q"><div><b>${bn(no)}.</b> ${mq(x.q)}</div><div class="qp-opts oc${ocOf(os)}">${os.map((op,j)=>`<span>${'কখগঘ'[j]}) ${op}</span>`).join('')}</div></div>`); }
       else if(t==='s') B.push(`<div class="qp-q"><b>${bn(no)}.</b> ${mq(x.q)}${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
-      else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(x.stem)}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span> ${mq(p)} <i>${bn([1,2,3,4][j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
+      else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(x.stem)}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span> ${mq(p)} <i>${bn(qmCqMarks(x)[j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
     }); };
   sec('m','বহুনির্বাচনি প্রশ্ন',QM_MARK.m); sec('s','সংক্ষিপ্ত প্রশ্ন',QM_MARK.s); sec('c','সৃজনশীল প্রশ্ন',QM_MARK.c);
   return B;
