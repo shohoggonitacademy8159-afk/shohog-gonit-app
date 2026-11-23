@@ -133,6 +133,45 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .skill:first-child{border-top:0}
 .skill .row{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
+.qm-home{display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:18px;border:0;font:inherit;text-align:left;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0f766e,#2563eb);box-shadow:0 8px 20px rgba(37,99,235,.25)}
+.qm-home b{display:block;font-size:17px}.qm-home small{display:block;font-size:12.5px;opacity:.92}.qm-home-ic{font-size:28px}.qm-home .arrow{margin-left:auto;font-size:24px}
+.qm-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:12.5px;font-weight:700;text-align:center}
+.qm-steps span{padding:6px 2px;border-radius:10px;background:rgba(127,127,127,.12);color:var(--muted)}
+.qm-steps .on{background:var(--accent);color:#fff}.qm-steps .done{background:rgba(22,163,74,.15);color:#16a34a}
+.qm-filters{display:grid;gap:8px}
+.qm-tools{display:flex;gap:8px;flex-wrap:wrap}.qm-tools .input{flex:1 1 160px}.qm-tools .btn{flex:none}
+.qm-list{display:flex;flex-direction:column;gap:10px}
+.qm-card{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer}
+.qm-card.on{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.qm-card input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.qm-no{flex:none;font-weight:700;color:var(--muted);min-width:22px}
+.qm-body{flex:1;min-width:0;font-size:15px;line-height:1.55}
+.qm-o,.qm-cq{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;margin-top:6px;font-size:14px;color:var(--muted)}.qm-cq{grid-template-columns:1fr}
+.qm-pager{display:flex;justify-content:space-between;gap:10px}
+.qm-cart{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh,64px) + 10px);width:min(560px,calc(100% - 20px));z-index:30;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:18px;background:#0f172a;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.qm-cart-l{flex:1;min-width:0}.qm-cart-l b{display:block;font-size:16px}.qm-cart-l small{display:block;font-size:12.5px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qm-cart .link{color:#fca5a5}.qm-cart .btn:disabled{opacity:.5}
+.qm-bill b small{font-weight:500}
+.qm-new{border-color:var(--accent)}
+.qm-adm summary{cursor:pointer}.qm-adm code{font-size:12px}
+/* প্রশ্নপত্রের পাতা (PDF-এর জন্য, পর্দার বাইরে) */
+.qp-host{position:fixed;left:-10000px;top:0;width:794px;z-index:-1}
+.qp-page{width:794px;height:1123px;padding:46px 54px 26px;background:#fff;color:#111;box-sizing:border-box;display:flex;flex-direction:column;font-size:15px;line-height:1.55}
+.qp-page .muted{color:#555}
+.qp-body{flex:1;overflow:hidden}
+.qp-foot{height:22px;text-align:center;font-size:11px;color:#666;border-top:1px solid #ccc;padding-top:4px}
+.qp-head{text-align:center;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:10px}
+.qp-brand{font-size:13px;color:#444;font-weight:600}.qp-head h1{font-size:22px;margin:4px 0 6px;color:#111}
+.qp-meta,.qp-info{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;font-weight:600;font-size:14px}.qp-info{justify-content:space-between;margin-top:8px;font-weight:500}
+.qp-sec{font-size:17px;margin:12px 0 6px;padding:4px 10px;background:#f1f5f9;border-left:4px solid #111;color:#111}.qp-sec small{font-weight:500;font-size:13px}
+.qp-q{margin:0 0 9px;break-inside:avoid}
+.qp-opts{display:grid;grid-template-columns:1fr 1fr;gap:1px 18px;padding-left:22px;margin-top:2px}
+.qp-parts{padding-left:22px;margin-top:4px}.qp-parts div{display:flex;gap:6px}.qp-parts i{margin-left:auto;font-style:normal;font-weight:700}
+.qp-ans{margin:4px 0 0 22px;padding:6px 10px;border-left:3px solid #16a34a;background:#f0fdf4;white-space:pre-line}
+.qp-akey{display:grid;grid-template-columns:repeat(6,1fr);gap:4px 8px;margin-bottom:10px;font-size:15px}
+.mx-r::before,.mx-r::after{display:none}.mxb{display:block;flex:0 0 5px;border:1.6px solid #111}.mx-m .mxb-l{border-right:0}.mx-m .mxb-r{border-left:0}.mx-d .mxb{flex-basis:0}.mx-d .mxb-l{border-width:0 0 0 1.6px}.mx-d .mxb-r{border-width:0 1.6px 0 0}
+.qp-page .frc{color:#111}.qp-page .mx,.qp-page .stbl{color:#111}
+
 .q-import{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
 .pc-card{display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:20px;background:var(--surface);border:1.5px solid var(--line);text-align:center}
 .pc-ic{font-size:44px;line-height:1}
@@ -1173,6 +1212,7 @@ const S = {
   user: saved.user||null,
   joined: !!saved.joined,
   enrolled: saved.enrolled||{},
+  qorders: saved.qorders||{},
   results: saved.results||{},     // quizId -> {best,total,last}
   done: saved.done||{},           // "courseId:idx" -> true
   exams: saved.exams||{},
@@ -1193,7 +1233,7 @@ const S = {
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,noticeSeen:S.noticeSeen,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,noticeSeen:S.noticeSeen,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,qorders:S.qorders,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -1287,6 +1327,7 @@ function vHome(){
     ${updBanner()}${todayExamBanner()}
     ${myPkgBar()}
     <section class="cls-home"><h2>🎥 লাইভ ও রেকর্ড ক্লাস</h2>${classBtns(hubCourse())}</section>
+    <button class="qm-home" data-go="qm"><span class="qm-home-ic" aria-hidden="true">📝</span><span><b>কাস্টম প্রশ্ন তৈরি</b><small>প্রশ্নব্যাংক থেকে বেছে নিজের প্রশ্নপত্র PDF · MCQ ৳${tk(qmCfg().m)}/টি</small></span><span class="arrow" aria-hidden="true">›</span></button>
     ${SECTIONS.map(sec=>`<section class="panel">
       <div class="panel-head">${art(sec.art)}<h2>${sec.title}</h2><span class="rule"></span>
         <span class="chev" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
@@ -1650,7 +1691,7 @@ function vProfile(){
     <div class="profile-card"><span class="avatar">স</span><div style="min-width:0"><b style="font-size:18px">শিক্ষার্থী</b><br><span class="muted" style="word-break:break-all">${esc(bn(id))}</span></div></div>
     ${CAN_EDIT?`<div class="list">${item('data-go="admin"','pencil','c-violet','অ্যাডমিন প্যানেল','রুটিন, প্রশ্ন, ফলাফল ও রিপোর্ট')}</div>`:''}
     <h3 class="m-sec">পেমেন্ট</h3>
-    <div class="list">${item('data-go="pay"','wallet','c-teal','পেমেন্ট ও অর্ডার হিস্ট্রি',nEn?`${bn(nEn)}টি প্যাকেজ`:'')}</div>
+    <div class="list">${item('data-go="pay"','wallet','c-teal','পেমেন্ট ও অর্ডার হিস্ট্রি',nEn?`${bn(nEn)}টি প্যাকেজ`:'')}${item('data-go="qm" data-qmorders="1"','book','c-blue','আমার তৈরি প্রশ্ন',qmOrders().length?`${bn(qmOrders().length)}টি প্রশ্নপত্র`:'কাস্টম প্রশ্নপত্র তৈরি ও ডাউনলোড')}</div>
     <h3 class="m-sec">পড়াশোনা</h3>
     <div class="list">
       ${item('data-go="routine"','calendar','c-blue','পরীক্ষার রুটিন')}
@@ -1778,6 +1819,7 @@ async function refreshPays(){
   for(const id of ids){
     try{ const d=await DB.collection('payments').doc(id).get(); if(!d) continue;
       const p=S.pays[id]; if(d.status!==p.status||d.until!==p.until){ Object.assign(p,{status:d.status,until:d.until||0,note:d.note||''}); changed=true; }
+      if(d.status==='approved'&&String(p.course).startsWith('qm:')){ p.synced=true; changed=true; continue; }
       if(d.status==='approved'&&d.until){ const cur=S.enrolled[p.course]; if(!cur||!cur.until||+cur.until<+d.until) S.enrolled[p.course]={at:Date.now(),until:+d.until,pay:id}; p.synced=true; changed=true; }
     }catch(e){}
   }
@@ -1790,7 +1832,7 @@ function watchPays(){
   if(payUnsub||!DB) return;
   try{ payUnsub=DB.collection('payments').onSnapshot(snap=>{ const m={}; snap.docs.forEach(d=>{ m[d.id]=Object.assign({id:d.id},d.data()); }); PAY=m; PAY_OK=true; adminNotify('pay',m); softRender(); },()=>{ PAY_OK=false; payUnsub=null; softRender(); }); }catch(e){ PAY_OK=false; }
 }
-function pcInit(){ if(!S.pc){ const c=payCfg(); S.pc=Object.assign({},c,{busy:false,err:''}); } return S.pc; }
+function pcInit(){ if(!S.pc){ const c=payCfg(), q=qmCfg(); S.pc=Object.assign({},c,{qmM:String(q.m/100),qmS:String(q.s/100),qmC:String(q.c/100),qmDisc:String(q.disc),qmMin:String(q.min),busy:false,err:''}); } return S.pc; }
 function payPanel(){
   watchPays();
   const pc=pcInit(), list=Object.values(PAY).sort((a,b)=>String(b.at).localeCompare(String(a.at))), f=S.payF||'pending';
@@ -1806,6 +1848,10 @@ function payPanel(){
       <div class="field"><label>শিক্ষার্থীদের জন্য নির্দেশনা (ঐচ্ছিক)</label><textarea class="input area" data-pcf="note" maxlength="300" rows="2" placeholder="যেমন: শুধু Send Money করবেন, Cash Out নয়।">${esc(pc.note)}</textarea></div>
       <div class="field"><label>এক মাসের ফি দিলে প্যাকেজ কত দিন চালু থাকবে</label><input class="input" data-pcf="days" inputmode="numeric" maxlength="3" value="${esc(String(pc.days))}"></div>
       <p class="muted" style="margin:0;font-size:13px">🔒 নিয়ম (সবসময় চালু): প্যাকেজ ছাড়া কেউ পেইড কোর্সের পরীক্ষা দিতে পারবে না। শুধু ফ্রী ব্যাচের পরীক্ষা দেওয়া ও স্টাডি ম্যাটেরিয়াল দেখা যাবে।</p>
+      <h4 style="margin:10px 0 0">📝 কাস্টম প্রশ্নপত্রের দাম (টাকা)</h4>
+      <div class="nb-row">${[['qmM','প্রতি MCQ'],['qmS','প্রতি সংক্ষিপ্ত'],['qmC','প্রতি সৃজনশীল']].map(([k,l])=>`<div class="field" style="flex:1"><label>${l}</label><input class="input" data-pcf="${k}" inputmode="decimal" maxlength="6" value="${esc(String(pc[k]))}"></div>`).join('')}</div>
+      <div class="nb-row"><div class="field" style="flex:1"><label>প্যাকেজধারীদের ছাড় (%)</label><input class="input" data-pcf="qmDisc" inputmode="numeric" maxlength="2" value="${esc(String(pc.qmDisc))}"></div>
+        <div class="field" style="flex:1"><label>সর্বনিম্ন পেমেন্ট (টাকা, ০ = নেই)</label><input class="input" data-pcf="qmMin" inputmode="numeric" maxlength="3" value="${esc(String(pc.qmMin))}"></div></div>
       <div class="error" role="alert">${esc(pc.err||'')}</div>
       <button class="btn" data-pcsave ${pc.busy?'disabled':''}>${pc.busy?'সংরক্ষণ হচ্ছে…':'সেটিং সংরক্ষণ কর'}</button></div></details>
     ${PAY_OK===false?`<div class="empty">পেমেন্ট তালিকা দেখা যাচ্ছে না। Firebase Rules-এ "payments" অংশটি যোগ করা হয়েছে কি না দেখুন।</div>`:''}
@@ -1815,7 +1861,7 @@ function payPanel(){
       return `<article class="xa-card"><div class="xa-top"><span class="xa-date">${fmtT(p.at)}</span><span class="xa-pill ${p.status==='approved'?'st-done':p.status==='rejected'?'st-miss':'st-sched'}">${p.status==='approved'?'অনুমোদিত':p.status==='rejected'?'বাতিল':'যাচাই বাকি'}</span></div>
         <h3 class="xa-title" style="font-size:17px">${esc(p.name||'')}${p.roll?' · রোল '+esc(p.roll):''}</h3>
         <div class="pay-rows">
-          <span>কোর্স</span><b>${c?esc(c.name+' '+(c.subj||'')):esc(p.course)}</b>
+          <span>কোর্স</span><b>${c?esc(c.name+' '+(c.subj||'')):String(p.course).startsWith('qm:')?'📝 কাস্টম প্রশ্নপত্র (অর্ডার '+esc(p.course.slice(3))+')':esc(p.course)}</b>
           <span>মাধ্যম</span><b>${payName(p.method)} · ${bn(p.months||1)} মাস</b>
           <span>টাকা</span><b>৳${bn(p.amount)}</b>
           <span>পাঠানো নম্বর</span><b><a href="tel:${esc(p.sender)}">${esc(p.sender)}</a></b>
@@ -1833,7 +1879,8 @@ async function decidePay(id,status){
   const p=PAY[id]; if(!p||!DB) return;
   const r=Object.assign({},p); delete r.id;
   r.status=status; r.decidedAt=new Date().toISOString();
-  if(status==='approved'){
+  if(status==='approved'&&String(p.course).startsWith('qm:')){ delete r.until; }
+  else if(status==='approved'){
     const prev=Object.values(PAY).filter(x=>x.id!==id&&x.status==='approved'&&x.course===p.course&&(p.uid?x.uid===p.uid:x.device===p.device)&&x.until).reduce((m,x)=>Math.max(m,+x.until),0);
     const start=Math.max(Date.now(),prev); r.until=start+payCfg().days*(+p.months||1)*DAYMS;
   } else if(status==='pending'){ delete r.until; delete r.decidedAt; }
@@ -1843,7 +1890,7 @@ async function decidePay(id,status){
 }
 async function savePayCfg(){
   const pc=pcInit(), clean=v=>en(String(v||'')).replace(/[^\d]/g,'');
-  const r={type:'paycfg',bkash:clean(pc.bkash),nagad:clean(pc.nagad),rocket:clean(pc.rocket),note:String(pc.note||'').slice(0,300),enforce:!!pc.enforce,days:Math.min(366,Math.max(1,Math.round(+en(String(pc.days))||30))),publishAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  const r={type:'paycfg',bkash:clean(pc.bkash),nagad:clean(pc.nagad),rocket:clean(pc.rocket),note:String(pc.note||'').slice(0,300),enforce:!!pc.enforce,days:Math.min(366,Math.max(1,Math.round(+en(String(pc.days))||30))),qmM:Math.max(0,+en(String(pc.qmM))||0),qmS:Math.max(0,+en(String(pc.qmS))||0),qmC:Math.max(0,+en(String(pc.qmC))||0),qmDisc:Math.min(90,Math.max(0,Math.round(+en(String(pc.qmDisc))||0))),qmMin:Math.max(0,Math.round(+en(String(pc.qmMin))||0)),publishAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
   if(['bkash','nagad','rocket'].some(k=>r[k]&&!/^01[3-9]\d{8}$/.test(r[k]))){ pc.err='প্রতিটি নম্বর ১১ অঙ্কের হতে হবে (01 দিয়ে শুরু)।'; render(); return; }
   if(!r.bkash&&!r.nagad&&!r.rocket){ pc.err='কমপক্ষে একটি নম্বর দিন।'; render(); return; }
   pc.busy=true; pc.err=''; render();
@@ -1860,7 +1907,7 @@ function vPay(){
     ${act.map(k=>{ const on=pkgActive(k); return `<section class="pay-sum"><div><b>${esc(ptitle(COURSES[k]))}</b><span class="muted">${on?`প্যাকেজ চালু · ${bnD(new Date(pkgUntil(k))).split(',')[0]} পর্যন্ত`:`মেয়াদ শেষ হয়েছে ${bnD(new Date(pkgUntil(k))).split(',')[0]}`}</span></div><button class="btn ${on?'outline':''}" data-buy="${k}">${on?'আগাম নবায়ন':'নবায়ন করো'}</button></section>`; }).join('')}
     ${pays.length?`<h3 class="m-sec">পেমেন্টের তালিকা</h3>`+pays.map(p=>{ const c=COURSES[p.course];
       return `<article class="xa-card"><div class="xa-top"><span class="xa-date">${p.at?bnD(new Date(p.at)):''}</span><span class="xa-pill ${p.status==='approved'?'st-done':p.status==='rejected'?'st-miss':'st-sched'}">${p.status==='approved'?'অনুমোদিত':p.status==='rejected'?'বাতিল':'যাচাই হচ্ছে'}</span></div>
-        <h3 class="xa-title">${c?esc(ptitle(c)):esc(p.course)}</h3>
+        <h3 class="xa-title">${c?esc(ptitle(c)):String(p.course).startsWith('qm:')?'📝 কাস্টম প্রশ্নপত্র':esc(p.course)}</h3>
         <div class="pay-rows"><span>টাকা</span><b>৳${bn(p.amount)} · ${bn(p.months||1)} মাস</b><span>মাধ্যম</span><b>${payName(p.method)} · ${esc(p.sender)}</b><span>TrxID</span><b class="trx">${esc(p.trx)}</b>${p.until&&p.status==='approved'?`<span>চালু থাকবে</span><b>${bnD(new Date(p.until)).split(',')[0]} পর্যন্ত</b>`:''}</div>
         ${p.status==='pending'?`<p class="muted" style="margin:0;font-size:13.5px">শিক্ষক TrxID মিলিয়ে দেখছেন। অনুমোদন হলে প্যাকেজ নিজে থেকে চালু হবে।</p><button class="btn outline" data-paycheck>অবস্থা আবার দেখো</button>`
           :p.status==='rejected'?`<p class="muted" style="margin:0;font-size:13.5px">TrxID মেলেনি। ঠিক TrxID দিয়ে আবার জমা দাও বা "সমস্যা জানাও" থেকে যোগাযোগ করো।</p><button class="btn" data-buy="${esc(p.course)}">আবার জমা দাও</button>`:''}
@@ -2678,7 +2725,7 @@ const PHONE_DOMAIN='phone.sohog.app';
 let AUTHBUSY=false, ACCT_UNSUB=null, CLOUD_T=null, AUTH_KNOWN=false;
 const normPhone=v=>{ const d=en(String(v||'')).replace(/[\s-]/g,'').replace(/^\+?88/,''); return /^01[3-9]\d{8}$/.test(d)?d:''; };
 const isEmail=v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(v||'').trim());
-const ACCT_KEYS=['exams','retakes','fav','favx','results','done','enrolled','pays'];
+const ACCT_KEYS=['exams','retakes','fav','favx','results','done','enrolled','pays','qorders'];
 function acctBlob(){ const o={}; ACCT_KEYS.forEach(k=>o[k]=S[k]||{}); o.joined=!!S.joined; o.reports=(S.reports||[]).slice(-50); return JSON.stringify(o); }
 function applyBlob(str,merge){
   PAYV_OK=false; PAYV={}; setTimeout(()=>verifyPays(true),50);
@@ -2687,7 +2734,7 @@ function applyBlob(str,merge){
   S.joined=!!d.joined||(merge&&!!S.joined);
   const r=Array.isArray(d.reports)?d.reports:[]; const rk=x=>x?String(x.at||'')+'|'+String(x.text||'').slice(0,40):''; S.reports=merge?r.concat((S.reports||[]).filter(x=>!r.some(y=>rk(y)===rk(x)))):r;
 }
-const clearPersonal=()=>(PAYV={},PAYV_OK=false,Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},results:{},done:{},examRun:null,reports:[],joined:false}));
+const clearPersonal=()=>(PAYV={},PAYV_OK=false,Object.assign(S,{student:null,exams:{},retakes:{},fav:{},favx:{},enrolled:{},pays:{},qorders:{},results:{},done:{},examRun:null,reports:[],joined:false}),S.qm=null);
 function cloudSoon(){ if(!S.uid||!DB||!DB.docSet||AUTHBUSY) return; clearTimeout(CLOUD_T); CLOUD_T=setTimeout(cloudSave,1500); }
 function cloudSave(){ if(!S.uid||!DB||AUTHBUSY) return;
   const st=S.student||{};
@@ -2784,6 +2831,273 @@ function vPc(){
     </ol>
     <p class="muted" style="font-size:13.5px;text-align:center;margin:0">টিপস: কম্পিউটারে প্রশ্ন যোগ/সম্পাদনা, ফলাফল দেখা ও লম্বা লেখা টাইপ করা সহজ।</p>
   </div>`;
+}
+/* ===== কাস্টম প্রশ্ন তৈরি (প্রশ্নপত্র বানাও) =====
+   ১) প্রশ্নব্যাংক থেকে বাছাই (MCQ = bankFor; সংক্ষিপ্ত/সৃজনশীল = syllabus/sq_<cid>_<ch>, cq_<cid>_<ch> — অ্যাডমিন যোগ করেন)
+   ২) দাম: প্রতি MCQ/সংক্ষিপ্ত ০.৫০, সৃজনশীল ২.০০ টাকা (অ্যাডমিন বদলাতে পারেন; হিসাব পয়সায়, পরিশোধ পূর্ণ টাকায় — বিকাশে পয়সা যায় না)
+   ৩) পেমেন্ট: বিদ্যমান বিকাশ/নগদ/রকেট → অ্যাডমিন অনুমোদন (payments, course = "qm:<অর্ডার id>")
+   ৪) অনুমোদনের পর প্রশ্নপত্র ও উত্তরপত্র PDF (pdfgen.js — html2canvas + jsPDF; বাংলা ও গণিত লেখা অ্যাপের মতোই)
+   অর্ডারগুলো শিক্ষার্থীর অ্যাকাউন্টে থাকে (S.qorders) — "আমার তৈরি প্রশ্ন" থেকে যেকোনো সময় আবার ডাউনলোড। */
+const QM_T={m:['বহুনির্বাচনি (MCQ)','MCQ'],s:['সংক্ষিপ্ত প্রশ্ন','সংক্ষিপ্ত'],c:['সৃজনশীল প্রশ্ন','সৃজনশীল']};
+const QM_MARK={m:1,s:2,c:10};
+const qmCfg=()=>{ const r=SYL.paycfg||{}, p=(v,d)=>{ const x=Math.round(parseFloat(v)*100); return isFinite(x)&&x>=0?x:d; };
+  return {m:p(r.qmM,50),s:p(r.qmS,50),c:p(r.qmC,200),disc:Math.min(90,Math.max(0,+r.qmDisc||0)),min:Math.max(0,Math.round(+r.qmMin||0))}; };
+const tk=p=>{ const s=(p/100).toFixed(2); return bn(s.endsWith('.00')?s.slice(0,-3):s); };   // পয়সা → "১৩.৫০"
+const qmKey=(t,cid,ch,n)=>`${t}|${cid}|${ch}|${n}`;
+function qmInit(){ if(!S.qm){ const ids=OFFER_IDS(); S.qm={cid:ids.includes(hubCourse())?hubCourse():ids[0],ch:'1',t:'m',q:'',page:0,sel:{},order:[],step:'pick',title:'',time:'',marks:'',ans:true,pay:null,adm:'',admT:'s',admErr:''}; } return S.qm; }
+function qmPool(cid,ch,t){
+  if(t==='m') return bankFor(cid,ch).map(x=>({n:x.n,q:x.q,o:x.o,a:x.a,e:x.e}));
+  const d=SYL[`${t==='s'?'sq':'cq'}_${cid}_${ch}`]; return d&&Array.isArray(d.items)?d.items:[];
+}
+function qmItem(k){ const [t,cid,ch,n]=k.split('|'); return Object.assign({t,cid,ch},(qmPool(cid,ch,t).find(x=>String(x.n)===n)||null)||{missing:true,n}); }
+function qmCalc(keys){
+  const cfg=qmCfg(), c={m:0,s:0,c:0}; keys.forEach(k=>{ c[k[0]]=(c[k[0]]||0)+1; });
+  const sub=c.m*cfg.m+c.s*cfg.s+c.c*cfg.c, hasPkg=PKG_IDS().some(pkgActive), disc=hasPkg&&cfg.disc?Math.round(sub*cfg.disc/100):0;
+  const net=sub-disc, pay=net>0?Math.max(cfg.min,Math.ceil(net/100)):0;
+  return {c,sub,disc,net,pay,cfg,marks:c.m*QM_MARK.m+c.s*QM_MARK.s+c.c*QM_MARK.c,n:keys.length};
+}
+const qmOrders=()=>Object.values(S.qorders||{}).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+const qmPaid=o=>o&&(o.status==='paid'||o.free);
+
+/* ---------- বাছাই পাতা ---------- */
+function vQm(){
+  const m=qmInit(); if(m.step==='paper') return vQmPaper(); if(m.step==='pay') return vQmPay(); if(m.step==='orders') return vQmOrders();
+  const ids=OFFER_IDS(), c=COURSES[m.cid]||COURSES[ids[0]], chs=c.chapters||[];
+  const pool=qmPool(m.cid,m.ch,m.t), qq=String(m.q||'').trim().toLowerCase();
+  const list=qq?pool.filter(x=>String(x.q||x.stem||'').toLowerCase().includes(qq)):pool;
+  const PER=20, pages=Math.max(1,Math.ceil(list.length/PER)); m.page=Math.min(m.page,pages-1);
+  const shown=list.slice(m.page*PER,m.page*PER+PER), calc=qmCalc(m.order);
+  const isSel=x=>!!m.sel[qmKey(m.t,m.cid,m.ch,x.n)];
+  const card=(x,i)=>{ const on=isSel(x), no=m.page*PER+i+1;
+    const body=m.t==='m'?`<div class="qm-q">${mq(x.q)}</div><div class="qm-o">${(x.o||[]).map((o,j)=>`<span>${'কখগঘ'[j]}) ${mq(o)}</span>`).join('')}</div>`
+      :m.t==='s'?`<div class="qm-q">${mq(x.q)}</div>`
+      :`<div class="qm-q"><b>উদ্দীপক:</b> ${mq(x.stem)}</div><div class="qm-cq">${(x.p||[]).map((p,j)=>`<span>${'কখগঘ'[j]}) ${mq(p)}</span>`).join('')}</div>`;
+    return `<label class="qm-card ${on?'on':''}"><input type="checkbox" data-qmpick="${esc(String(x.n))}" ${on?'checked':''}><span class="qm-no">${bn(no)}</span><div class="qm-body">${body}</div>${CAN_EDIT&&m.t!=='m'?`<button class="link danger" data-qmdel="${esc(String(x.n))}" style="align-self:flex-start">মুছুন</button>`:''}</label>`; };
+  return `<div class="screen qm">
+    ${backTop('কাস্টম প্রশ্ন তৈরি','home')}
+    <div class="qm-steps"><span class="on">১ বাছাই</span><span>২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
+    <button class="btn ghost" data-qmstep="orders" style="width:100%">📁 আমার তৈরি প্রশ্ন${qmOrders().length?` (${bn(qmOrders().length)})`:''}</button>
+    <div class="qm-filters">
+      <div class="field"><label for="qmC">শ্রেণি ও বিষয়</label><select class="input" id="qmC" data-qmf="cid">${ids.map(k=>`<option value="${k}" ${k===m.cid?'selected':''}>${esc(ptitle(COURSES[k]))}</option>`).join('')}</select></div>
+      <div class="field"><label for="qmCh">অধ্যায়</label><select class="input" id="qmCh" data-qmf="ch">${chs.map((n,j)=>`<option value="${j+1}" ${String(j+1)===String(m.ch)?'selected':''}>${bn(j+1)}. ${esc(n)}</option>`).join('')}</select></div>
+    </div>
+    <div class="seg" style="grid-template-columns:repeat(3,minmax(0,1fr))">${['m','s','c'].map(t=>{ const n=qmPool(m.cid,m.ch,t).length; return `<button class="seg-btn" aria-selected="${m.t===t}" data-qmt="${t}">${QM_T[t][1]} (${bn(n)})<br><small>৳${tk(qmCfg()[t])}/টি</small></button>`; }).join('')}</div>
+    ${CAN_EDIT&&m.t!=='m'?qmAdminAdd(m):''}
+    <div class="qm-tools"><input class="input" data-qmf="q" placeholder="প্রশ্ন খুঁজুন…" value="${esc(m.q)}">
+      ${list.length?`<button class="btn ghost" data-qmall="1">এই পাতার সব</button><button class="btn ghost" data-qmrand="10">এলোমেলো ১০টি</button>`:''}</div>
+    ${list.length?`<p class="muted" style="margin:0;font-size:13.5px">${bn(list.length)}টি প্রশ্ন · পাতা ${bn(m.page+1)}/${bn(pages)}</p>
+      <div class="qm-list">${shown.map(card).join('')}</div>
+      ${pages>1?`<div class="qm-pager"><button class="btn ghost" data-qmpg="-1" ${m.page?'':'disabled'}>← আগের</button><button class="btn ghost" data-qmpg="1" ${m.page<pages-1?'':'disabled'}>পরের →</button></div>`:''}`
+      :`<div class="empty">${m.t==='m'?'এই অধ্যায়ে প্রশ্ন নেই।':`এই অধ্যায়ে এখনো ${QM_T[m.t][0]} যোগ করা হয়নি।${CAN_EDIT?' উপরের ঘরে যোগ করুন।':' শীঘ্রই যোগ হবে।'}`}</div>`}
+    <div style="height:96px"></div>
+    ${qmCart(calc,'paper')}
+  </div>`;
+}
+function qmCart(calc,next){
+  const m=qmInit();
+  return `<div class="qm-cart" role="region" aria-label="সিলেক্টেড প্রশ্ন">
+    <div class="qm-cart-l"><b>${bn(calc.n)}টি প্রশ্ন${calc.n?` · ৳${tk(calc.net)}`:''}</b>
+      <small>${['m','s','c'].filter(t=>calc.c[t]).map(t=>`${QM_T[t][1]} ${bn(calc.c[t])}`).join(' · ')||'প্রশ্নে টিক দিয়ে বাছাই করুন'}</small></div>
+    ${calc.n?`<button class="link danger" data-qmclear>খালি</button>`:''}
+    <button class="btn" data-qmstep="${next}" ${calc.n?'':'disabled'}>পরবর্তী →</button>
+  </div>`;
+}
+function qmBreak(calc){
+  const row=t=>calc.c[t]?`<span>${QM_T[t][0]}</span><b>${bn(calc.c[t])} × ৳${tk(calc.cfg[t])} = ৳${tk(calc.c[t]*calc.cfg[t])}</b>`:'';
+  return `<div class="pay-rows qm-bill">${row('m')}${row('s')}${row('c')}
+    ${calc.disc?`<span>প্যাকেজধারী ছাড় (${bn(calc.cfg.disc)}%)</span><b>− ৳${tk(calc.disc)}</b>`:''}
+    <span><b>মোট</b></span><b>৳${tk(calc.net)}</b>
+    ${!CAN_EDIT&&calc.pay*100!==calc.net?`<span>পরিশোধযোগ্য</span><b>৳${bn(calc.pay)} <small class="muted">(${calc.cfg.min&&calc.pay===calc.cfg.min&&calc.net<calc.cfg.min*100?'সর্বনিম্ন পেমেন্ট':'পূর্ণ টাকায়'})</small></b>`:''}</div>`;
+}
+/* ---------- প্রশ্নপত্রের তথ্য ---------- */
+function vQmPaper(){
+  const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
+  if(!m.title) m.title=`${c.name||''} ${c.subj||''} — মডেল টেস্ট`.trim();
+  const autoTime=Math.max(10,calc.c.m*1+calc.c.s*3+calc.c.c*25);
+  return `<div class="screen qm">${backTop('প্রশ্নপত্রের তথ্য','qm')}
+    <div class="qm-steps"><span class="done">১ বাছাই</span><span class="on">২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
+    <div class="field"><label for="qmTi">পরীক্ষার নাম / শিরোনাম</label><input class="input" id="qmTi" data-qmf="title" maxlength="80" value="${esc(m.title)}"></div>
+    <div class="nb-row"><div class="field" style="flex:1"><label for="qmTm">সময় (মিনিট)</label><input class="input" id="qmTm" data-qmf="time" inputmode="numeric" maxlength="3" placeholder="${bn(autoTime)}" value="${esc(m.time)}"></div>
+      <div class="field" style="flex:1"><label for="qmMk">পূর্ণমান</label><input class="input" id="qmMk" data-qmf="marks" inputmode="numeric" maxlength="4" placeholder="${bn(calc.marks)}" value="${esc(m.marks)}"></div></div>
+    <p class="muted" style="margin:-4px 0 0;font-size:13px">ফাঁকা রাখলে সময় ${bn(autoTime)} মিনিট ও পূর্ণমান ${bn(calc.marks)} (MCQ ১, সংক্ষিপ্ত ২, সৃজনশীল ১০ নম্বর করে) বসবে।</p>
+    <label class="chk"><input type="checkbox" data-qmf="ans" ${m.ans?'checked':''}> উত্তরপত্র / সমাধানও তৈরি হবে</label>
+    <h3 class="m-sec">বিল</h3>${qmBreak(calc)}
+    <div class="error" role="alert">${esc(m.err||'')}</div>
+    <button class="btn" data-qmcreate style="width:100%" ${calc.n?'':'disabled'}>${CAN_EDIT?'প্রশ্নপত্র তৈরি করুন (অ্যাডমিন — ফ্রী)':calc.pay?`পেমেন্ট করুন ও প্রশ্ন তৈরি করুন · ৳${bn(calc.pay)}`:'প্রশ্নপত্র তৈরি করুন'}</button>
+    <button class="btn ghost" data-qmstep="pick" style="width:100%">← প্রশ্ন বাছাইয়ে ফিরুন</button>
+  </div>`;
+}
+function qmCreateOrder(){
+  const m=qmInit(), calc=qmCalc(m.order); if(!calc.n) return;
+  const id='q'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), c=COURSES[m.cid]||{};
+  const o={id,at:new Date().toISOString(),title:String(m.title||'').trim().slice(0,80)||'মডেল টেস্ট',cid:m.cid,cls:c.name||'',subj:c.subj||'',
+    time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),ans:!!m.ans,
+    items:m.order.slice(0,300),count:calc.c,net:calc.net,amount:calc.pay,free:CAN_EDIT||calc.pay===0,status:CAN_EDIT||calc.pay===0?'paid':'draft'};
+  S.qorders=S.qorders||{}; S.qorders[id]=o; persist();
+  m.sel={}; m.order=[]; m.title=''; m.time=''; m.marks=''; m.cur=id;
+  if(o.free){ m.step='orders'; toast('প্রশ্নপত্র তৈরি হয়েছে — এখন PDF ডাউনলোড করুন'); }
+  else { m.step='pay'; m.pay=null; }
+  render();
+}
+/* ---------- পেমেন্ট (বিদ্যমান বিকাশ/নগদ/রকেট, অ্যাডমিন অনুমোদন) ---------- */
+function vQmPay(){
+  const m=qmInit(), o=(S.qorders||{})[m.cur]; if(!o){ m.step='orders'; return vQmOrders(); }
+  const ms=payMethods(), cfg=payCfg(), f=m.pay=m.pay&&m.pay.id===o.id?m.pay:{id:o.id,m:(ms[0]||[''])[0],sender:'',trx:'',name:S.student?S.student.name:'',err:'',busy:false};
+  const num_=cfg[f.m]||'';
+  return `<div class="screen pay qm">${backTop('পেমেন্ট','qm')}
+    <div class="qm-steps"><span class="done">১ বাছাই</span><span class="done">২ প্রশ্নপত্র</span><span class="on">৩ পেমেন্ট</span><span>৪ PDF</span></div>
+    <section class="pay-sum"><div><b>${esc(o.title)}</b><span class="muted">${['m','s','c'].filter(t=>o.count[t]).map(t=>`${QM_T[t][1]} ${bn(o.count[t])}টি`).join(' · ')}</span></div><span class="chip">৳${bn(o.amount)}</span></section>
+    ${!ms.length?`<div class="empty">পেমেন্ট নম্বর এখনো যোগ করা হয়নি। কিছুক্ষণ পর আবার চেষ্টা করুন।</div>`:`
+    <h3 class="pay-h"><span>১</span> কোন মাধ্যমে পাঠাবেন?</h3>
+    <div class="pay-ms">${ms.map(([k,l,col])=>`<button class="pay-m" style="--pc:${col}" aria-pressed="${f.m===k}" data-qmpm="${k}"><b>${l}</b><small>Send Money</small></button>`).join('')}</div>
+    <h3 class="pay-h"><span>২</span> টাকা পাঠান</h3>
+    <section class="pay-box" style="--pc:${(PAYM.find(x=>x[0]===f.m)||PAYM[0])[2]}">
+      <div class="pay-num"><div><small>${payName(f.m)} পার্সোনাল নম্বর</small><b>${esc(num_)}</b></div><button class="btn ghost" data-paycopy="${esc(num_)}">কপি</button></div>
+      <div class="pay-amt"><small>পাঠাতে হবে</small><b>৳${bn(o.amount)}</b></div>
+    </section>
+    <h3 class="pay-h"><span>৩</span> তথ্য জমা দিন</h3>
+    <div class="field"><label for="qpN">আপনার নাম</label><input class="input" id="qpN" data-qmp="name" maxlength="60" value="${esc(f.name)}"></div>
+    <div class="field"><label for="qpS">যে নম্বর থেকে টাকা পাঠিয়েছেন</label><input class="input" id="qpS" data-qmp="sender" inputmode="tel" maxlength="14" value="${esc(f.sender)}" placeholder="01XXXXXXXXX"></div>
+    <div class="field"><label for="qpT">Transaction ID (TrxID)</label><input class="input" id="qpT" data-qmp="trx" maxlength="20" autocapitalize="characters" value="${esc(f.trx)}" placeholder="যেমন: 9KD4ABC12X"></div>
+    <div class="error" role="alert">${esc(f.err||'')}</div>
+    <button class="btn" data-qmpaysend style="width:100%" ${f.busy?'disabled':''}>${f.busy?'জমা হচ্ছে…':`যাচাইয়ের জন্য জমা দিন · ৳${bn(o.amount)}`}</button>
+    <p class="muted" style="margin:0;font-size:13px;text-align:center">শিক্ষক TrxID মিলিয়ে অনুমোদন দিলেই "আমার তৈরি প্রশ্ন" থেকে PDF ডাউনলোড করা যাবে।</p>`}
+  </div>`;
+}
+async function qmSendPay(){
+  const m=qmInit(), f=m.pay, o=f&&(S.qorders||{})[f.id]; if(!o) return;
+  const fail=x=>{ f.err=x; f.busy=false; render(); };
+  const name=String(f.name||'').trim().replace(/\s+/g,' '), sender=en(String(f.sender||'')).replace(/[^\d]/g,''), trx=String(f.trx||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(name.length<2) return fail('নাম লিখুন।');
+  if(!/^01[3-9]\d{8}$/.test(sender)) return fail('সঠিক ১১ অঙ্কের মোবাইল নম্বর লিখুন (01 দিয়ে শুরু)।');
+  if(trx.length<8||trx.length>12) return fail('Transaction ID ঠিকমতো লিখুন (৮–১২ অক্ষর)।');
+  if(Object.values(S.pays||{}).some(p=>p.trx===trx&&p.status!=='rejected')) return fail('এই TrxID আগেই জমা দেওয়া হয়েছে।');
+  if(!DB) return fail('ইন্টারনেট সংযোগ নেই।');
+  f.busy=true; f.err=''; render();
+  const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const r={course:'qm:'+o.id,method:f.m,amount:Math.max(1,Math.round(o.amount)),months:1,sender,trx,name:name.slice(0,60),roll:S.student&&S.student.roll?String(S.student.roll).slice(0,20):'',device:S.dev,at:new Date().toISOString(),status:'pending'};
+  try{
+    try{ await DB.collection('payments').doc(id).set(S.uid?Object.assign({uid:S.uid},r):r); }
+    catch(e1){ if(!S.uid||!(e1&&e1.code==='permission_denied')) throw e1; await DB.collection('payments').doc(id).set(r); }
+    S.pays=S.pays||{}; S.pays[id]=Object.assign({},r); o.payId=id; o.status='pending'; persist();
+    m.pay=null; m.step='orders'; toast('জমা হয়েছে · অনুমোদনের পর PDF ডাউনলোড করা যাবে'); render();
+  }catch(e){ fail('জমা দেওয়া যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।'); }
+}
+/* সার্ভারে পেমেন্ট যাচাই: অ্যাডমিন অনুমোদিত + নিজের অ্যাকাউন্ট + এই অর্ডার + পুরো টাকা */
+async function qmVerify(o){
+  if(qmPaid(o)) return true; if(!o.payId||!DB) return false;
+  try{ const d=await DB.collection('payments').doc(o.payId).get();
+    if(d&&d.status==='approved'&&d.course==='qm:'+o.id&&(!d.uid||d.uid===S.uid)&&+d.amount>=+o.amount){ o.status='paid'; persist(); return true; }
+    if(d&&d.status==='rejected'){ o.status='rejected'; persist(); }
+  }catch(e){}
+  return false;
+}
+let QM_CHK=false;
+async function qmRefresh(){ if(QM_CHK) return; QM_CHK=true; let ch=false;
+  for(const o of qmOrders().filter(x=>x.status==='pending')){ const b=o.status; await qmVerify(o); if(o.status!==b) ch=true; }
+  QM_CHK=false; if(ch) softRender(); }
+/* ---------- আমার তৈরি প্রশ্ন ---------- */
+function vQmOrders(){
+  const m=qmInit(), list=qmOrders(); qmRefresh();
+  const st=o=>qmPaid(o)?['st-done','প্রস্তুত']:o.status==='pending'?['st-sched','পেমেন্ট যাচাই হচ্ছে']:o.status==='rejected'?['st-miss','পেমেন্ট বাতিল']:['st-sched','পেমেন্ট বাকি'];
+  return `<div class="screen qm">${backTop('আমার তৈরি প্রশ্ন','qm')}
+    <button class="btn" data-qmstep="pick" style="width:100%">＋ নতুন প্রশ্নপত্র তৈরি করুন</button>
+    ${list.length?list.map(o=>{ const [cl,lb]=st(o); return `<article class="xa-card${o.id===m.cur?' qm-new':''}"><div class="xa-top"><span class="xa-date">${bnD(new Date(o.at)).split(',')[0]}</span><span class="xa-pill ${cl}">${lb}</span></div>
+      <h3 class="xa-title" style="font-size:17px">${esc(o.title)}</h3>
+      <div class="pay-rows"><span>শ্রেণি</span><b>${esc(o.cls)} ${esc(o.subj)}</b><span>প্রশ্ন</span><b>${['m','s','c'].filter(t=>o.count[t]).map(t=>`${QM_T[t][1]} ${bn(o.count[t])}`).join(' · ')}</b>
+        <span>সময় · পূর্ণমান</span><b>${bn(o.time)} মিনিট · ${bn(o.marks)}</b><span>মূল্য</span><b>${o.free?'ফ্রী':'৳'+bn(o.amount)}</b></div>
+      <div class="xa-act">${qmPaid(o)
+        ?`<button class="btn" data-qmpdf="${o.id}">📄 প্রশ্নপত্র PDF</button>${o.ans?`<button class="btn outline" data-qmpdfa="${o.id}">✅ উত্তরপত্র PDF</button>`:''}`
+        :o.status==='pending'?`<button class="btn outline" data-qmcheck="${o.id}">অবস্থা দেখুন</button>`
+        :`<button class="btn" data-qmpaynow="${o.id}">পেমেন্ট করুন · ৳${bn(o.amount)}</button>`}
+        ${!qmPaid(o)||o.free?`<button class="link danger" data-qmodel="${o.id}">${S.qmArmed===o.id?'নিশ্চিত মুছবেন?':'মুছুন'}</button>`:''}</div></article>`; }).join('')
+      :`<div class="empty">এখনো কোনো প্রশ্নপত্র তৈরি করা হয়নি।</div>`}
+  </div>`;
+}
+/* ---------- অ্যাডমিন: সংক্ষিপ্ত ও সৃজনশীল প্রশ্ন যোগ ---------- */
+function qmAdminAdd(m){
+  const s=m.t==='s';
+  return `<details class="nb-form qm-adm"><summary><b>＋ ${QM_T[m.t][0]} যোগ করুন (অ্যাডমিন)</b></summary>
+    <p class="muted" style="font-size:13px;margin:6px 0">প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। ${s?'বিন্যাস: <code>প্রশ্ন: …</code> এবং ঐচ্ছিক <code>উত্তর: …</code>':'বিন্যাস: <code>উদ্দীপক: …</code>, তারপর <code>ক) … খ) … গ) … ঘ) …</code> আলাদা লাইনে, ঐচ্ছিক <code>উত্তর: …</code>'}</p>
+    <textarea class="input area" rows="7" data-qmf="adm" placeholder="${s?'প্রশ্ন: 2x + 3 = 11 হলে x এর মান কত?\nউত্তর: 2x = 8, তাই x = 4':'উদ্দীপক: একটি ত্রিভুজের বাহুগুলো 5, 12 ও 13 সে.মি.।\nক) ত্রিভুজটির পরিসীমা নির্ণয় কর।\nখ) দেখাও যে ত্রিভুজটি সমকোণী।\nগ) ক্ষেত্রফল নির্ণয় কর।\nঘ) পরিবৃত্তের ব্যাসার্ধ নির্ণয় কর।\nউত্তর: ক) 30 সে.মি. …'}">${esc(m.adm||'')}</textarea>
+    <div class="error" role="alert">${esc(m.admErr||'')}</div>
+    <button class="btn" data-qmadmsave>যোগ করুন</button></details>`;
+}
+function qmParse(text,t){
+  const out=[], errs=[]; String(text||'').replace(/\r/g,'').split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean).forEach((b,i)=>{
+    const lines=b.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>l.replace(/^\d+\s*[\.\)।]\s*/,''));
+    let ans=[], q=[], parts=[], mode='q';
+    lines.forEach(l=>{ let mm;
+      if((mm=l.match(/^(উত্তর|সমাধান|ans(wer)?)\s*[:：]\s*(.*)$/i))){ mode='a'; if(mm[3]) ans.push(mm[3]); return; }
+      if(mode==='a'){ ans.push(l); return; }
+      if(t==='c'&&(mm=l.match(/^[\(（]?\s*([কখগঘ])\s*[\)\.।:）]\s*(.+)$/))){ parts['কখগঘ'.indexOf(mm[1])]=mm[2]; return; }
+      q.push(l.replace(/^(প্রশ্ন|উদ্দীপক)\s*[:：]\s*/,'')); });
+    const qt=q.join('\n').trim();
+    if(!qt) return errs.push(`${bn(i+1)} নম্বরে প্রশ্ন/উদ্দীপক নেই`);
+    if(t==='c'&&[0,1,2,3].some(k=>!parts[k])) return errs.push(`${bn(i+1)} নম্বরে ক, খ, গ, ঘ — চারটি অংশ লাগবে`);
+    out.push(t==='s'?{q:qt.slice(0,1500),a:ans.join('\n').slice(0,3000)}:{stem:qt.slice(0,3000),p:parts.slice(0,4).map(x=>x.slice(0,600)),a:ans.join('\n').slice(0,6000)}); });
+  return {out,errs};
+}
+async function qmAdminSave(){
+  const m=qmInit(), {out,errs}=qmParse(m.adm,m.t);
+  if(errs.length||!out.length){ m.admErr=errs.join('; ')||'কোনো প্রশ্ন পাওয়া যায়নি।'; render(); return; }
+  const id=`${m.t==='s'?'sq':'cq'}_${m.cid}_${m.ch}`, cur=SYL[id]&&Array.isArray(SYL[id].items)?SYL[id].items:[];
+  let next=cur.reduce((x,y)=>Math.max(x,+y.n||0),0);
+  const items=cur.concat(out.map(x=>Object.assign({n:++next},x)));
+  try{ await DB.collection('syllabus').doc(id).set({type:m.t==='s'?'sqset':'cqset',course:m.cid,ch:+m.ch,items,updatedAt:new Date().toISOString()});
+    m.adm=''; m.admErr=''; toast(`${bn(out.length)}টি প্রশ্ন যোগ হয়েছে`); }
+  catch(e){ m.admErr='সংরক্ষণ করা যায়নি (ডকুমেন্ট খুব বড় হলে অধ্যায় ভাগ করে দিন)।'; }
+  render();
+}
+async function qmAdminDel(n){
+  const m=qmInit(), id=`${m.t==='s'?'sq':'cq'}_${m.cid}_${m.ch}`, d=SYL[id]; if(!d) return;
+  if(S.qmDelArm!==id+n){ S.qmDelArm=id+n; toast('মুছতে আবার চাপুন'); return; }
+  S.qmDelArm=''; const items=(d.items||[]).filter(x=>String(x.n)!==String(n));
+  try{ await DB.collection('syllabus').doc(id).set({type:d.type,course:d.course,ch:d.ch,items,updatedAt:new Date().toISOString()}); toast('মুছে ফেলা হয়েছে'); }catch(e){ toast('মুছে ফেলা যায়নি'); }
+}
+/* ---------- PDF ---------- */
+let PDFLIB=null;
+const loadPdfLib=()=>PDFLIB||(PDFLIB=new Promise((ok,no)=>{ if(window.SohogPDF) return ok(window.SohogPDF); const s=document.createElement('script'); s.src='pdfgen.js'; s.onload=()=>window.SohogPDF?ok(window.SohogPDF):no(); s.onerror=()=>{ PDFLIB=null; no(); }; document.head.appendChild(s); }));
+function qmBlocks(o,answers){
+  const items=o.items.map(qmItem).filter(x=>!x.missing), by=t=>items.filter(x=>x.t===t), B=[];
+  const head=`<div class="qp-head"><div class="qp-brand">সহগ গণিত একাডেমি · অংকবাড়ি</div><h1>${esc(o.title)}${answers?' — উত্তরপত্র':''}</h1>
+    <div class="qp-meta"><span>শ্রেণি: ${esc(o.cls)}</span><span>বিষয়: ${esc(o.subj)}</span>${answers?'':`<span>সময়: ${bn(o.time)} মিনিট</span><span>পূর্ণমান: ${bn(o.marks)}</span>`}</div>
+    ${answers?'':`<div class="qp-info"><span>নাম: ……………………………</span><span>রোল: …………</span></div>`}</div>`;
+  B.push(head);
+  let no=0; const sec=(t,label,mk)=>{ const L=by(t); if(!L.length) return; B.push(`<h2 class="qp-sec">${label} <small>(${answers?'উত্তর':`প্রতিটি ${bn(mk)} নম্বর`})</small></h2>`);
+    if(answers&&t==='m'){ B.push(`<div class="qp-akey">${L.map((x,i)=>`<span><b>${bn(no+i+1)}.</b> ${'কখগঘ'[x.a]||'—'}</span>`).join('')}</div>`);
+      L.forEach((x,i)=>{ if(x.e) B.push(`<div class="qp-q"><b>${bn(no+i+1)}.</b> ${mq(x.e)}</div>`); }); no+=L.length; return; }
+    L.forEach(x=>{ no++;
+      if(t==='m') B.push(`<div class="qp-q"><div><b>${bn(no)}.</b> ${mq(x.q)}</div><div class="qp-opts">${(x.o||[]).map((op,j)=>`<span>${'কখগঘ'[j]}) ${mq(op)}</span>`).join('')}</div></div>`);
+      else if(t==='s') B.push(`<div class="qp-q"><b>${bn(no)}.</b> ${mq(x.q)}${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
+      else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(x.stem)}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span> ${mq(p)} <i>${bn([1,2,3,4][j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
+    }); };
+  sec('m','বহুনির্বাচনি প্রশ্ন',QM_MARK.m); sec('s','সংক্ষিপ্ত প্রশ্ন',QM_MARK.s); sec('c','সৃজনশীল প্রশ্ন',QM_MARK.c);
+  return B;
+}
+async function qmMakePdf(id,answers){
+  const o=(S.qorders||{})[id]; if(!o) return;
+  if(!qmPaid(o)&&!(await qmVerify(o))){ toast('পেমেন্ট এখনো অনুমোদিত হয়নি'); softRender(); return; }
+  if(S.qmBusy) return; S.qmBusy=true; toast('PDF তৈরি হচ্ছে…');
+  let host=null;
+  try{
+    const lib=await loadPdfLib();
+    host=document.createElement('div'); host.className='qp-host'; document.body.appendChild(host);
+    const pages=[]; let body;
+    const newPage=()=>{ const p=document.createElement('div'); p.className='qp-page'; p.innerHTML='<div class="qp-body"></div><div class="qp-foot"></div>'; host.appendChild(p); pages.push(p); body=p.firstChild; };
+    newPage();
+    for(const h of qmBlocks(o,answers)){
+      body.insertAdjacentHTML('beforeend',h);
+      body.querySelectorAll('.mx:not(.mx-r)').forEach(m=>{ m.classList.add('mx-r'); m.insertAdjacentHTML('afterbegin','<i class="mxb mxb-l"></i>'); m.insertAdjacentHTML('beforeend','<i class="mxb mxb-r"></i>'); });
+      if(body.scrollHeight>body.clientHeight+1&&body.children.length>1){ const last=body.lastElementChild; body.removeChild(last); newPage(); body.appendChild(last); }
+    }
+    pages.forEach((p,i)=>{ p.lastChild.textContent=`সহগ গণিত একাডেমি · অংকবাড়ি — পৃষ্ঠা ${bn(i+1)}/${bn(pages.length)}`; });
+    if(document.fonts&&document.fonts.ready) await document.fonts.ready;
+    const pdf=await lib.render(pages,(k,n)=>toast(`PDF তৈরি হচ্ছে… ${bn(k)}/${bn(n)} পৃষ্ঠা`));
+    const name=`${o.title.replace(/[\\/:*?"<>|]+/g,' ').trim()||'prosnopotro'}${answers?' - uttor':''}.pdf`;
+    await lib.save(pdf,name); toast(isNative()?'PDF তৈরি হয়েছে — সংরক্ষণ বা শেয়ার করুন':'PDF ডাউনলোড হয়েছে');
+  }catch(e){ toast('PDF তৈরি করা যায়নি। আবার চেষ্টা করুন।'); }
+  finally{ if(host) host.remove(); S.qmBusy=false; }
 }
 /* ===== লাইভ ক্লাস ও রেকর্ড ক্লাস: প্রতিটি শ্রেণির জন্য (syllabus সংগ্রহে type:'cls'; অ্যাডমিন লিংক দেন, শিক্ষার্থী দেখে) =====
    kind:'live' → at (শুরুর সময়), dur (মিনিট) · kind:'rec' → ch (অধ্যায়, ০ = সাধারণ) · lock:'paid' হলে শুধু প্যাকেজধারীরা লিংক পাবে */
@@ -3819,7 +4133,7 @@ function renderTabs(){
 function render(){
   const authed=!!S.user && !['login','otp'].includes(S.view);
   tabbar.hidden=!authed;
-  const V={pc:vPc,lclass:()=>vClass('live'),rclass:()=>vClass('rec'),notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={qm:vQm,pc:vPc,lclass:()=>vClass('live'),rclass:()=>vClass('rec'),notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   const gate=needAuth(); if(gate){ tabbar.hidden=true; app.innerHTML=vAuth(); return; }
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
@@ -3862,7 +4176,29 @@ app.addEventListener('click',e=>{
   if(t.dataset.aumode){ const au=S.au||(S.au={}); const id=document.getElementById('auId'); if(id) au.id=id.value; Object.assign(au,{mode:t.dataset.aumode,err:'',msg:t.dataset.aumode==='forgot'?'':au.msg}); return render(); }
   if(t.hasAttribute('data-aushow')){ const au=S.au||(S.au={}); ['auName','auId','auRec','auRoll'].forEach(k=>{ const x=document.getElementById(k); if(x) au[{auName:'name',auId:'id',auRec:'rec',auRoll:'roll'}[k]]=x.value; });
     const vals={}; ['auPw','auPw2'].forEach(k=>{ const x=document.getElementById(k); if(x) vals[k]=x.value; }); au.show=!au.show; render(); Object.keys(vals).forEach(k=>{ const x=document.getElementById(k); if(x) x.value=vals[k]; }); return; }
+  if(t.dataset.qmorders) qmInit().step='orders';
+  if(t.dataset.go==='qm'&&S.view==='qm'){ const m=qmInit(); m.step=m.step==='pay'?'paper':m.step==='paper'||m.step==='orders'?'pick':m.step; if(!t.dataset.qmorders){ if(m.step==='pick'&&S.qmBackHome){ S.qmBackHome=false; return go('home'); } return render(); } }
   if(t.dataset.go){ if(t.dataset.rtc) S.rtc=t.dataset.rtc; return go(t.dataset.go); }
+  /* কাস্টম প্রশ্ন তৈরি */
+  if(t.dataset.qmstep){ const m=qmInit(); m.err=''; m.step=t.dataset.qmstep; window.scrollTo(0,0); return render(); }
+  if(t.dataset.qmt){ const m=qmInit(); m.t=t.dataset.qmt; m.page=0; m.admErr=''; return render(); }
+  if(t.dataset.qmpg){ const m=qmInit(); m.page=Math.max(0,m.page+(+t.dataset.qmpg)); window.scrollTo(0,0); return render(); }
+  if(t.hasAttribute('data-qmclear')){ const m=qmInit(); m.sel={}; m.order=[]; return render(); }
+  if(t.dataset.qmall||t.dataset.qmrand){ const m=qmInit(), pool=qmPool(m.cid,m.ch,m.t), qq=String(m.q||'').trim().toLowerCase();
+    let L=qq?pool.filter(x=>String(x.q||x.stem||'').toLowerCase().includes(qq)):pool;
+    if(t.dataset.qmall) L=L.slice(m.page*20,m.page*20+20);
+    else { L=L.filter(x=>!m.sel[qmKey(m.t,m.cid,m.ch,x.n)]).map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).slice(0,+t.dataset.qmrand).map(x=>x[1]); }
+    L.forEach(x=>{ const k=qmKey(m.t,m.cid,m.ch,x.n); if(!m.sel[k]){ m.sel[k]=1; m.order.push(k); } }); return render(); }
+  if(t.hasAttribute('data-qmcreate')){ qmCreateOrder(); return; }
+  if(t.dataset.qmpm){ const m=qmInit(); if(m.pay){ m.pay.m=t.dataset.qmpm; render(); } return; }
+  if(t.hasAttribute('data-qmpaysend')){ qmSendPay(); return; }
+  if(t.dataset.qmpaynow){ const m=qmInit(); m.cur=t.dataset.qmpaynow; m.pay=null; m.step='pay'; return render(); }
+  if(t.dataset.qmcheck){ const o=(S.qorders||{})[t.dataset.qmcheck]; if(o) qmVerify(o).then(ok=>{ toast(ok?'পেমেন্ট অনুমোদিত — PDF ডাউনলোড করুন':o.status==='rejected'?'পেমেন্ট বাতিল হয়েছে — আবার পেমেন্ট করুন':'এখনো যাচাই হচ্ছে'); if(o.status==='rejected'){ o.status='draft'; o.payId=''; persist(); } softRender(); }); return; }
+  if(t.dataset.qmodel){ const id=t.dataset.qmodel; if(S.qmArmed===id){ S.qmArmed=''; delete S.qorders[id]; persist(); toast('মুছে ফেলা হয়েছে'); } else S.qmArmed=id; return render(); }
+  if(t.dataset.qmpdf){ qmMakePdf(t.dataset.qmpdf,false); return; }
+  if(t.dataset.qmpdfa){ qmMakePdf(t.dataset.qmpdfa,true); return; }
+  if(t.hasAttribute('data-qmadmsave')){ qmAdminSave(); return; }
+  if(t.dataset.qmdel){ qmAdminDel(t.dataset.qmdel); return; }
   if(t.dataset.chlist){ S.chFrom=S.view==='admin'?'admin':S.view==='course'?'course':'play'; return go('chapters',{course:t.dataset.chlist}); }
   if(t.dataset.openex){ return go('exercise',{exKey:t.dataset.openex}); }
   if(t.hasAttribute('data-exdone')){ const k=`${S.course}:ex:${S.exKey}`; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); return; }
@@ -4062,6 +4398,9 @@ app.addEventListener('click',e=>{
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.nf){ nfInit()[t.dataset.nf]=t.type==='checkbox'?t.checked:t.value; }
+  if(t.dataset.qmf){ const m=qmInit(), k=t.dataset.qmf; if(k==='q'){ m.q=t.value; m.page=0; clearTimeout(S.qmQT); S.qmQT=setTimeout(()=>{ const pos=t.selectionStart; render(); const x=document.querySelector('[data-qmf=q]'); if(x){ x.focus(); try{ x.setSelectionRange(pos,pos); }catch(e){} } },350); }
+    else if(k!=='cid'&&k!=='ch'&&k!=='ans') m[k]=t.value; }
+  if(t.dataset.qmp){ const m=qmInit(); if(m.pay) m.pay[t.dataset.qmp]=t.value; }
   if(t.dataset.clf){ cfInitC()[t.dataset.clf]=t.value; }
   if(t.dataset.payf&&S.buy){ S.buy[t.dataset.payf]=t.value; }
   if(t.dataset.pcf&&t.type!=='checkbox'){ pcInit()[t.dataset.pcf]=t.value; }
@@ -4086,6 +4425,9 @@ app.addEventListener('input',e=>{
 });
 app.addEventListener('change',e=>{
   const t=e.target;
+  if(t.dataset.qmf==='cid'||t.dataset.qmf==='ch'){ const m=qmInit(); m[t.dataset.qmf]=t.value; if(t.dataset.qmf==='cid') m.ch='1'; m.page=0; m.q=''; return render(); }
+  if(t.dataset.qmf==='ans'){ qmInit().ans=t.checked; return; }
+  if(t.dataset.qmpick!==undefined){ const m=qmInit(), k=qmKey(m.t,m.cid,m.ch,t.dataset.qmpick); if(t.checked){ if(!m.sel[k]){ m.sel[k]=1; m.order.push(k); } } else { delete m.sel[k]; m.order=m.order.filter(x=>x!==k); } return render(); }
   if(t.dataset.pcf==='enforce'){ pcInit().enforce=t.checked; return; }
   if(t.hasAttribute('data-qfile')){ const f=t.files&&t.files[0]; t.value=''; if(f){ const rd=new FileReader(); rd.onload=()=>qLoadBulk(rd.result); rd.onerror=()=>toast('ফাইল পড়া যায়নি'); rd.readAsText(f,'utf-8'); } return; }
   if(t.dataset.pdffile){ const f=t.files&&t.files[0]; t.value=''; if(f) uploadPdf(t.dataset.pdffile,f); return; }

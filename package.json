@@ -3,14 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "esbuild src/db.js --bundle --minify --format=iife --target=es2019 --outfile=www/db.js",
+    "build": "esbuild src/db.js --bundle --minify --format=iife --target=es2019 --outfile=www/db.js && esbuild src/pdfgen.js --bundle --minify --format=iife --target=es2019 --outfile=www/pdfgen.js",
     "sync": "npm run build && cap sync android"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",
     "@capacitor/core": "8.5.3",
+    "@capacitor/filesystem": "^8.1.5",
     "@capacitor/local-notifications": "8.3.0",
-    "firebase": "12.19.0"
+    "@capacitor/share": "^8.0.3",
+    "firebase": "12.19.0",
+    "html2canvas-pro": "^2.5.0",
+    "jspdf": "^4.2.1"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.3",
