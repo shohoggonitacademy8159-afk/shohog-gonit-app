@@ -2922,9 +2922,15 @@ const QM_GRP=[['এসএসসি',[['c9','সাধারণ গণিত'],['
 const QM_HIDE={c10:'c9',c10h:'c9h'};
 const qmCid=cid=>QM_HIDE[cid]||cid;
 function qmLbl(cid){ for(const [g,l] of QM_GRP){ const x=l.find(y=>y[0]===cid); if(x) return {cls:g,subj:x[1]}; } const c=COURSES[cid]||{}; return {cls:c.name||'',subj:c.subj||''}; }
-function qmCidOptions(cur){ const ids=OFFER_IDS(), used=new Set(), opt=(k,l)=>`<option value="${k}" ${k===cur?'selected':''}>${esc(l)}</option>`;
-  let h=QM_GRP.map(([g,l])=>{ const o=l.filter(([k])=>ids.includes(k)||ids.includes(Object.keys(QM_HIDE).find(x=>QM_HIDE[x]===k))); o.forEach(([k])=>used.add(k)); return o.length?`<optgroup label="${g}">${o.map(([k,t])=>opt(k,`${g} ➤ ${t}`)).join('')}</optgroup>`:''; }).join('');
-  const rest=ids.filter(k=>!used.has(k)&&!QM_HIDE[k]); if(rest.length) h+=`<optgroup label="অন্যান্য শ্রেণি">${rest.map(k=>opt(k,ptitle(COURSES[k]))).join('')}</optgroup>`; return h; }
+const QM_GKEY={'এসএসসি':'ssc','এইচএসসি':'hsc'};
+const qmGrpOf=cid=>{ const g=QM_GRP.find(([,l])=>l.some(x=>x[0]===cid)); return g?g:null; };
+function qmAvail(k){ const ids=OFFER_IDS(); return ids.includes(k)||Object.keys(QM_HIDE).some(x=>QM_HIDE[x]===k&&ids.includes(x)); }
+function qmLevelSel(cur){ const ids=OFFER_IDS(), g=qmGrpOf(cur), opt=(v,l,on)=>`<option value="${v}" ${on?'selected':''}>${esc(l)}</option>`;
+  const grp=QM_GRP.filter(([,l])=>l.some(([k])=>qmAvail(k))).map(([n])=>opt(QM_GKEY[n],n,g&&g[0]===n)).join('');
+  const inG=new Set(QM_GRP.flatMap(([,l])=>l.map(x=>x[0])));
+  const rest=ids.filter(k=>!inG.has(k)&&!QM_HIDE[k]).map(k=>opt(k,ptitle(COURSES[k]),k===cur)).join('');
+  return `<div class="field"><label for="qmL">শ্রেণি</label><select class="input" id="qmL" data-qmf="lvl">${grp}${rest?`<optgroup label="অন্যান্য শ্রেণি">${rest}</optgroup>`:''}</select></div>`+
+    (g?`<div class="field"><label for="qmC">বিষয়</label><select class="input" id="qmC" data-qmf="cid">${g[1].filter(([k])=>qmAvail(k)).map(([k,t])=>opt(k,t,k===cur)).join('')}</select></div>`:''); }
 function qmInit(){ if(S.qm) S.qm.cid=qmCid(S.qm.cid); if(!S.qm){ const ids=OFFER_IDS(); S.qm={cid:qmCid(ids.includes(hubCourse())?hubCourse():ids[0]),ch:'1',t:'m',q:'',page:0,sel:{},order:[],step:'pick',title:'',time:'',marks:'',ans:true,pay:null,adm:'',admT:'s',admErr:''}; } return S.qm; }
 /* অ্যাপের সাথে আসা প্রশ্ন (www/sq.js); অ্যাডমিন একবার ফায়ারবেসে তুললে (fromApp) এরপর শুধু ফায়ারবেস থেকে আসে */
 function qmBuiltin(cid,ch,t){ const SQ=window.SOHOG_SQ||{}, bc=SQ[cid]?cid:{c9:'c10',c9h:'c10h'}[cid]; return t==='s'&&bc&&SQ[bc]&&SQ[bc][String(ch)]||[]; }
@@ -2981,7 +2987,7 @@ function vQm(){
     <div class="qm-steps"><span class="on">১ বাছাই</span><span>২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
     <button class="btn ghost" data-qmstep="orders" style="width:100%">📁 আমার তৈরি প্রশ্ন${qmOrders().length?` (${bn(qmOrders().length)})`:''}</button>
     <div class="qm-filters">
-      <div class="field"><label for="qmC">শ্রেণি ও বিষয়</label><select class="input" id="qmC" data-qmf="cid">${qmCidOptions(m.cid)}</select></div>
+      ${qmLevelSel(m.cid)}
       <div class="field"><label for="qmCh">অধ্যায়</label><select class="input" id="qmCh" data-qmf="ch">${chs.map((n,j)=>`<option value="${j+1}" ${String(j+1)===String(m.ch)?'selected':''}>${bn(j+1)}. ${esc(n)}</option>`).join('')}</select></div>
       ${exs.length?`<div class="field"><label for="qmEx">অনুশীলনী</label><select class="input" id="qmEx" data-qmf="ex"><option value="">সব অনুশীলনী</option>${exs.map(x=>`<option value="${x}" ${m.ex===x?'selected':''}>অনুশীলনী ${bn(exName(x))}</option>`).join('')}</select></div>`:''}
     </div>
@@ -4587,7 +4593,7 @@ app.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.nf){ nfInit()[t.dataset.nf]=t.type==='checkbox'?t.checked:t.value; }
   if(t.dataset.qmf){ const m=qmInit(), k=t.dataset.qmf; if(k==='q'){ m.q=t.value; m.page=0; clearTimeout(S.qmQT); S.qmQT=setTimeout(()=>{ const pos=t.selectionStart; render(); const x=document.querySelector('[data-qmf=q]'); if(x){ x.focus(); try{ x.setSelectionRange(pos,pos); }catch(e){} } },350); }
-    else if(!['cid','ch','ans','ex'].includes(k)) m[k]=t.value; }
+    else if(!['cid','ch','ans','ex','lvl'].includes(k)) m[k]=t.value; }
   if(t.dataset.qmp){ const m=qmInit(); if(m.pay) m.pay[t.dataset.qmp]=t.value; }
   if(t.dataset.qmd){ qmSetD(t.dataset.qmo||'',t.dataset.qmd,t.value); clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,300); }
   if(t.dataset.qmf==='title'||t.dataset.qmf==='time'||t.dataset.qmf==='marks'){ clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,400); }
@@ -4615,6 +4621,7 @@ app.addEventListener('input',e=>{
 });
 app.addEventListener('change',e=>{
   const t=e.target;
+  if(t.dataset.qmf==='lvl'){ const m=qmInit(), v=t.value, g=QM_GRP.find(([n])=>QM_GKEY[n]===v); m.cid=g?(g[1].find(([k])=>qmAvail(k))||g[1][0])[0]:v; m.ch='1'; m.ex=''; m.page=0; m.q=''; return render(); }
   if(t.dataset.qmf==='cid'||t.dataset.qmf==='ch'){ const m=qmInit(); m[t.dataset.qmf]=t.value; if(t.dataset.qmf==='cid') m.ch='1'; m.ex=''; m.page=0; m.q=''; return render(); }
   if(t.dataset.qmf==='ex'){ const m=qmInit(); m.ex=t.value; m.page=0; return render(); }
   if(t.dataset.qmf==='ans'){ qmInit().ans=t.checked; return; }
