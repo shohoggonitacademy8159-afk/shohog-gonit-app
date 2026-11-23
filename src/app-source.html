@@ -156,19 +156,32 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qm-adm summary{cursor:pointer}.qm-adm code{font-size:12px}
 /* প্রশ্নপত্রের পাতা (PDF-এর জন্য, পর্দার বাইরে) */
 .qp-host{position:fixed;left:-10000px;top:0;width:794px;z-index:-1}
-.qp-page{width:794px;height:1123px;padding:46px 54px 26px;background:#fff;color:#111;box-sizing:border-box;display:flex;flex-direction:column;font-size:15px;line-height:1.55}
+.qp-page{position:relative;width:794px;height:1123px;padding:46px 54px 26px;background:#fff;color:#111;box-sizing:border-box;display:flex;flex-direction:column;font-size:var(--qfs,15px);line-height:1.55;font-family:var(--qff,'Hind Siliguri',sans-serif)}
 .qp-page .muted{color:#555}
-.qp-body{flex:1;overflow:hidden}
-.qp-foot{height:22px;text-align:center;font-size:11px;color:#666;border-top:1px solid #ccc;padding-top:4px}
+.qp-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.qp-cols{flex:1;min-height:0;display:grid;grid-template-columns:repeat(var(--qc,1),minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
+.qp-col{overflow:hidden;min-width:0}.qp-col:not(:first-child){border-left:1px solid #bbb;padding-left:14px}.qp-col:not(:last-child){padding-right:14px}
+.qp-foot{height:22px;text-align:center;font-size:11px;color:#666;border-top:1px solid #ccc;padding-top:4px;font-family:'Hind Siliguri',sans-serif}
 .qp-head{text-align:center;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:10px}
-.qp-brand{font-size:13px;color:#444;font-weight:600}.qp-head h1{font-size:22px;margin:4px 0 6px;color:#111}
-.qp-meta,.qp-info{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;font-weight:600;font-size:14px}.qp-info{justify-content:space-between;margin-top:8px;font-weight:500}
-.qp-sec{font-size:17px;margin:12px 0 6px;padding:4px 10px;background:#f1f5f9;border-left:4px solid #111;color:#111}.qp-sec small{font-weight:500;font-size:13px}
-.qp-q{margin:0 0 9px;break-inside:avoid}
-.qp-opts{display:grid;grid-template-columns:1fr 1fr;gap:1px 18px;padding-left:22px;margin-top:2px}
-.qp-parts{padding-left:22px;margin-top:4px}.qp-parts div{display:flex;gap:6px}.qp-parts i{margin-left:auto;font-style:normal;font-weight:700}
-.qp-ans{margin:4px 0 0 22px;padding:6px 10px;border-left:3px solid #16a34a;background:#f0fdf4;white-space:pre-line}
-.qp-akey{display:grid;grid-template-columns:repeat(6,1fr);gap:4px 8px;margin-bottom:10px;font-size:15px}
+.qp-brand{font-size:13px;color:#444;font-weight:600}.qp-head h1{font-size:1.47em;margin:4px 0 6px;color:#111;line-height:1.3}
+.qp-inst{font-size:1.75em;font-weight:700;line-height:1.25;color:#111}.qp-inst2{font-size:.9em;color:#333;margin-top:1px}.qp-inst~h1{font-size:1.27em}
+.qp-meta,.qp-info{display:flex;justify-content:center;gap:4px 22px;flex-wrap:wrap;font-weight:600;font-size:.93em}.qp-info{justify-content:space-between;margin-top:8px;font-weight:500}
+.qp-sec{font-size:1.13em;margin:.6em 0 .4em;padding:4px 10px;background:#f1f5f9;border-left:4px solid #111;color:#111;line-height:1.4}.qp-sec small{font-weight:500;font-size:.78em}
+.qp-q{margin:0 0 .6em;break-inside:avoid}
+.qp-opts{display:grid;grid-template-columns:1fr 1fr;gap:1px 14px;padding-left:1.4em;margin-top:2px}.qp-opts.oc1{grid-template-columns:1fr}.qp-opts.oc4{grid-template-columns:repeat(4,auto);justify-content:space-between}
+.qp-parts{padding-left:1.4em;margin-top:4px}.qp-parts div{display:flex;gap:6px}.qp-parts i{margin-left:auto;font-style:normal;font-weight:700}
+.qp-ans{margin:4px 0 0 1.4em;padding:6px 10px;border-left:3px solid #16a34a;background:#f0fdf4;white-space:pre-line}
+.qp-akey{display:grid;grid-template-columns:repeat(var(--akc,6),1fr);gap:4px 8px;margin-bottom:10px}
+.qp-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:5;overflow:hidden}
+.qp-wm span{transform:rotate(-32deg);font-weight:700;color:rgba(15,23,42,.075);white-space:nowrap;font-family:var(--qff,'Hind Siliguri',sans-serif)}
+.qm-dz{border:1px solid var(--line,#dbe3ee);border-radius:14px;padding:12px;margin:6px 0 10px;display:flex;flex-direction:column;gap:8px;background:var(--card,#fff)}
+.qm-dz h4{margin:0;font-size:15px}.qm-dz .qm-lab{font-size:13px;font-weight:600;color:var(--muted,#5B6B82);margin-top:2px}
+.qm-seg{display:flex;flex-wrap:wrap;gap:6px}.qm-seg button{flex:1 1 auto;min-width:56px;padding:7px 10px;border-radius:10px;border:1px solid var(--line,#cbd5e1);background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
+.qm-seg button[aria-pressed=true]{background:var(--accent,#1F6FE5);border-color:var(--accent,#1F6FE5);color:#fff;font-weight:600}
+.qp-prev{position:relative;width:min(100%,340px);margin:4px auto 2px;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px -10px rgba(16,35,63,.45);background:#fff}
+.qp-prev>.qp-page{position:absolute;left:0;top:0;transform-origin:0 0}
+@font-face{font-family:'Nikosh';src:url(fonts/nikosh.woff2) format('woff2');font-display:swap}
+@font-face{font-family:'Kalpurush';src:url(fonts/kalpurush.woff2) format('woff2');font-display:swap}
 .mx-r::before,.mx-r::after{display:none}.mxb{display:block;flex:0 0 5px;border:1.6px solid #111}.mx-m .mxb-l{border-right:0}.mx-m .mxb-r{border-left:0}.mx-d .mxb{flex-basis:0}.mx-d .mxb-l{border-width:0 0 0 1.6px}.mx-d .mxb-r{border-width:0 1.6px 0 0}
 .qp-page .frc{color:#111}.qp-page .mx,.qp-page .stbl{color:#111}
 
@@ -1213,6 +1226,7 @@ const S = {
   joined: !!saved.joined,
   enrolled: saved.enrolled||{},
   qorders: saved.qorders||{},
+  qmPref: saved.qmPref||{},
   results: saved.results||{},     // quizId -> {best,total,last}
   done: saved.done||{},           // "courseId:idx" -> true
   exams: saved.exams||{},
@@ -1233,7 +1247,7 @@ const S = {
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,noticeSeen:S.noticeSeen,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,qorders:S.qorders,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,noticeSeen:S.noticeSeen,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,qorders:S.qorders,qmPref:S.qmPref,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -2910,6 +2924,62 @@ function qmBreak(calc){
     ${!CAN_EDIT&&calc.pay*100!==calc.net?`<span>পরিশোধযোগ্য</span><b>৳${bn(calc.pay)} <small class="muted">(${calc.cfg.min&&calc.pay===calc.cfg.min&&calc.net<calc.cfg.min*100?'সর্বনিম্ন পেমেন্ট':'পূর্ণ টাকায়'})</small></b>`:''}</div>`;
 }
 /* ---------- প্রশ্নপত্রের তথ্য ---------- */
+/* ---------- প্রশ্নপত্রের ডিজাইন: ফন্ট, লেখার সাইজ, কলাম, ওয়াটারমার্ক, প্রতিষ্ঠানের নাম ---------- */
+const QM_FONTS={nikosh:['নিকস',"'Nikosh','Hind Siliguri',sans-serif"],kalpurush:['কালপুরুষ',"'Kalpurush','Hind Siliguri',sans-serif"],hind:['হিন্দ শিলিগুড়ি',"'Hind Siliguri','Noto Sans Bengali',sans-serif"]};
+const QM_FS=[[13,'ছোট'],[15,'মাঝারি'],[17,'বড়'],[19,'অনেক বড়']];
+function qmDef(){ const p=S.qmPref||{}; return {font:QM_FONTS[p.font]?p.font:'nikosh',fs:QM_FS.some(x=>x[0]===+p.fs)?+p.fs:15,cols:[1,2,3].includes(+p.cols)?+p.cols:1,oc:[0,1,2,4].includes(+p.oc)?+p.oc:0,inst:p.inst||'',inst2:p.inst2||'',wm:p.wm||''}; }
+function qmD(oid){ if(oid){ const o=(S.qorders||{})[oid]; if(!o) return qmDef(); return o.d=Object.assign(qmDef(),o.d||{}); } const m=qmInit(); return m.d=m.d||qmDef(); }
+function qmSetD(oid,k,v){ const d=qmD(oid); d[k]=['fs','cols','oc'].includes(k)?+v:k==='font'?v:String(v).slice(0,k==='wm'?30:k==='inst2'?90:70);
+  S.qmPref=Object.assign({},d); persist(); }
+function qmDesignForm(d,oid){
+  const seg=(k,opts)=>`<div class="qm-seg" role="group">${opts.map(([v,l])=>`<button type="button" aria-pressed="${String(d[k])===String(v)}" data-qmdset="${k}:${v}" data-qmo="${oid||''}">${l}</button>`).join('')}</div>`;
+  return `<section class="qm-dz"><h4>🎨 প্রশ্নপত্রের ডিজাইন</h4>
+    <div class="qm-lab">ফন্ট</div>${seg('font',Object.entries(QM_FONTS).map(([k,[l]])=>[k,`<span style="font-family:${l==='নিকস'?"'Nikosh'":l==='কালপুরুষ'?"'Kalpurush'":"'Hind Siliguri'"}">${l}</span>`]))}
+    <div class="qm-lab">লেখার সাইজ</div>${seg('fs',QM_FS)}
+    <div class="qm-lab">পাতায় কলাম</div>${seg('cols',[[1,'১ কলাম'],[2,'২ কলাম'],[3,'৩ কলাম']])}
+    <div class="qm-lab">MCQ অপশন এক লাইনে কয়টি</div>${seg('oc',[[0,'অটো'],[1,'১টি'],[2,'২টি'],[4,'৪টি']])}
+    <div class="field"><label>প্রতিষ্ঠানের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst" data-qmo="${oid||''}" maxlength="70" placeholder="যেমন: আদর্শ উচ্চ বিদ্যালয়" value="${esc(d.inst)}"></div>
+    <div class="field"><label>ঠিকানা / শাখা / শিক্ষকের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst2" data-qmo="${oid||''}" maxlength="90" value="${esc(d.inst2)}"></div>
+    <div class="field"><label>ওয়াটারমার্ক (ঐচ্ছিক)</label><input class="input" data-qmd="wm" data-qmo="${oid||''}" maxlength="30" placeholder="যেমন: প্রতিষ্ঠানের নাম বা গোপনীয়" value="${esc(d.wm)}"></div>
+    <div class="qm-lab">নমুনা (প্রথম পাতা)</div><div class="qp-prev" data-qmo="${oid||''}"></div>
+    <p class="muted" style="margin:0;font-size:12px">ডিজাইন বদলাতে বাড়তি টাকা লাগে না। পরে "আমার তৈরি প্রশ্ন" থেকেও বদলাতে পারবেন।</p></section>`;
+}
+function qmPrevOrder(oid){
+  if(oid) return (S.qorders||{})[oid];
+  const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
+  return {title:String(m.title||'মডেল টেস্ট'),cls:c.name||'',subj:c.subj||'',time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),items:m.order.slice(0,40),d:m.d};
+}
+/* পাতা সাজানো: শিরোনাম পুরো প্রস্থে, বাকি ব্লক কলাম ধরে ভরে; জায়গা না হলে পরের কলাম/পাতা */
+function qmLayout(host,o,answers,d,maxPages){
+  const pages=[]; let cols=[],ci=0;
+  const wmFs=d.wm?Math.max(44,Math.min(130,Math.round(1250/Math.max(4,[...d.wm].length)))):0;
+  const newPage=()=>{ const p=document.createElement('div'); p.className='qp-page';
+    p.style.setProperty('--qfs',d.fs+'px'); p.style.setProperty('--qff',QM_FONTS[d.font][1]); p.style.setProperty('--qc',d.cols); p.style.setProperty('--akc',[0,6,3,2][d.cols]);
+    p.innerHTML=`<div class="qp-body"><div class="qp-top"></div><div class="qp-cols">${'<div class="qp-col"></div>'.repeat(d.cols)}</div></div><div class="qp-foot"></div>${d.wm?`<div class="qp-wm" aria-hidden="true"><span style="font-size:${wmFs}px">${esc(d.wm)}</span></div>`:''}`;
+    host.appendChild(p); pages.push(p); cols=[...p.querySelectorAll('.qp-col')]; ci=0; };
+  const fixMx=el=>el.querySelectorAll('.mx:not(.mx-r)').forEach(m=>{ m.classList.add('mx-r'); m.insertAdjacentHTML('afterbegin','<i class="mxb mxb-l"></i>'); m.insertAdjacentHTML('beforeend','<i class="mxb mxb-r"></i>'); });
+  const over=c=>c.scrollHeight>c.clientHeight+1;
+  newPage();
+  const B=qmBlocks(o,answers,d); const top=pages[0].querySelector('.qp-top'); top.innerHTML=B[0]; fixMx(top);
+  for(const h of B.slice(1)){
+    let col=cols[ci]; col.insertAdjacentHTML('beforeend',h); fixMx(col);
+    while(over(col)&&col.children.length>1){
+      const last=col.lastElementChild; col.removeChild(last);
+      const orphan=col.lastElementChild&&col.lastElementChild.classList.contains('qp-sec')&&col.children.length>1?col.lastElementChild:null; if(orphan) col.removeChild(orphan);
+      if(ci+1<cols.length) ci++; else { if(maxPages&&pages.length>=maxPages) return pages; newPage(); }
+      col=cols[ci]; if(orphan) col.appendChild(orphan); col.appendChild(last);
+    }
+  }
+  return pages;
+}
+function qmFillPreview(el){
+  const oid=el.dataset.qmo||'', o=qmPrevOrder(oid); if(!o) return;
+  const d=qmD(oid); el.innerHTML='';
+  const [pg]=qmLayout(el,o,false,d,1); if(!pg) return;
+  pg.querySelector('.qp-foot').textContent=`${d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি'} — পৃষ্ঠা ১`;
+  const sc=(el.clientWidth||300)/794; pg.style.transform=`scale(${sc})`; el.style.height=Math.round(1123*sc)+'px';
+}
+const qmPreviewAll=()=>app.querySelectorAll('.qp-prev').forEach(qmFillPreview);
 function vQmPaper(){
   const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
   if(!m.title) m.title=`${c.name||''} ${c.subj||''} — মডেল টেস্ট`.trim();
@@ -2921,6 +2991,7 @@ function vQmPaper(){
       <div class="field" style="flex:1"><label for="qmMk">পূর্ণমান</label><input class="input" id="qmMk" data-qmf="marks" inputmode="numeric" maxlength="4" placeholder="${bn(calc.marks)}" value="${esc(m.marks)}"></div></div>
     <p class="muted" style="margin:-4px 0 0;font-size:13px">ফাঁকা রাখলে সময় ${bn(autoTime)} মিনিট ও পূর্ণমান ${bn(calc.marks)} (MCQ ১, সংক্ষিপ্ত ২, সৃজনশীল ১০ নম্বর করে) বসবে।</p>
     <label class="chk"><input type="checkbox" data-qmf="ans" ${m.ans?'checked':''}> উত্তরপত্র / সমাধানও তৈরি হবে</label>
+    ${qmDesignForm(qmD(''),'')}
     <h3 class="m-sec">বিল</h3>${qmBreak(calc)}
     <div class="error" role="alert">${esc(m.err||'')}</div>
     <button class="btn" data-qmcreate style="width:100%" ${calc.n?'':'disabled'}>${CAN_EDIT?'প্রশ্নপত্র তৈরি করুন (অ্যাডমিন — ফ্রী)':calc.pay?`পেমেন্ট করুন ও প্রশ্ন তৈরি করুন · ৳${bn(calc.pay)}`:'প্রশ্নপত্র তৈরি করুন'}</button>
@@ -2932,7 +3003,7 @@ function qmCreateOrder(){
   const id='q'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), c=COURSES[m.cid]||{};
   const o={id,at:new Date().toISOString(),title:String(m.title||'').trim().slice(0,80)||'মডেল টেস্ট',cid:m.cid,cls:c.name||'',subj:c.subj||'',
     time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),ans:!!m.ans,
-    items:m.order.slice(0,300),count:calc.c,net:calc.net,amount:calc.pay,free:CAN_EDIT||calc.pay===0,status:CAN_EDIT||calc.pay===0?'paid':'draft'};
+    items:m.order.slice(0,300),d:Object.assign({},qmD('')),count:calc.c,net:calc.net,amount:calc.pay,free:CAN_EDIT||calc.pay===0,status:CAN_EDIT||calc.pay===0?'paid':'draft'};
   S.qorders=S.qorders||{}; S.qorders[id]=o; persist();
   m.sel={}; m.order=[]; m.title=''; m.time=''; m.marks=''; m.cur=id;
   if(o.free){ m.step='orders'; toast('প্রশ্নপত্র তৈরি হয়েছে — এখন PDF ডাউনলোড করুন'); }
@@ -3007,10 +3078,10 @@ function vQmOrders(){
       <div class="pay-rows"><span>শ্রেণি</span><b>${esc(o.cls)} ${esc(o.subj)}</b><span>প্রশ্ন</span><b>${['m','s','c'].filter(t=>o.count[t]).map(t=>`${QM_T[t][1]} ${bn(o.count[t])}`).join(' · ')}</b>
         <span>সময় · পূর্ণমান</span><b>${bn(o.time)} মিনিট · ${bn(o.marks)}</b><span>মূল্য</span><b>${o.free?'ফ্রী':'৳'+bn(o.amount)}</b></div>
       <div class="xa-act">${qmPaid(o)
-        ?`<button class="btn" data-qmpdf="${o.id}">📄 প্রশ্নপত্র PDF</button>${o.ans?`<button class="btn outline" data-qmpdfa="${o.id}">✅ উত্তরপত্র PDF</button>`:''}`
+        ?`<button class="btn" data-qmpdf="${o.id}">📄 প্রশ্নপত্র PDF</button>${o.ans?`<button class="btn outline" data-qmpdfa="${o.id}">✅ উত্তরপত্র PDF</button>`:''}<button class="btn ghost" data-qmdz="${o.id}" aria-expanded="${S.qmDzOpen===o.id}">🎨 ডিজাইন</button>`
         :o.status==='pending'?`<button class="btn outline" data-qmcheck="${o.id}">অবস্থা দেখুন</button>`
         :`<button class="btn" data-qmpaynow="${o.id}">পেমেন্ট করুন · ৳${bn(o.amount)}</button>`}
-        ${!qmPaid(o)||o.free?`<button class="link danger" data-qmodel="${o.id}">${S.qmArmed===o.id?'নিশ্চিত মুছবেন?':'মুছুন'}</button>`:''}</div></article>`; }).join('')
+        ${!qmPaid(o)||o.free?`<button class="link danger" data-qmodel="${o.id}">${S.qmArmed===o.id?'নিশ্চিত মুছবেন?':'মুছুন'}</button>`:''}</div>${qmPaid(o)&&S.qmDzOpen===o.id?qmDesignForm(qmD(o.id),o.id):''}</article>`; }).join('')
       :`<div class="empty">এখনো কোনো প্রশ্নপত্র তৈরি করা হয়নি।</div>`}
   </div>`;
 }
@@ -3058,9 +3129,12 @@ async function qmAdminDel(n){
 /* ---------- PDF ---------- */
 let PDFLIB=null;
 const loadPdfLib=()=>PDFLIB||(PDFLIB=new Promise((ok,no)=>{ if(window.SohogPDF) return ok(window.SohogPDF); const s=document.createElement('script'); s.src='pdfgen.js'; s.onload=()=>window.SohogPDF?ok(window.SohogPDF):no(); s.onerror=()=>{ PDFLIB=null; no(); }; document.head.appendChild(s); }));
-function qmBlocks(o,answers){
-  const items=o.items.map(qmItem).filter(x=>!x.missing), by=t=>items.filter(x=>x.t===t), B=[];
-  const head=`<div class="qp-head"><div class="qp-brand">সহগ গণিত একাডেমি · অংকবাড়ি</div><h1>${esc(o.title)}${answers?' — উত্তরপত্র':''}</h1>
+function qmBlocks(o,answers,d){
+  d=d||qmDef(); const items=o.items.map(qmItem).filter(x=>!x.missing), by=t=>items.filter(x=>x.t===t), B=[];
+  const plain=h=>String(h).replace(/<[^>]+>/g,'').replace(/&[a-z#0-9]+;/gi,'x').trim();
+  const ocOf=os=>{ if(d.oc) return d.oc; const wide=os.some(h=>/class="(mx|stbl)/.test(h)), L=Math.max(0,...os.map(h=>[...plain(h)].length));
+    if(d.cols===1) return wide?2:L<=14?4:2; if(d.cols===2) return wide?1:L<=6?4:L<=16?2:1; return !wide&&L<=9?2:1; };
+  const head=`<div class="qp-head">${d.inst?`<div class="qp-inst">${esc(d.inst)}</div>${d.inst2?`<div class="qp-inst2">${esc(d.inst2)}</div>`:''}`:`<div class="qp-brand">সহগ গণিত একাডেমি · অংকবাড়ি</div>${d.inst2?`<div class="qp-inst2">${esc(d.inst2)}</div>`:''}`}<h1>${esc(o.title)}${answers?' — উত্তরপত্র':''}</h1>
     <div class="qp-meta"><span>শ্রেণি: ${esc(o.cls)}</span><span>বিষয়: ${esc(o.subj)}</span>${answers?'':`<span>সময়: ${bn(o.time)} মিনিট</span><span>পূর্ণমান: ${bn(o.marks)}</span>`}</div>
     ${answers?'':`<div class="qp-info"><span>নাম: ……………………………</span><span>রোল: …………</span></div>`}</div>`;
   B.push(head);
@@ -3068,7 +3142,7 @@ function qmBlocks(o,answers){
     if(answers&&t==='m'){ B.push(`<div class="qp-akey">${L.map((x,i)=>`<span><b>${bn(no+i+1)}.</b> ${'কখগঘ'[x.a]||'—'}</span>`).join('')}</div>`);
       L.forEach((x,i)=>{ if(x.e) B.push(`<div class="qp-q"><b>${bn(no+i+1)}.</b> ${mq(x.e)}</div>`); }); no+=L.length; return; }
     L.forEach(x=>{ no++;
-      if(t==='m') B.push(`<div class="qp-q"><div><b>${bn(no)}.</b> ${mq(x.q)}</div><div class="qp-opts">${(x.o||[]).map((op,j)=>`<span>${'কখগঘ'[j]}) ${mq(op)}</span>`).join('')}</div></div>`);
+      if(t==='m'){ const os=(x.o||[]).map(mq); B.push(`<div class="qp-q"><div><b>${bn(no)}.</b> ${mq(x.q)}</div><div class="qp-opts oc${ocOf(os)}">${os.map((op,j)=>`<span>${'কখগঘ'[j]}) ${op}</span>`).join('')}</div></div>`); }
       else if(t==='s') B.push(`<div class="qp-q"><b>${bn(no)}.</b> ${mq(x.q)}${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
       else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(x.stem)}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span> ${mq(p)} <i>${bn([1,2,3,4][j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
     }); };
@@ -3083,15 +3157,10 @@ async function qmMakePdf(id,answers){
   try{
     const lib=await loadPdfLib();
     host=document.createElement('div'); host.className='qp-host'; document.body.appendChild(host);
-    const pages=[]; let body;
-    const newPage=()=>{ const p=document.createElement('div'); p.className='qp-page'; p.innerHTML='<div class="qp-body"></div><div class="qp-foot"></div>'; host.appendChild(p); pages.push(p); body=p.firstChild; };
-    newPage();
-    for(const h of qmBlocks(o,answers)){
-      body.insertAdjacentHTML('beforeend',h);
-      body.querySelectorAll('.mx:not(.mx-r)').forEach(m=>{ m.classList.add('mx-r'); m.insertAdjacentHTML('afterbegin','<i class="mxb mxb-l"></i>'); m.insertAdjacentHTML('beforeend','<i class="mxb mxb-r"></i>'); });
-      if(body.scrollHeight>body.clientHeight+1&&body.children.length>1){ const last=body.lastElementChild; body.removeChild(last); newPage(); body.appendChild(last); }
-    }
-    pages.forEach((p,i)=>{ p.lastChild.textContent=`সহগ গণিত একাডেমি · অংকবাড়ি — পৃষ্ঠা ${bn(i+1)}/${bn(pages.length)}`; });
+    const d=Object.assign(qmDef(),o.d||{});
+    if(document.fonts&&document.fonts.load){ try{ await Promise.all([document.fonts.load(`${d.fs}px ${QM_FONTS[d.font][1]}`,'অআকখ১২'),document.fonts.load(`700 ${d.fs}px ${QM_FONTS[d.font][1]}`,'অআকখ')]); }catch(e){} }
+    const pages=qmLayout(host,o,answers,d,0);
+    pages.forEach((p,i)=>{ p.querySelector('.qp-foot').textContent=`${d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি'} — পৃষ্ঠা ${bn(i+1)}/${bn(pages.length)}`; });
     if(document.fonts&&document.fonts.ready) await document.fonts.ready;
     const pdf=await lib.render(pages,(k,n)=>toast(`PDF তৈরি হচ্ছে… ${bn(k)}/${bn(n)} পৃষ্ঠা`));
     const name=`${o.title.replace(/[\\/:*?"<>|]+/g,' ').trim()||'prosnopotro'}${answers?' - uttor':''}.pdf`;
@@ -4140,6 +4209,7 @@ function render(){
   if(authed) renderTabs();
   const ct=app.querySelector('.ctabs .ctab.on'); if(ct&&ct.parentNode.scrollWidth>ct.parentNode.clientWidth) ct.parentNode.scrollLeft=ct.offsetLeft-ct.parentNode.clientWidth/2+ct.offsetWidth/2;
   const f=app.querySelector('#loginId,#otp'); if(f) f.focus({preventScroll:true});
+  if(S.view==='qm') qmPreviewAll();
 }
 function startQuiz(id){
   if(S.view!=='quiz'&&id.indexOf('mcq_')===0) fillMcq(id);
@@ -4195,6 +4265,8 @@ app.addEventListener('click',e=>{
   if(t.dataset.qmpaynow){ const m=qmInit(); m.cur=t.dataset.qmpaynow; m.pay=null; m.step='pay'; return render(); }
   if(t.dataset.qmcheck){ const o=(S.qorders||{})[t.dataset.qmcheck]; if(o) qmVerify(o).then(ok=>{ toast(ok?'পেমেন্ট অনুমোদিত — PDF ডাউনলোড করুন':o.status==='rejected'?'পেমেন্ট বাতিল হয়েছে — আবার পেমেন্ট করুন':'এখনো যাচাই হচ্ছে'); if(o.status==='rejected'){ o.status='draft'; o.payId=''; persist(); } softRender(); }); return; }
   if(t.dataset.qmodel){ const id=t.dataset.qmodel; if(S.qmArmed===id){ S.qmArmed=''; delete S.qorders[id]; persist(); toast('মুছে ফেলা হয়েছে'); } else S.qmArmed=id; return render(); }
+  if(t.dataset.qmdset){ const [k,v]=t.dataset.qmdset.split(':'); qmSetD(t.dataset.qmo||'',k,v); return render(); }
+  if(t.dataset.qmdz){ S.qmDzOpen=S.qmDzOpen===t.dataset.qmdz?null:t.dataset.qmdz; return render(); }
   if(t.dataset.qmpdf){ qmMakePdf(t.dataset.qmpdf,false); return; }
   if(t.dataset.qmpdfa){ qmMakePdf(t.dataset.qmpdfa,true); return; }
   if(t.hasAttribute('data-qmadmsave')){ qmAdminSave(); return; }
@@ -4401,6 +4473,8 @@ app.addEventListener('input',e=>{
   if(t.dataset.qmf){ const m=qmInit(), k=t.dataset.qmf; if(k==='q'){ m.q=t.value; m.page=0; clearTimeout(S.qmQT); S.qmQT=setTimeout(()=>{ const pos=t.selectionStart; render(); const x=document.querySelector('[data-qmf=q]'); if(x){ x.focus(); try{ x.setSelectionRange(pos,pos); }catch(e){} } },350); }
     else if(k!=='cid'&&k!=='ch'&&k!=='ans') m[k]=t.value; }
   if(t.dataset.qmp){ const m=qmInit(); if(m.pay) m.pay[t.dataset.qmp]=t.value; }
+  if(t.dataset.qmd){ qmSetD(t.dataset.qmo||'',t.dataset.qmd,t.value); clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,300); }
+  if(t.dataset.qmf==='title'||t.dataset.qmf==='time'||t.dataset.qmf==='marks'){ clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,400); }
   if(t.dataset.clf){ cfInitC()[t.dataset.clf]=t.value; }
   if(t.dataset.payf&&S.buy){ S.buy[t.dataset.payf]=t.value; }
   if(t.dataset.pcf&&t.type!=='checkbox'){ pcInit()[t.dataset.pcf]=t.value; }
