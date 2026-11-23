@@ -2867,11 +2867,11 @@ const qmCfg=()=>{ const r=SYL.paycfg||{}, p=(v,d)=>{ const x=Math.round(parseFlo
 const tk=p=>{ const s=(p/100).toFixed(2); return bn(s.endsWith('.00')?s.slice(0,-3):s); };   // পয়সা → "১৩.৫০"
 const qmKey=(t,cid,ch,n)=>`${t}|${cid}|${ch}|${n}`;
 /* কাস্টম প্রশ্নে শ্রেণি সাজানো: এসএসসি ও এইচএসসি গ্রুপ; নবম-দশম একই প্রশ্নব্যাংক, তাই দশম আলাদা দেখানো হয় না */
-const QM_GRP=[['এসএসসি',[['c9','সাধারণ গণিত'],['c9h','উচ্চতর গণিত']]],['এইচএসসি',[['h11','উচ্চতর গণিত ১ম পত্র'],['h12','উচ্চতর গণিত ২য় পত্র']]]];
+const QM_GRP=[['৫ম শ্রেণি',[['p5','গণিত'],['p5s','বিজ্ঞান']]],['৬ষ্ঠ শ্রেণি',[['c6','গণিত'],['c6s','বিজ্ঞান']]],['৭ম শ্রেণি',[['c7','গণিত'],['c7s','বিজ্ঞান']]],['৮ম শ্রেণি',[['c8','গণিত'],['c8s','বিজ্ঞান']]],['এসএসসি',[['c9','সাধারণ গণিত'],['c9h','উচ্চতর গণিত']]],['এইচএসসি',[['h11','উচ্চতর গণিত ১ম পত্র'],['h12','উচ্চতর গণিত ২য় পত্র']]]];
 const QM_HIDE={c10:'c9',c10h:'c9h'};
 const qmCid=cid=>QM_HIDE[cid]||cid;
 function qmLbl(cid){ for(const [g,l] of QM_GRP){ const x=l.find(y=>y[0]===cid); if(x) return {cls:g,subj:x[1]}; } const c=COURSES[cid]||{}; return {cls:c.name||'',subj:c.subj||''}; }
-const QM_GKEY={'এসএসসি':'ssc','এইচএসসি':'hsc'};
+const QM_GKEY={'৫ম শ্রেণি':'g5','৬ষ্ঠ শ্রেণি':'g6','৭ম শ্রেণি':'g7','৮ম শ্রেণি':'g8','এসএসসি':'ssc','এইচএসসি':'hsc'};
 const qmGrpOf=cid=>{ const g=QM_GRP.find(([,l])=>l.some(x=>x[0]===cid)); return g?g:null; };
 function qmAvail(k){ const ids=OFFER_IDS(); return ids.includes(k)||Object.keys(QM_HIDE).some(x=>QM_HIDE[x]===k&&ids.includes(x)); }
 function qmLevelSel(cur){ const ids=OFFER_IDS(), g=qmGrpOf(cur), opt=(v,l,on)=>`<option value="${v}" ${on?'selected':''}>${esc(l)}</option>`;
