@@ -2917,7 +2917,15 @@ const qmCfg=()=>{ const r=SYL.paycfg||{}, p=(v,d)=>{ const x=Math.round(parseFlo
   return {m:p(r.qmM,50),s:p(r.qmS,50),c:p(r.qmC,200),disc:Math.min(90,Math.max(0,+r.qmDisc||0)),min:Math.max(0,Math.round(+r.qmMin||0))}; };
 const tk=p=>{ const s=(p/100).toFixed(2); return bn(s.endsWith('.00')?s.slice(0,-3):s); };   // পয়সা → "১৩.৫০"
 const qmKey=(t,cid,ch,n)=>`${t}|${cid}|${ch}|${n}`;
-function qmInit(){ if(!S.qm){ const ids=OFFER_IDS(); S.qm={cid:ids.includes(hubCourse())?hubCourse():ids[0],ch:'1',t:'m',q:'',page:0,sel:{},order:[],step:'pick',title:'',time:'',marks:'',ans:true,pay:null,adm:'',admT:'s',admErr:''}; } return S.qm; }
+/* কাস্টম প্রশ্নে শ্রেণি সাজানো: এসএসসি ও এইচএসসি গ্রুপ; নবম-দশম একই প্রশ্নব্যাংক, তাই দশম আলাদা দেখানো হয় না */
+const QM_GRP=[['এসএসসি',[['c9','সাধারণ গণিত'],['c9h','উচ্চতর গণিত']]],['এইচএসসি',[['h11','উচ্চতর গণিত ১ম পত্র'],['h12','উচ্চতর গণিত ২য় পত্র']]]];
+const QM_HIDE={c10:'c9',c10h:'c9h'};
+const qmCid=cid=>QM_HIDE[cid]||cid;
+function qmLbl(cid){ for(const [g,l] of QM_GRP){ const x=l.find(y=>y[0]===cid); if(x) return {cls:g,subj:x[1]}; } const c=COURSES[cid]||{}; return {cls:c.name||'',subj:c.subj||''}; }
+function qmCidOptions(cur){ const ids=OFFER_IDS(), used=new Set(), opt=(k,l)=>`<option value="${k}" ${k===cur?'selected':''}>${esc(l)}</option>`;
+  let h=QM_GRP.map(([g,l])=>{ const o=l.filter(([k])=>ids.includes(k)||ids.includes(Object.keys(QM_HIDE).find(x=>QM_HIDE[x]===k))); o.forEach(([k])=>used.add(k)); return o.length?`<optgroup label="${g}">${o.map(([k,t])=>opt(k,`${g} ➤ ${t}`)).join('')}</optgroup>`:''; }).join('');
+  const rest=ids.filter(k=>!used.has(k)&&!QM_HIDE[k]); if(rest.length) h+=`<optgroup label="অন্যান্য শ্রেণি">${rest.map(k=>opt(k,ptitle(COURSES[k]))).join('')}</optgroup>`; return h; }
+function qmInit(){ if(S.qm) S.qm.cid=qmCid(S.qm.cid); if(!S.qm){ const ids=OFFER_IDS(); S.qm={cid:qmCid(ids.includes(hubCourse())?hubCourse():ids[0]),ch:'1',t:'m',q:'',page:0,sel:{},order:[],step:'pick',title:'',time:'',marks:'',ans:true,pay:null,adm:'',admT:'s',admErr:''}; } return S.qm; }
 /* অ্যাপের সাথে আসা প্রশ্ন (www/sq.js); অ্যাডমিন একবার ফায়ারবেসে তুললে (fromApp) এরপর শুধু ফায়ারবেস থেকে আসে */
 function qmBuiltin(cid,ch,t){ const SQ=window.SOHOG_SQ||{}, bc=SQ[cid]?cid:{c9:'c10',c9h:'c10h'}[cid]; return t==='s'&&bc&&SQ[bc]&&SQ[bc][String(ch)]||[]; }
 const QM_TWIN={c9:['c9','c10'],c10:['c9','c10'],c9h:['c9h','c10h'],c10h:['c9h','c10h']};
@@ -2973,7 +2981,7 @@ function vQm(){
     <div class="qm-steps"><span class="on">১ বাছাই</span><span>২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
     <button class="btn ghost" data-qmstep="orders" style="width:100%">📁 আমার তৈরি প্রশ্ন${qmOrders().length?` (${bn(qmOrders().length)})`:''}</button>
     <div class="qm-filters">
-      <div class="field"><label for="qmC">শ্রেণি ও বিষয়</label><select class="input" id="qmC" data-qmf="cid">${ids.map(k=>`<option value="${k}" ${k===m.cid?'selected':''}>${esc(ptitle(COURSES[k]))}</option>`).join('')}</select></div>
+      <div class="field"><label for="qmC">শ্রেণি ও বিষয়</label><select class="input" id="qmC" data-qmf="cid">${qmCidOptions(m.cid)}</select></div>
       <div class="field"><label for="qmCh">অধ্যায়</label><select class="input" id="qmCh" data-qmf="ch">${chs.map((n,j)=>`<option value="${j+1}" ${String(j+1)===String(m.ch)?'selected':''}>${bn(j+1)}. ${esc(n)}</option>`).join('')}</select></div>
       ${exs.length?`<div class="field"><label for="qmEx">অনুশীলনী</label><select class="input" id="qmEx" data-qmf="ex"><option value="">সব অনুশীলনী</option>${exs.map(x=>`<option value="${x}" ${m.ex===x?'selected':''}>অনুশীলনী ${bn(exName(x))}</option>`).join('')}</select></div>`:''}
     </div>
@@ -3032,7 +3040,7 @@ function qmDesignForm(d,oid){
 function qmPrevOrder(oid){
   if(oid) return (S.qorders||{})[oid];
   const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
-  return {title:String(m.title||'মডেল টেস্ট'),cls:c.name||'',subj:c.subj||'',time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),items:m.order.slice(0,40),d:m.d};
+  return {title:String(m.title||'মডেল টেস্ট'),...qmLbl(m.cid),time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),items:m.order.slice(0,40),d:m.d};
 }
 /* পাতা সাজানো: শিরোনাম পুরো প্রস্থে, বাকি ব্লক কলাম ধরে ভরে; জায়গা না হলে পরের কলাম/পাতা */
 function qmLayout(host,o,answers,d,maxPages){
@@ -3069,7 +3077,7 @@ function qmFoot(p,d,i,n,one){ const f=p.querySelector('.qp-foot');
 const qmPreviewAll=()=>app.querySelectorAll('.qp-prev').forEach(qmFillPreview);
 function vQmPaper(){
   const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
-  if(!m.title) m.title=`${c.name||''} ${c.subj||''} — মডেল টেস্ট`.trim();
+  if(!m.title) { const L=qmLbl(m.cid); m.title=`${L.cls} ${L.subj} — মডেল টেস্ট`.trim(); }
   const autoTime=Math.max(10,calc.c.m*1+calc.c.s*3+calc.c.c*25);
   return `<div class="screen qm">${backTop('প্রশ্নপত্রের তথ্য','qm')}
     <div class="qm-steps"><span class="done">১ বাছাই</span><span class="on">২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
@@ -3088,7 +3096,7 @@ function vQmPaper(){
 function qmCreateOrder(){
   const m=qmInit(), calc=qmCalc(m.order); if(!calc.n) return;
   const id='q'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), c=COURSES[m.cid]||{};
-  const o={id,at:new Date().toISOString(),title:String(m.title||'').trim().slice(0,80)||'মডেল টেস্ট',cid:m.cid,cls:c.name||'',subj:c.subj||'',
+  const o={id,at:new Date().toISOString(),title:String(m.title||'').trim().slice(0,80)||'মডেল টেস্ট',cid:m.cid,...qmLbl(m.cid),
     time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),ans:!!m.ans,
     items:m.order.slice(0,300),d:Object.assign({},qmD('')),count:calc.c,net:calc.net,amount:calc.pay,free:CAN_EDIT||calc.pay===0,status:CAN_EDIT||calc.pay===0?'paid':'draft'};
   S.qorders=S.qorders||{}; S.qorders[id]=o; persist();
