@@ -175,6 +175,12 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qp-akey{display:grid;grid-template-columns:repeat(var(--akc,6),1fr);gap:4px 8px;margin-bottom:10px}
 .qp-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:5;overflow:hidden}
 .qp-wm span{transform:rotate(-32deg);font-weight:700;color:rgba(15,23,42,.075);white-space:nowrap;font-family:var(--qff,'Hind Siliguri',sans-serif)}
+.qm-lab2{font-size:14px;font-weight:700;margin:2px 0 -2px}
+.qm-types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.qm-type{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 11px;border-radius:14px;border:1.5px solid var(--line,#dbe3ee);background:var(--card,#fff);color:inherit;font:inherit;cursor:pointer;min-width:0}
+.qm-type b{font-size:15.5px}.qm-type span{font-size:12px;color:var(--muted,#5B6B82)}.qm-type i{font-style:normal;font-size:12px;font-weight:700;color:#15803d}
+.qm-type[aria-selected=true]{border-color:var(--accent,#1F6FE5);background:color-mix(in srgb,var(--accent,#1F6FE5) 10%,transparent);box-shadow:0 0 0 1px var(--accent,#1F6FE5) inset}
+.qm-type[aria-selected=true] b{color:var(--accent,#1F6FE5)}
 .qm-dz{border:1px solid var(--line,#dbe3ee);border-radius:14px;padding:12px;margin:6px 0 10px;display:flex;flex-direction:column;gap:8px;background:var(--card,#fff)}
 .qm-dz h4{margin:0;font-size:15px}.qm-dz .qm-lab{font-size:13px;font-weight:600;color:var(--muted,#5B6B82);margin-top:2px}
 .qm-seg{display:flex;flex-wrap:wrap;gap:6px}.qm-seg button{flex:1 1 auto;min-width:56px;padding:7px 10px;border-radius:10px;border:1px solid var(--line,#cbd5e1);background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
@@ -2861,8 +2867,10 @@ const tk=p=>{ const s=(p/100).toFixed(2); return bn(s.endsWith('.00')?s.slice(0,
 const qmKey=(t,cid,ch,n)=>`${t}|${cid}|${ch}|${n}`;
 function qmInit(){ if(!S.qm){ const ids=OFFER_IDS(); S.qm={cid:ids.includes(hubCourse())?hubCourse():ids[0],ch:'1',t:'m',q:'',page:0,sel:{},order:[],step:'pick',title:'',time:'',marks:'',ans:true,pay:null,adm:'',admT:'s',admErr:''}; } return S.qm; }
 function qmPool(cid,ch,t){
-  if(t==='m') return bankFor(cid,ch).map(x=>({n:x.n,q:x.q,o:x.o,a:x.a,e:x.e}));
-  const d=SYL[`${t==='s'?'sq':'cq'}_${cid}_${ch}`]; return d&&Array.isArray(d.items)?d.items:[];
+  if(t==='m') return bankFor(cid,ch).map(x=>({n:x.n,q:x.q,o:x.o,a:x.a,e:x.e,ex:x.ex}));
+  const d=SYL[`${t==='s'?'sq':'cq'}_${cid}_${ch}`], own=d&&Array.isArray(d.items)?d.items:[];
+  const SQ=window.SOHOG_SQ||{}, bc=SQ[cid]?cid:{c9:'c10',c9h:'c10h'}[cid], bi=t==='s'&&bc&&SQ[bc]&&SQ[bc][String(ch)]||[];
+  return bi.concat(own);
 }
 function qmItem(k){ const [t,cid,ch,n]=k.split('|'); return Object.assign({t,cid,ch},(qmPool(cid,ch,t).find(x=>String(x.n)===n)||null)||{missing:true,n}); }
 function qmCalc(keys){
@@ -2878,7 +2886,9 @@ const qmPaid=o=>o&&(o.status==='paid'||o.free);
 function vQm(){
   const m=qmInit(); if(m.step==='paper') return vQmPaper(); if(m.step==='pay') return vQmPay(); if(m.step==='orders') return vQmOrders();
   const ids=OFFER_IDS(), c=COURSES[m.cid]||COURSES[ids[0]], chs=c.chapters||[];
-  const pool=qmPool(m.cid,m.ch,m.t), qq=String(m.q||'').trim().toLowerCase();
+  const exs=((c.exs||{})[m.ch]||[]); if(m.ex&&!exs.includes(m.ex)) m.ex='';
+  const byEx=a=>m.ex?a.filter(x=>x.ex===m.ex):a;
+  const pool=byEx(qmPool(m.cid,m.ch,m.t)), qq=String(m.q||'').trim().toLowerCase();
   const list=qq?pool.filter(x=>String(x.q||x.stem||'').toLowerCase().includes(qq)):pool;
   const PER=20, pages=Math.max(1,Math.ceil(list.length/PER)); m.page=Math.min(m.page,pages-1);
   const shown=list.slice(m.page*PER,m.page*PER+PER), calc=qmCalc(m.order);
@@ -2887,7 +2897,7 @@ function vQm(){
     const body=m.t==='m'?`<div class="qm-q">${mq(x.q)}</div><div class="qm-o">${(x.o||[]).map((o,j)=>`<span>${'কখগঘ'[j]}) ${mq(o)}</span>`).join('')}</div>`
       :m.t==='s'?`<div class="qm-q">${mq(x.q)}</div>`
       :`<div class="qm-q"><b>উদ্দীপক:</b> ${mq(x.stem)}</div><div class="qm-cq">${(x.p||[]).map((p,j)=>`<span>${'কখগঘ'[j]}) ${mq(p)}</span>`).join('')}</div>`;
-    return `<label class="qm-card ${on?'on':''}"><input type="checkbox" data-qmpick="${esc(String(x.n))}" ${on?'checked':''}><span class="qm-no">${bn(no)}</span><div class="qm-body">${body}</div>${CAN_EDIT&&m.t!=='m'?`<button class="link danger" data-qmdel="${esc(String(x.n))}" style="align-self:flex-start">মুছুন</button>`:''}</label>`; };
+    return `<label class="qm-card ${on?'on':''}"><input type="checkbox" data-qmpick="${esc(String(x.n))}" ${on?'checked':''}><span class="qm-no">${bn(no)}</span><div class="qm-body">${body}</div>${CAN_EDIT&&m.t!=='m'&&!/^b/.test(String(x.n))?`<button class="link danger" data-qmdel="${esc(String(x.n))}" style="align-self:flex-start">মুছুন</button>`:''}</label>`; };
   return `<div class="screen qm">
     ${backTop('কাস্টম প্রশ্ন তৈরি','home')}
     <div class="qm-steps"><span class="on">১ বাছাই</span><span>২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
@@ -2895,8 +2905,11 @@ function vQm(){
     <div class="qm-filters">
       <div class="field"><label for="qmC">শ্রেণি ও বিষয়</label><select class="input" id="qmC" data-qmf="cid">${ids.map(k=>`<option value="${k}" ${k===m.cid?'selected':''}>${esc(ptitle(COURSES[k]))}</option>`).join('')}</select></div>
       <div class="field"><label for="qmCh">অধ্যায়</label><select class="input" id="qmCh" data-qmf="ch">${chs.map((n,j)=>`<option value="${j+1}" ${String(j+1)===String(m.ch)?'selected':''}>${bn(j+1)}. ${esc(n)}</option>`).join('')}</select></div>
+      ${exs.length?`<div class="field"><label for="qmEx">অনুশীলনী</label><select class="input" id="qmEx" data-qmf="ex"><option value="">সব অনুশীলনী</option>${exs.map(x=>`<option value="${x}" ${m.ex===x?'selected':''}>অনুশীলনী ${bn(exName(x))}</option>`).join('')}</select></div>`:''}
     </div>
-    <div class="seg" style="grid-template-columns:repeat(3,minmax(0,1fr))">${['m','s','c'].map(t=>{ const n=qmPool(m.cid,m.ch,t).length; return `<button class="seg-btn" aria-selected="${m.t===t}" data-qmt="${t}">${QM_T[t][1]} (${bn(n)})<br><small>৳${tk(qmCfg()[t])}/টি</small></button>`; }).join('')}</div>
+    <div class="qm-lab2">প্রশ্নের ধরন বাছাই করুন</div>
+    <div class="qm-types" role="tablist">${['m','s','c'].map(t=>{ const n=byEx(qmPool(m.cid,m.ch,t)).length, k=m.order.filter(x=>x[0]===t).length;
+      return `<button class="qm-type" role="tab" aria-selected="${m.t===t}" data-qmt="${t}"><b>${QM_T[t][1]}</b><span>${bn(n)}টি প্রশ্ন · ৳${tk(qmCfg()[t])}/টি</span>${k?`<i>✓ ${bn(k)}টি বাছাই</i>`:''}</button>`; }).join('')}</div>
     ${CAN_EDIT&&m.t!=='m'?qmAdminAdd(m):''}
     <div class="qm-tools"><input class="input" data-qmf="q" placeholder="প্রশ্ন খুঁজুন…" value="${esc(m.q)}">
       ${list.length?`<button class="btn ghost" data-qmall="1">এই পাতার সব</button><button class="btn ghost" data-qmrand="10">এলোমেলো ১০টি</button>`:''}</div>
@@ -3117,7 +3130,7 @@ async function qmAdminSave(){
   if(errs.length||!out.length){ m.admErr=errs.join('; ')||'কোনো প্রশ্ন পাওয়া যায়নি।'; render(); return; }
   const id=`${m.t==='s'?'sq':'cq'}_${m.cid}_${m.ch}`, cur=SYL[id]&&Array.isArray(SYL[id].items)?SYL[id].items:[];
   let next=cur.reduce((x,y)=>Math.max(x,+y.n||0),0);
-  const items=cur.concat(out.map(x=>Object.assign({n:++next},x)));
+  const items=cur.concat(out.map(x=>Object.assign({n:++next},m.ex?{ex:m.ex}:{},x)));
   try{ await DB.collection('syllabus').doc(id).set({type:m.t==='s'?'sqset':'cqset',course:m.cid,ch:+m.ch,items,updatedAt:new Date().toISOString()});
     m.adm=''; m.admErr=''; toast(`${bn(out.length)}টি প্রশ্ন যোগ হয়েছে`); }
   catch(e){ m.admErr='সংরক্ষণ করা যায়নি (ডকুমেন্ট খুব বড় হলে অধ্যায় ভাগ করে দিন)।'; }
@@ -4474,7 +4487,7 @@ app.addEventListener('input',e=>{
   const t=e.target;
   if(t.dataset.nf){ nfInit()[t.dataset.nf]=t.type==='checkbox'?t.checked:t.value; }
   if(t.dataset.qmf){ const m=qmInit(), k=t.dataset.qmf; if(k==='q'){ m.q=t.value; m.page=0; clearTimeout(S.qmQT); S.qmQT=setTimeout(()=>{ const pos=t.selectionStart; render(); const x=document.querySelector('[data-qmf=q]'); if(x){ x.focus(); try{ x.setSelectionRange(pos,pos); }catch(e){} } },350); }
-    else if(k!=='cid'&&k!=='ch'&&k!=='ans') m[k]=t.value; }
+    else if(!['cid','ch','ans','ex'].includes(k)) m[k]=t.value; }
   if(t.dataset.qmp){ const m=qmInit(); if(m.pay) m.pay[t.dataset.qmp]=t.value; }
   if(t.dataset.qmd){ qmSetD(t.dataset.qmo||'',t.dataset.qmd,t.value); clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,300); }
   if(t.dataset.qmf==='title'||t.dataset.qmf==='time'||t.dataset.qmf==='marks'){ clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,400); }
@@ -4502,7 +4515,8 @@ app.addEventListener('input',e=>{
 });
 app.addEventListener('change',e=>{
   const t=e.target;
-  if(t.dataset.qmf==='cid'||t.dataset.qmf==='ch'){ const m=qmInit(); m[t.dataset.qmf]=t.value; if(t.dataset.qmf==='cid') m.ch='1'; m.page=0; m.q=''; return render(); }
+  if(t.dataset.qmf==='cid'||t.dataset.qmf==='ch'){ const m=qmInit(); m[t.dataset.qmf]=t.value; if(t.dataset.qmf==='cid') m.ch='1'; m.ex=''; m.page=0; m.q=''; return render(); }
+  if(t.dataset.qmf==='ex'){ const m=qmInit(); m.ex=t.value; m.page=0; return render(); }
   if(t.dataset.qmf==='ans'){ qmInit().ans=t.checked; return; }
   if(t.dataset.qmpick!==undefined){ const m=qmInit(), k=qmKey(m.t,m.cid,m.ch,t.dataset.qmpick); if(t.checked){ if(!m.sel[k]){ m.sel[k]=1; m.order.push(k); } } else { delete m.sel[k]; m.order=m.order.filter(x=>x!==k); } return render(); }
   if(t.dataset.pcf==='enforce'){ pcInit().enforce=t.checked; return; }

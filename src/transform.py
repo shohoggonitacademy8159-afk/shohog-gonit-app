@@ -83,6 +83,7 @@ img{max-width:100%}
 <script src="build.js"></script>
 <script src="db.js"></script>
 <script src="mcq.js"></script>
+<script src="sq.js"></script>
 """
 # <title> + <style> + markup are at the top of the artifact; move title/style into head, rest into body
 m = re.match(r'(<title>.*?</title>\n)(.*?</style>\n)(.*)$', s, re.S)
