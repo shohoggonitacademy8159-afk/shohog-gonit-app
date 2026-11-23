@@ -175,6 +175,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qp-akey{display:grid;grid-template-columns:repeat(var(--akc,6),1fr);gap:4px 8px;margin-bottom:10px}
 .qp-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:5;overflow:hidden}
 .qp-wm span{transform:rotate(-32deg);font-weight:700;color:rgba(15,23,42,.075);white-space:nowrap;font-family:var(--qff,'Hind Siliguri',sans-serif)}
+.qm-imp{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px;border-radius:14px;border:1.5px dashed #f59e0b;background:color-mix(in srgb,#f59e0b 9%,transparent)}.qm-imp div{display:flex;flex-direction:column;gap:2px;flex:1 1 220px}.qm-imp small{font-size:12.5px;color:var(--muted,#5B6B82)}
 .qm-lab2{font-size:14px;font-weight:700;margin:2px 0 -2px}
 .qm-types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .qm-type{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 11px;border-radius:14px;border:1.5px solid var(--line,#dbe3ee);background:var(--card,#fff);color:inherit;font:inherit;cursor:pointer;min-width:0}
@@ -2866,11 +2867,28 @@ const qmCfg=()=>{ const r=SYL.paycfg||{}, p=(v,d)=>{ const x=Math.round(parseFlo
 const tk=p=>{ const s=(p/100).toFixed(2); return bn(s.endsWith('.00')?s.slice(0,-3):s); };   // পয়সা → "১৩.৫০"
 const qmKey=(t,cid,ch,n)=>`${t}|${cid}|${ch}|${n}`;
 function qmInit(){ if(!S.qm){ const ids=OFFER_IDS(); S.qm={cid:ids.includes(hubCourse())?hubCourse():ids[0],ch:'1',t:'m',q:'',page:0,sel:{},order:[],step:'pick',title:'',time:'',marks:'',ans:true,pay:null,adm:'',admT:'s',admErr:''}; } return S.qm; }
+/* অ্যাপের সাথে আসা প্রশ্ন (www/sq.js); অ্যাডমিন একবার ফায়ারবেসে তুললে (fromApp) এরপর শুধু ফায়ারবেস থেকে আসে */
+function qmBuiltin(cid,ch,t){ const SQ=window.SOHOG_SQ||{}, bc=SQ[cid]?cid:{c9:'c10',c9h:'c10h'}[cid]; return t==='s'&&bc&&SQ[bc]&&SQ[bc][String(ch)]||[]; }
+const QM_TWIN={c9:['c9','c10'],c10:['c9','c10'],c9h:['c9h','c10h'],c10h:['c9h','c10h']};
+async function qmAdminImport(){
+  const m=qmInit(); if(S.qmImpBusy) return; S.qmImpBusy=true; render();
+  const targets=(QM_TWIN[m.cid]||[m.cid]).filter(cid=>COURSES[cid]); let tot=0;
+  try{
+    for(const cid of targets){
+      const id=`sq_${cid}_${m.ch}`, d=SYL[id]; if(d&&d.fromApp) continue;
+      const cur=d&&Array.isArray(d.items)?d.items:[], bi=qmBuiltin(cid,m.ch,'s'), have=new Set(cur.map(x=>String(x.n)));
+      const items=bi.filter(x=>!have.has(String(x.n))).map(x=>Object.assign({},x)).concat(cur);
+      await DB.collection('syllabus').doc(id).set({type:'sqset',course:cid,ch:+m.ch,items,fromApp:true,updatedAt:new Date().toISOString()});
+      SYL[id]={type:'sqset',course:cid,ch:+m.ch,items,fromApp:true}; tot+=bi.length;
+    }
+    toast(`${bn(tot)}টি প্রশ্ন ফায়ারবেসে তোলা হয়েছে`);
+  }catch(e){ toast('ফায়ারবেসে তোলা যায়নি — ইন্টারনেট ও অ্যাডমিন লগইন দেখুন'); }
+  S.qmImpBusy=false; render();
+}
 function qmPool(cid,ch,t){
   if(t==='m') return bankFor(cid,ch).map(x=>({n:x.n,q:x.q,o:x.o,a:x.a,e:x.e,ex:x.ex}));
   const d=SYL[`${t==='s'?'sq':'cq'}_${cid}_${ch}`], own=d&&Array.isArray(d.items)?d.items:[];
-  const SQ=window.SOHOG_SQ||{}, bc=SQ[cid]?cid:{c9:'c10',c9h:'c10h'}[cid], bi=t==='s'&&bc&&SQ[bc]&&SQ[bc][String(ch)]||[];
-  return bi.concat(own);
+  return (d&&d.fromApp?[]:qmBuiltin(cid,ch,t)).concat(own);
 }
 function qmItem(k){ const [t,cid,ch,n]=k.split('|'); return Object.assign({t,cid,ch},(qmPool(cid,ch,t).find(x=>String(x.n)===n)||null)||{missing:true,n}); }
 function qmCalc(keys){
@@ -2887,7 +2905,8 @@ function vQm(){
   const m=qmInit(); if(m.step==='paper') return vQmPaper(); if(m.step==='pay') return vQmPay(); if(m.step==='orders') return vQmOrders();
   const ids=OFFER_IDS(), c=COURSES[m.cid]||COURSES[ids[0]], chs=c.chapters||[];
   const exs=((c.exs||{})[m.ch]||[]); if(m.ex&&!exs.includes(m.ex)) m.ex='';
-  const byEx=a=>m.ex?a.filter(x=>x.ex===m.ex):a;
+  const byEx=a=>m.ex?a.filter(x=>x.ex===m.ex):a, ownDoc=SYL[`${m.t==='s'?'sq':'cq'}_${m.cid}_${m.ch}`];
+  const impN=CAN_EDIT&&m.t==='s'&&!(ownDoc&&ownDoc.fromApp)?qmBuiltin(m.cid,m.ch,'s').length:0;
   const pool=byEx(qmPool(m.cid,m.ch,m.t)), qq=String(m.q||'').trim().toLowerCase();
   const list=qq?pool.filter(x=>String(x.q||x.stem||'').toLowerCase().includes(qq)):pool;
   const PER=20, pages=Math.max(1,Math.ceil(list.length/PER)); m.page=Math.min(m.page,pages-1);
@@ -2897,7 +2916,7 @@ function vQm(){
     const body=m.t==='m'?`<div class="qm-q">${mq(x.q)}</div><div class="qm-o">${(x.o||[]).map((o,j)=>`<span>${'কখগঘ'[j]}) ${mq(o)}</span>`).join('')}</div>`
       :m.t==='s'?`<div class="qm-q">${mq(x.q)}</div>`
       :`<div class="qm-q"><b>উদ্দীপক:</b> ${mq(x.stem)}</div><div class="qm-cq">${(x.p||[]).map((p,j)=>`<span>${'কখগঘ'[j]}) ${mq(p)}</span>`).join('')}</div>`;
-    return `<label class="qm-card ${on?'on':''}"><input type="checkbox" data-qmpick="${esc(String(x.n))}" ${on?'checked':''}><span class="qm-no">${bn(no)}</span><div class="qm-body">${body}</div>${CAN_EDIT&&m.t!=='m'&&!/^b/.test(String(x.n))?`<button class="link danger" data-qmdel="${esc(String(x.n))}" style="align-self:flex-start">মুছুন</button>`:''}</label>`; };
+    return `<label class="qm-card ${on?'on':''}"><input type="checkbox" data-qmpick="${esc(String(x.n))}" ${on?'checked':''}><span class="qm-no">${bn(no)}</span><div class="qm-body">${body}</div>${CAN_EDIT&&m.t!=='m'&&(!/^b/.test(String(x.n))||(ownDoc&&ownDoc.fromApp))?`<button class="link danger" data-qmdel="${esc(String(x.n))}" style="align-self:flex-start">মুছুন</button>`:''}</label>`; };
   return `<div class="screen qm">
     ${backTop('কাস্টম প্রশ্ন তৈরি','home')}
     <div class="qm-steps"><span class="on">১ বাছাই</span><span>২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
@@ -2910,6 +2929,7 @@ function vQm(){
     <div class="qm-lab2">প্রশ্নের ধরন বাছাই করুন</div>
     <div class="qm-types" role="tablist">${['m','s','c'].map(t=>{ const n=byEx(qmPool(m.cid,m.ch,t)).length, k=m.order.filter(x=>x[0]===t).length;
       return `<button class="qm-type" role="tab" aria-selected="${m.t===t}" data-qmt="${t}"><b>${QM_T[t][1]}</b><span>${bn(n)}টি প্রশ্ন · ৳${tk(qmCfg()[t])}/টি</span>${k?`<i>✓ ${bn(k)}টি বাছাই</i>`:''}</button>`; }).join('')}</div>
+    ${impN?`<div class="qm-imp"><div><b>📤 অ্যাপের ${bn(impN)}টি সংক্ষিপ্ত প্রশ্ন এখনো ফায়ারবেসে নেই</b><small>তুললে এগুলো ফায়ারবেস থেকে আসবে, আর আপনি মুছতে বা বদলাতে পারবেন।${QM_TWIN[m.cid]?' নবম ও দশম দুই শ্রেণিতেই উঠবে।':''}</small></div><button class="btn" data-qmimport="1" ${S.qmImpBusy?'disabled':''}>${S.qmImpBusy?'তোলা হচ্ছে…':'ফায়ারবেসে তুলুন'}</button></div>`:''}
     ${CAN_EDIT&&m.t!=='m'?qmAdminAdd(m):''}
     <div class="qm-tools"><input class="input" data-qmf="q" placeholder="প্রশ্ন খুঁজুন…" value="${esc(m.q)}">
       ${list.length?`<button class="btn ghost" data-qmall="1">এই পাতার সব</button><button class="btn ghost" data-qmrand="10">এলোমেলো ১০টি</button>`:''}</div>
@@ -3131,7 +3151,7 @@ async function qmAdminSave(){
   const id=`${m.t==='s'?'sq':'cq'}_${m.cid}_${m.ch}`, cur=SYL[id]&&Array.isArray(SYL[id].items)?SYL[id].items:[];
   let next=cur.reduce((x,y)=>Math.max(x,+y.n||0),0);
   const items=cur.concat(out.map(x=>Object.assign({n:++next},m.ex?{ex:m.ex}:{},x)));
-  try{ await DB.collection('syllabus').doc(id).set({type:m.t==='s'?'sqset':'cqset',course:m.cid,ch:+m.ch,items,updatedAt:new Date().toISOString()});
+  try{ await DB.collection('syllabus').doc(id).set(Object.assign({type:m.t==='s'?'sqset':'cqset',course:m.cid,ch:+m.ch,items,updatedAt:new Date().toISOString()},SYL[id]&&SYL[id].fromApp?{fromApp:true}:{}));
     m.adm=''; m.admErr=''; toast(`${bn(out.length)}টি প্রশ্ন যোগ হয়েছে`); }
   catch(e){ m.admErr='সংরক্ষণ করা যায়নি (ডকুমেন্ট খুব বড় হলে অধ্যায় ভাগ করে দিন)।'; }
   render();
@@ -3140,7 +3160,7 @@ async function qmAdminDel(n){
   const m=qmInit(), id=`${m.t==='s'?'sq':'cq'}_${m.cid}_${m.ch}`, d=SYL[id]; if(!d) return;
   if(S.qmDelArm!==id+n){ S.qmDelArm=id+n; toast('মুছতে আবার চাপুন'); return; }
   S.qmDelArm=''; const items=(d.items||[]).filter(x=>String(x.n)!==String(n));
-  try{ await DB.collection('syllabus').doc(id).set({type:d.type,course:d.course,ch:d.ch,items,updatedAt:new Date().toISOString()}); toast('মুছে ফেলা হয়েছে'); }catch(e){ toast('মুছে ফেলা যায়নি'); }
+  try{ await DB.collection('syllabus').doc(id).set(Object.assign({type:d.type,course:d.course,ch:d.ch,items,updatedAt:new Date().toISOString()},d.fromApp?{fromApp:true}:{})); toast('মুছে ফেলা হয়েছে'); }catch(e){ toast('মুছে ফেলা যায়নি'); }
 }
 /* ---------- PDF ---------- */
 let PDFLIB=null;
@@ -4281,6 +4301,7 @@ app.addEventListener('click',e=>{
   if(t.dataset.qmpaynow){ const m=qmInit(); m.cur=t.dataset.qmpaynow; m.pay=null; m.step='pay'; return render(); }
   if(t.dataset.qmcheck){ const o=(S.qorders||{})[t.dataset.qmcheck]; if(o) qmVerify(o).then(ok=>{ toast(ok?'পেমেন্ট অনুমোদিত — PDF ডাউনলোড করুন':o.status==='rejected'?'পেমেন্ট বাতিল হয়েছে — আবার পেমেন্ট করুন':'এখনো যাচাই হচ্ছে'); if(o.status==='rejected'){ o.status='draft'; o.payId=''; persist(); } softRender(); }); return; }
   if(t.dataset.qmodel){ const id=t.dataset.qmodel; if(S.qmArmed===id){ S.qmArmed=''; delete S.qorders[id]; persist(); toast('মুছে ফেলা হয়েছে'); } else S.qmArmed=id; return render(); }
+  if(t.dataset.qmimport){ qmAdminImport(); return; }
   if(t.dataset.qmdset){ const [k,v]=t.dataset.qmdset.split(':'); qmSetD(t.dataset.qmo||'',k,v); return render(); }
   if(t.dataset.qmdz){ S.qmDzOpen=S.qmDzOpen===t.dataset.qmdz?null:t.dataset.qmdz; return render(); }
   if(t.dataset.qmpdf){ qmMakePdf(t.dataset.qmpdf,false); return; }
