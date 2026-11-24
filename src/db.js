@@ -144,8 +144,11 @@ window.SohogOTA = {
     let h = null;
     if (onProgress) h = await CapacitorUpdater.addListener('download', e => onProgress(+e.percent || 0)).catch(() => null);
     try {
-      const b = await CapacitorUpdater.download({ url, version: 'b' + build, checksum: checksum || '' }); // প্লাগইন SHA-256 চেকসাম ছাড়া বান্ডেল নেয় না
-      await CapacitorUpdater.set({ id: b.id }); // এখানেই অ্যাপ নতুন সংস্করণে আবার চালু হয়
+      let b;
+      try { b = await CapacitorUpdater.download({ url, version: 'b' + build, checksum: checksum || '' }); } // প্লাগইন SHA-256 চেকসাম ছাড়া বান্ডেল নেয় না
+      catch (e) { throw new Error('ডাউনলোড ধাপে: ' + ((e && e.message) || e)); }
+      try { await CapacitorUpdater.set({ id: b.id }); } // এখানেই অ্যাপ নতুন সংস্করণে আবার চালু হয়
+      catch (e) { throw new Error('বসানোর ধাপে: ' + ((e && e.message) || e)); }
     } finally { if (h) h.remove(); }
   }
 };
