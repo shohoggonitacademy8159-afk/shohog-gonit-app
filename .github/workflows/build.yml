@@ -118,7 +118,8 @@ jobs:
           B=$RUNNER_TEMP/ota; rm -rf "$B"; cp -r www "$B"; rm -rf "$B/pdf"
           echo "window.SOHOG_BUILD=$N;window.SOHOG_NATIVE='$FP';window.SOHOG_OTA=1;" > "$B/build.js"
           mkdir -p www/ota; (cd "$B" && zip -qr9 "$GITHUB_WORKSPACE/www/ota/b$N.zip" .)
-          printf '{"build":%s,"native":"%s","url":"https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/ota/b%s.zip"}\n' "$N" "$FP" "$N" > www/ota/latest.json
+          SUM=$(sha256sum "www/ota/b$N.zip" | cut -d' ' -f1)
+          printf '{"build":%s,"native":"%s","url":"https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/ota/b%s.zip","sha256":"%s"}\n' "$N" "$FP" "$N" "$SUM" > www/ota/latest.json
           cat www/ota/latest.json; ls -la www/ota
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -140,11 +140,11 @@ if (Capacitor.isNativePlatform()) {
 }
 window.SohogOTA = {
   ok: Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('CapacitorUpdater'),
-  async apply(url, build, onProgress) {
+  async apply(url, build, onProgress, checksum) {
     let h = null;
     if (onProgress) h = await CapacitorUpdater.addListener('download', e => onProgress(+e.percent || 0)).catch(() => null);
     try {
-      const b = await CapacitorUpdater.download({ url, version: 'b' + build });
+      const b = await CapacitorUpdater.download({ url, version: 'b' + build, checksum: checksum || '' }); // প্লাগইন SHA-256 চেকসাম ছাড়া বান্ডেল নেয় না
       await CapacitorUpdater.set({ id: b.id }); // এখানেই অ্যাপ নতুন সংস্করণে আবার চালু হয়
     } finally { if (h) h.remove(); }
   }

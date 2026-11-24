@@ -3455,12 +3455,12 @@ const otaOk=()=>!!(window.SohogOTA&&window.SohogOTA.ok&&window.SOHOG_NATIVE);
 const updWhy=o=>{ /* এক চাপে আপডেট না হলে কারণ (ডাউনলোড পাতায় দেখায়) */
   if(!window.SohogOTA||!window.SOHOG_NATIVE) return 'তোমার এখনকার সংস্করণে এক চাপের আপডেট নেই — এই একবার APK বসাও, এরপর থেকে এক চাপে হবে';
   if(!window.SohogOTA.ok) return 'এক চাপের আপডেট চালু হয়নি (প্লাগইন পাওয়া যায়নি) — APK বসাও';
-  if(!o||!o.url) return 'এক চাপের আপডেট-ফাইল পাওয়া যায়নি — APK দিয়ে আপডেট করো';
+  if(!o||!o.url||!o.sum) return 'এক চাপের আপডেট-ফাইল পাওয়া যায়নি — APK দিয়ে আপডেট করো';
   if(o.native!==window.SOHOG_NATIVE) return 'এবারের আপডেটে অ্যাপের ফোন-অংশ বদলেছে — এই একবার APK লাগবে';
   return ''; };
 const updFrom=(nRel,o)=>{ /* OTA মিললে সেটাই; না হলে শুধু প্রকাশিত APK রিলিজ */
   UPD_WHY=updWhy(o);
-  if(o&&o.url&&o.native===window.SOHOG_NATIVE&&otaOk()&&o.build>APP_BUILD&&o.build>=nRel) return {n:o.build,ota:o.url};
+  if(o&&o.url&&o.sum&&o.native===window.SOHOG_NATIVE&&otaOk()&&o.build>APP_BUILD&&o.build>=nRel) return {n:o.build,ota:o.url,sum:o.sum};
   return nRel>APP_BUILD?{n:nRel,ota:null}:null; };
 async function checkUpdate(force){
   if(!APP_BUILD||UPD_BUSY) return;
@@ -3471,7 +3471,7 @@ async function checkUpdate(force){
       fetch('https://api.github.com/repos/shohoggonitacademy8159-afk/shohog-gonit-app/releases/latest',{headers:{Accept:'application/vnd.github+json'},cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()),
       fetch(FILE_BASE+'ota/latest.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject())]);
     const nRel=rel.status==='fulfilled'?(+(String(rel.value.tag_name||'').split('.').pop())||0):0;
-    const o=ota.status==='fulfilled'&&ota.value&&+ota.value.build?{build:+ota.value.build,native:String(ota.value.native||''),url:String(ota.value.url||'')}:null;
+    const o=ota.status==='fulfilled'&&ota.value&&+ota.value.build?{build:+ota.value.build,native:String(ota.value.native||''),url:String(ota.value.url||''),sum:String(ota.value.sha256||'')}:null;
     if(nRel||o){
       const was=!!UPD; UPD=updFrom(nRel,o); const n=UPD?UPD.n:Math.max(nRel,APP_BUILD);
       NTF_ST.updAt=Date.now(); NTF_ST.updLatest=n; NTF_ST.updRel=nRel; NTF_ST.updOta=o; ntfSave();
@@ -3487,7 +3487,7 @@ var OTA_PCT=-1;
 async function otaApply(){
   if(!UPD||!UPD.ota||OTA_PCT>=0) return;
   OTA_PCT=0; softRender(); toast('আপডেট নামছে… অ্যাপ বন্ধ কোরো না');
-  try{ await window.SohogOTA.apply(UPD.ota,UPD.n,p=>{ OTA_PCT=Math.max(OTA_PCT,Math.min(99,Math.round(p))); document.querySelectorAll('[data-otapct]').forEach(e=>e.textContent=bn(OTA_PCT)+'%'); }); }
+  try{ await window.SohogOTA.apply(UPD.ota,UPD.n,p=>{ OTA_PCT=Math.max(OTA_PCT,Math.min(99,Math.round(p))); document.querySelectorAll('[data-otapct]').forEach(e=>e.textContent=bn(OTA_PCT)+'%'); },UPD.sum); }
   catch(e){ OTA_PCT=-1; UPD.ota=null; UPD_WHY='এক চাপের আপডেট বসানো যায়নি ('+String(e&&e.message||e).slice(0,80)+') — APK দিয়ে আপডেট করো'; softRender(); toast('আপডেট বসানো গেল না — এবার চাপলে APK নামবে'); }
 }
 const updBtnAttr=()=>UPD&&UPD.ota?'href="#" data-ota':`href="${APK_URL}" target="_blank" rel="noopener"`;
