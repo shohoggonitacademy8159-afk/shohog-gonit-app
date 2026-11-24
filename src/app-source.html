@@ -2050,7 +2050,7 @@ function vDownloads(){
   const mine=Object.keys(S.exams||{}).length;
   return `<div class="screen">
     <div class="topbar"><span style="width:44px"></span><h1>ডাউনলোড</h1><span style="width:44px"></span></div>
-    <section class="dl-card"><span class="dl-ic">${svg('download')}</span><div style="flex:1;min-width:0"><b>${UPD?`নতুন সংস্করণ ${verName(UPD.n)} এসেছে`:'এপের সর্বশেষ সংস্করণ'}</b><span class="muted">${APP_BUILD?`তোমার ফোনে আছে ${verName(APP_BUILD)}${UPD?'':' · '+(NTF_ST.updLatest?'এটিই সর্বশেষ ✓':'যাচাই হয়নি')}`:'নতুন সুবিধা পেতে মাঝে মাঝে আপডেট করো'}</span>${APP_BUILD?`<button class="link" data-updcheck style="padding:0;margin-top:4px;text-align:left">${UPD_BUSY?'যাচাই হচ্ছে…':'↻ আপডেট আছে কি না দেখো'}</button>`:''}</div><a class="btn ${UPD?'upd-go':''}" ${UPD?updBtnAttr():`href="${APK_URL}" target="_blank" rel="noopener"`}>${UPD?(OTA_PCT>=0?`<span data-otapct>${bn(OTA_PCT)}%</span>`:'আপডেট করো'):'নামাও'}</a></section>
+    <section class="dl-card"><span class="dl-ic">${svg('download')}</span><div style="flex:1;min-width:0"><b>${UPD?`নতুন সংস্করণ ${verName(UPD.n)} এসেছে`:'এপের সর্বশেষ সংস্করণ'}</b><span class="muted">${APP_BUILD?`তোমার ফোনে আছে ${verName(APP_BUILD)}${UPD?'':' · '+(NTF_ST.updLatest?'এটিই সর্বশেষ ✓':'যাচাই হয়নি')}`:'নতুন সুবিধা পেতে মাঝে মাঝে আপডেট করো'}</span>${UPD&&!UPD.ota&&APP_BUILD&&UPD_WHY?`<span class="muted" style="display:block;font-size:.85em;margin-top:2px">ⓘ ${UPD_WHY}</span>`:''}${APP_BUILD?`<button class="link" data-updcheck style="padding:0;margin-top:4px;text-align:left">${UPD_BUSY?'যাচাই হচ্ছে…':'↻ আপডেট আছে কি না দেখো'}</button>`:''}</div><a class="btn ${UPD?'upd-go':''}" ${UPD?updBtnAttr():`href="${APK_URL}" target="_blank" rel="noopener"`}>${UPD?(OTA_PCT>=0?`<span data-otapct>${bn(OTA_PCT)}%</span>`:'আপডেট করো'):'নামাও'}</a></section>
     <section class="dl-card"><span class="dl-ic">${svg('report')}</span><div style="flex:1;min-width:0"><b>আমার ফলাফলের ফাইল</b><span class="muted">${mine?`${bn(mine)}টি পরীক্ষার নম্বর (Excel/CSV)`:'পরীক্ষা দিলে এখান থেকে নামানো যাবে'}</span></div><button class="btn ghost" data-mycsv ${mine?'':'disabled'}>নামাও</button></section>
     <h2 class="xa-h">স্টাডি ম্যাটেরিয়াল ${sg.length?`<small class="muted" style="font-size:14px">${bn(sg.length)}টি PDF</small>`:''}</h2>
     ${sg.length?pdfList(sg):`<div class="empty">পরীক্ষার সিলেবাস প্রকাশ হলে সেই অংশের PDF এখানে আসবে।</div>`}
@@ -3397,11 +3397,18 @@ function adminNotify(kind,m){
 function adminWatchAll(){ if(!CAN_EDIT||!DB) return; watchPays(); watchReports(); if(NTF&&NTF.native) scheduleExamNotifs(); }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) scheduleExamNotifs(); });
 /* ===== অ্যাপ আপডেট: GitHub-এর সর্বশেষ রিলিজের সাথে মিলিয়ে দেখা (শুধু অ্যান্ড্রয়েড অ্যাপে; বিল্ড নম্বর CI দেয় build.js-এ) ===== */
-var APP_BUILD=+(window.SOHOG_BUILD||0), UPD=null, UPD_BUSY=false;
+var APP_BUILD=+(window.SOHOG_BUILD||0), UPD=null, UPD_BUSY=false; var UPD_WHY='';
 const verName=n=>`১.০.${bn(n)}`;
 /* OTA: ওয়েবসাইটে ota/latest.json থাকে {build,native,url}। নেটিভ আঙুলছাপ মিললে অ্যাপের ভেতরেই এক চাপে আপডেট, না মিললে APK */
 const otaOk=()=>!!(window.SohogOTA&&window.SohogOTA.ok&&window.SOHOG_NATIVE);
+const updWhy=o=>{ /* এক চাপে আপডেট না হলে কারণ (ডাউনলোড পাতায় দেখায়) */
+  if(!window.SohogOTA||!window.SOHOG_NATIVE) return 'তোমার এখনকার সংস্করণে এক চাপের আপডেট নেই — এই একবার APK বসাও, এরপর থেকে এক চাপে হবে';
+  if(!window.SohogOTA.ok) return 'এক চাপের আপডেট চালু হয়নি (প্লাগইন পাওয়া যায়নি) — APK বসাও';
+  if(!o||!o.url) return 'এক চাপের আপডেট-ফাইল পাওয়া যায়নি — APK দিয়ে আপডেট করো';
+  if(o.native!==window.SOHOG_NATIVE) return 'এবারের আপডেটে অ্যাপের ফোন-অংশ বদলেছে — এই একবার APK লাগবে';
+  return ''; };
 const updFrom=(nRel,o)=>{ /* OTA মিললে সেটাই; না হলে শুধু প্রকাশিত APK রিলিজ */
+  UPD_WHY=updWhy(o);
   if(o&&o.url&&o.native===window.SOHOG_NATIVE&&otaOk()&&o.build>APP_BUILD&&o.build>=nRel) return {n:o.build,ota:o.url};
   return nRel>APP_BUILD?{n:nRel,ota:null}:null; };
 async function checkUpdate(force){
@@ -3430,7 +3437,7 @@ async function otaApply(){
   if(!UPD||!UPD.ota||OTA_PCT>=0) return;
   OTA_PCT=0; softRender(); toast('আপডেট নামছে… অ্যাপ বন্ধ কোরো না');
   try{ await window.SohogOTA.apply(UPD.ota,UPD.n,p=>{ OTA_PCT=Math.max(OTA_PCT,Math.min(99,Math.round(p))); document.querySelectorAll('[data-otapct]').forEach(e=>e.textContent=bn(OTA_PCT)+'%'); }); }
-  catch(e){ OTA_PCT=-1; UPD.ota=null; softRender(); toast('আপডেট বসানো গেল না — এবার চাপলে APK নামবে'); }
+  catch(e){ OTA_PCT=-1; UPD.ota=null; UPD_WHY='এক চাপের আপডেট বসানো যায়নি ('+String(e&&e.message||e).slice(0,80)+') — APK দিয়ে আপডেট করো'; softRender(); toast('আপডেট বসানো গেল না — এবার চাপলে APK নামবে'); }
 }
 const updBtnAttr=()=>UPD&&UPD.ota?'href="#" data-ota':`href="${APK_URL}" target="_blank" rel="noopener"`;
 const updBanner=()=>UPD?`<a class="upd-bar" ${updBtnAttr()}>${svg('download')}<span><b>নতুন সংস্করণ ${verName(UPD.n)} এসেছে</b><br>${UPD.ota?(OTA_PCT>=0?`আপডেট হচ্ছে… <span data-otapct>${bn(OTA_PCT)}%</span>`:'চাপ দিলেই আপডেট হয়ে যাবে — আলাদা করে নামাতে হবে না'):'চাপ দিয়ে নামাও, তারপর ফাইল খুলে Install/Update করো'}</span></a>`:'';
