@@ -62,4 +62,5 @@ for k_,(ex,L) in enumerate((('4.1',E41),('4.2',E42))):
     for i,(s_,p_,a_,lv) in enumerate(L):
         assert len(p_)==3 and a_.count('ক)')==1 and a_.count('খ)')==1 and a_.count('গ)')==1
         items.append({'n':f'b{k_*5+i+1}','ex':ex,'stem':s_,'p':p_,'a':a_,'lv':lv})
+import sys; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from gen_cq_c10_4s import ITEMS; items+=ITEMS  # b11–b30
 json.dump(items,open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'cq_c10_4.json'),'w'),ensure_ascii=False,indent=1); print('cq_c10_4',len(items))
