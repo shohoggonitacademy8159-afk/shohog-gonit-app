@@ -171,7 +171,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qp-sec{font-size:1.13em;margin:.6em 0 .4em;padding:4px 10px;background:#f1f5f9;border-left:4px solid #111;color:#111;line-height:1.4}.qp-sec small{font-weight:500;font-size:.78em}
 .qp-q{margin:0 0 .6em;break-inside:avoid}
 .qp-opts{display:grid;grid-template-columns:1fr 1fr;gap:1px 14px;padding-left:1.4em;margin-top:2px}.qp-opts.oc1{grid-template-columns:1fr}.qp-opts.oc4{grid-template-columns:repeat(4,auto);justify-content:space-between}
-.qp-parts{padding-left:1.4em;margin-top:4px}.qp-parts div{display:flex;gap:6px}.qp-parts i{margin-left:auto;font-style:normal;font-weight:700}
+.qp-parts{padding-left:1.4em;margin-top:4px}.qp-parts>div{display:flex;gap:6px}.qp-parts .qp-pt{flex:1;min-width:0}.qp-parts i{margin-left:auto;font-style:normal;font-weight:700}
 .qp-ans{margin:4px 0 0 1.4em;padding:6px 10px;border-left:3px solid #16a34a;background:#f0fdf4;white-space:pre-line}
 .qp-akey{display:grid;grid-template-columns:repeat(var(--akc,6),1fr);gap:4px 8px;margin-bottom:10px}
 .qp-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:5;overflow:hidden}
@@ -3207,7 +3207,7 @@ function qmBlocks(o,answers,d){
     L.forEach(x=>{ no++;
       if(t==='m'){ const os=(x.o||[]).map(mq); B.push(`<div class="qp-q"><div><b>${bn(no)}.</b> ${mq(x.q)}</div><div class="qp-opts oc${ocOf(os)}">${os.map((op,j)=>`<span>${'কখগঘ'[j]}) ${op}</span>`).join('')}</div></div>`); }
       else if(t==='s') B.push(`<div class="qp-q"><b>${bn(no)}.</b> ${mq(x.q)}${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
-      else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(x.stem)}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span> ${mq(p)} <i>${bn(qmCqMarks(x)[j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
+      else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(x.stem)}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span><span class="qp-pt">${mq(p)}</span><i>${bn(qmCqMarks(x)[j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
     }); };
   sec('m','বহুনির্বাচনি প্রশ্ন',QM_MARK.m); sec('s','সংক্ষিপ্ত প্রশ্ন',QM_MARK.s); sec('c','সৃজনশীল প্রশ্ন',QM_MARK.c);
   return B;
