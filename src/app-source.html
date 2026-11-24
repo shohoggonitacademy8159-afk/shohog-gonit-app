@@ -1,5 +1,6 @@
 <title>অংকবাড়ি</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>/* রং: ডিফল্ট লাইট, সব ফোনে একই রকম; মেনু থেকে ডার্ক বেছে নেওয়া যায় */try{document.documentElement.dataset.theme=(JSON.parse(localStorage.getItem('sohog-ganit-v1')||'{}')||{}).theme==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Tiro+Bangla&display=swap">
 <style>
 /* Layout: one phone-width app column; screens swap in place; tab bar pinned to the bottom edge */
@@ -318,6 +319,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile.combo .subj{font-size:15px}
 .ctile.combo .price-tag{margin:5px 0 0}
 .fx-strip{display:block;overflow:hidden;border-radius:10px;background:rgba(255,255,255,.55);border:1px solid var(--purple-b);padding:6px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+:root[data-theme="dark"] .fx-strip{background:rgba(255,255,255,.04)}
 .fx-track{display:inline-flex;gap:8px;white-space:nowrap;animation:fxmarq 38s linear infinite;padding-left:8px}
 .fx-track i{font-style:normal;font-weight:700;font-size:13px;padding:3px 10px;border-radius:999px;background:var(--surface)}
 .fx-track i.m{color:var(--purple-a);border:1px solid var(--purple-b)}
@@ -1076,6 +1078,7 @@ const ICONS = {
   download:'<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/>',
   wallet:'<rect x="3.5" y="6" width="17" height="13" rx="2.5"/><path d="M16 12.5h4.5M6.5 6l9-2.5 1 2.5"/>',
   flag:'<path d="M6 21V4M6 4h10.5l-2 4 2 4H6"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
   bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
   logout:'<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 8l-4 4 4 4M6 12h10"/>',
   archive:'<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v10a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19V9M10 13h4"/>',
@@ -1251,12 +1254,13 @@ const S = {
   lastUid: saved.lastUid||null,  // এই ফোনে শেষ যে অ্যাকাউন্ট ছিল
   adminEmail: saved.adminEmail||'',
   ntfOff: !!saved.ntfOff,
+  theme: saved.theme==='dark'?'dark':'light',
   noticeSeen: saved.noticeSeen||'',
   dev: saved.dev||('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),
   view: saved.user ? 'home' : 'login',
   pendingId:'', course:null, quiz:null
 };
-function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,noticeSeen:S.noticeSeen,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,qorders:S.qorders,qmPref:S.qmPref,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
+function persist(){ cloudSoon(); scheduleExamNotifs(); try{ localStorage.setItem(KEY, JSON.stringify({uid:S.uid,acct:S.acct,lastUid:S.lastUid,adminEmail:S.adminEmail,ntfOff:S.ntfOff,theme:S.theme,noticeSeen:S.noticeSeen,student:S.student,dev:S.dev,exams:S.exams,retakes:S.retakes,fav:S.fav,favx:S.favx,reports:S.reports,pays:S.pays,qorders:S.qorders,qmPref:S.qmPref,examRun:S.examRun,enrolled:S.enrolled,joined:S.joined,user:S.user,results:S.results,done:S.done})); }catch(e){} }
 
 const app=document.getElementById('app'), tabbar=document.getElementById('tabbar'), tabs=document.getElementById('tabs'), toastEl=document.getElementById('toast');
 let toastT;
@@ -1720,6 +1724,7 @@ function vProfile(){
       ${item('data-go="routine"','calendar','c-blue','পরীক্ষার রুটিন')}
       ${item('data-go="report"','chart','c-blue','আমার লার্নিং রিপোর্ট')}
       ${item('data-go="downloads"','download','c-teal','ডাউনলোড','ফলাফল ফাইল ও এপের নতুন সংস্করণ')}
+      ${item('data-themetoggle','moon','c-blue',`ডার্ক মোড: ${S.theme==='dark'?'চালু':'বন্ধ'}`,'চাপ দিলে অ্যাপের রং '+(S.theme==='dark'?'সাদা (লাইট)':'কালো (ডার্ক)')+' হবে')}
       ${NTF&&NTF.native?item('data-ntftoggle','bell','c-amber',`নোটিফিকেশন: ${S.ntfOff?'বন্ধ':'চালু'}`,CAN_EDIT?'নতুন পেমেন্ট ও রিপোর্ট এলে জানানো হবে':'লাইভ পরীক্ষা নির্ধারিত হলে ও চলার দিন জানানো হবে'):''}
     </div>
     <h3 class="m-sec">কম্পিউটার</h3>
@@ -4474,6 +4479,7 @@ app.addEventListener('click',e=>{
   if(t.hasAttribute('data-nfcancel')){ S.nf=null; render(); return; }
   if(t.dataset.nfedit){ const n=SYL[t.dataset.nfedit]; if(n){ S.nf={id:n.id,title:n.title||'',body:n.body||'',course:n.course||'all',pin:!!n.pin,busy:false,err:''}; render(); window.scrollTo(0,0); } return; }
   if(t.dataset.nfdel){ const id=t.dataset.nfdel; if(S.nfArmed===id){ S.nfArmed=''; DB.collection('syllabus').doc(id).delete().then(()=>toast('নোটিশ মুছে ফেলা হয়েছে'),()=>toast('মুছে ফেলা যায়নি')); } else { S.nfArmed=id; render(); } return; }
+  if(t.hasAttribute('data-themetoggle')){ S.theme=S.theme==='dark'?'light':'dark'; document.documentElement.dataset.theme=S.theme; persist(); render(); return; }
   if(t.hasAttribute('data-ntftoggle')){ S.ntfOff=!S.ntfOff; persist(); if(!S.ntfOff&&NTF) NTF.ready(); toast(S.ntfOff?'নোটিফিকেশন বন্ধ করা হয়েছে':'নোটিফিকেশন চালু করা হয়েছে'); render(); return; }
   if(t.hasAttribute('data-spublish')){ if(!S.spublishing) publishSyllabus(); return; }
   if(t.dataset.sdel){
