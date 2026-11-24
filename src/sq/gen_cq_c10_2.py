@@ -52,4 +52,5 @@ items=[]
 for ex,L,off in (('2.1',E1,0),('2.2',E2,5)):
     for i,(s_,p_,a_) in enumerate(L):
         assert len(p_)==3; items.append({'n':f'b{off+i+1}','ex':ex,'stem':s_,'p':p_,'a':a_,'lv':'কঠিন'})
+import sys; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from gen_cq_c10_2s import ITEMS; items+=ITEMS  # সমন্বিত b11–b20
 json.dump(items,open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'cq_c10_2.json'),'w'),ensure_ascii=False,indent=1); print('cq_c10_2',len(items))
