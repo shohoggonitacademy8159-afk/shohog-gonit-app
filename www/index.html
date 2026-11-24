@@ -4415,6 +4415,7 @@ app.addEventListener('click',e=>{
   if(t.hasAttribute('data-qmclear')){ const m=qmInit(); m.sel={}; m.order=[]; return render(); }
   if(t.dataset.qmall||t.dataset.qmrand){ const m=qmInit(), pool=qmPool(m.cid,m.ch,m.t), qq=String(m.q||'').trim().toLowerCase();
     let L=qq?pool.filter(x=>String(x.q||x.stem||'').toLowerCase().includes(qq)):pool;
+    if(m.ex) L=L.filter(x=>x.ex===m.ex); // বাছাই করা অনুশীলনী মেনে
     if(t.dataset.qmall) L=L.slice(m.page*20,m.page*20+20);
     else { L=L.filter(x=>!m.sel[qmKey(m.t,m.cid,m.ch,x.n)]).map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).slice(0,+t.dataset.qmrand).map(x=>x[1]); }
     L.forEach(x=>{ const k=qmKey(m.t,m.cid,m.ch,x.n); if(!m.sel[k]){ m.sel[k]=1; m.order.push(k); } }); return render(); }
