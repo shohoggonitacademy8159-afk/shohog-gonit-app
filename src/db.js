@@ -131,3 +131,21 @@ window.SohogNotify = {
     LocalNotifications.addListener('localNotificationActionPerformed', a => { try { cb((a && a.notification && a.notification.extra) || {}); } catch (e) {} });
   }
 };
+
+// এক চাপে আপডেট (OTA): নতুন ওয়েব অংশ নামিয়ে অ্যাপের ভেতরেই বসায়, APK লাগে না।
+// নেটিভ অংশ (android/, প্লাগইন) বদলালে অ্যাপ নিজেই APK-র পথে যায়।
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
+if (Capacitor.isNativePlatform()) {
+  CapacitorUpdater.notifyAppReady().catch(() => {});
+}
+window.SohogOTA = {
+  ok: Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('CapacitorUpdater'),
+  async apply(url, build, onProgress) {
+    let h = null;
+    if (onProgress) h = await CapacitorUpdater.addListener('download', e => onProgress(+e.percent || 0)).catch(() => null);
+    try {
+      const b = await CapacitorUpdater.download({ url, version: 'b' + build });
+      await CapacitorUpdater.set({ id: b.id }); // এখানেই অ্যাপ নতুন সংস্করণে আবার চালু হয়
+    } finally { if (h) h.remove(); }
+  }
+};

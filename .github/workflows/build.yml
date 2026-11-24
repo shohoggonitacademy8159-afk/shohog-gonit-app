@@ -60,7 +60,8 @@ jobs:
         run: |
           npm ci
           npm run build
-          echo "window.SOHOG_BUILD=${{ github.run_number }};" > www/build.js
+          FP=$(bash scripts/native-fp.sh); echo "নেটিভ আঙুলছাপ: $FP"
+          echo "window.SOHOG_BUILD=${{ github.run_number }};window.SOHOG_NATIVE='$FP';" > www/build.js
           npx cap sync android
 
       - name: APK তৈরি ও সই
@@ -110,6 +111,15 @@ jobs:
       - run: |
           npm ci
           npm run build
+      - name: এক চাপে আপডেটের বান্ডেল (OTA, pdf/ ছাড়া)
+        run: |
+          N=${{ github.run_number }}; FP=$(bash scripts/native-fp.sh); echo "নেটিভ আঙুলছাপ: $FP"
+          rm -f www/_prev.html; rm -rf www/ota
+          B=$RUNNER_TEMP/ota; rm -rf "$B"; cp -r www "$B"; rm -rf "$B/pdf"
+          echo "window.SOHOG_BUILD=$N;window.SOHOG_NATIVE='$FP';window.SOHOG_OTA=1;" > "$B/build.js"
+          mkdir -p www/ota; (cd "$B" && zip -qr9 "$GITHUB_WORKSPACE/www/ota/b$N.zip" .)
+          printf '{"build":%s,"native":"%s","url":"https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/ota/b%s.zip"}\n' "$N" "$FP" "$N" > www/ota/latest.json
+          cat www/ota/latest.json; ls -la www/ota
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
