@@ -366,6 +366,18 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .ctile .arrow svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .art{display:block}
 .tiles + .tiles{padding-top:0}
+.sqgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sqt{position:relative;aspect-ratio:1/1;min-width:0;background:var(--surface);border:1.5px solid var(--tb,var(--line));border-radius:14px;box-shadow:0 1px 4px rgba(16,35,63,.07);color:var(--fg);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;text-align:center;transition:transform .15s}
+.sqt:active{transform:scale(.96)}
+.sqt-art{display:flex;justify-content:center;gap:2px;margin-bottom:2px}
+.sqt-art .art{width:38px;height:38px}
+.sqt-art.two .art{width:28px;height:28px}
+.sqt b{font-size:13.5px;line-height:1.2;font-weight:700;max-width:100%}
+.sqt-sub{font-size:11px;line-height:1.25;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sqt-fee{margin-top:3px;font-size:10px;font-weight:700;line-height:1.5;color:#fff;background:var(--pink-a);border-radius:999px;padding:0 7px;white-space:nowrap}
+.sqt-fee.free{background:var(--green-a)}.sqt-fee.ok{background:var(--surface);color:var(--green-a);border:1px solid var(--green-a)}
+.sqt .live-badge{top:-7px;right:-4px;font-size:10px;padding:1px 6px 1px 5px}
+.home.enter .sqt{animation:tilein .55s cubic-bezier(.2,.8,.3,1.2) both;animation-delay:calc(var(--i,0)*60ms)}
 .mcq-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
 .ex-box{background:var(--surface);border:1.5px solid var(--violet);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
@@ -1365,6 +1377,16 @@ function vHome(){
     return `<button class="ctile ${kind} t-${c.t}" style="--i:${i}" ${HUB_CLASSES.includes(id)?`data-chub="${id}"`:`data-course="${id}"`}>${liveToday(id)?'<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>':''}${fxLayer(c,i)}${art(c.art)}
       <span style="flex:1;min-width:0"><b>${c.name}</b>${c.sub?`<small>(${c.sub})</small>`:''}${c.subj?`<span class="subj">${c.subj}</span>`:''}${c.offer&&!c.pkg?`<span class="price-tag">${feeTag(c.offer)}</span>`:''}</span>
       <span class="arrow">${chev}</span></button>`;};
+  /* হোমের কোর্স: ছোট, সাদা, বর্গাকার টাইল (প্রতি সারিতে ৩টি) */
+  const LIVE_B='<span class="live-badge" aria-label="আজ লাইভ পরীক্ষা আছে"><i></i>লাইভ</span>';
+  const sqTile=(id,kind)=>{ const c=COURSES[id], i=ti++, combo=kind==='combo';
+    const live=combo?bundleOf(id).some(liveToday):liveToday(id);
+    const arts=combo?bundleOf(id).map(k=>art(COURSES[k].art)).join(''):art(c.art);
+    const attr=combo||HUB_CLASSES.includes(id)?`data-chub="${id}"`:`data-course="${id}"`;
+    const sub=(combo?(c.bsubj||c.subj):c.subj)||c.sub||'';
+    const fee=c.offer&&(combo||!c.pkg)?feeTag(c.offer):'';
+    return `<button class="sqt t-${c.t}" style="--i:${i}" ${attr}>${live?LIVE_B:''}<span class="sqt-art${combo?' two':''}">${arts}</span><b>${c.name}</b>${sub?`<span class="sqt-sub">${esc(sub)}</span>`:''}${fee?`<span class="sqt-fee">${fee}</span>`:''}</button>`; };
+  const sqPrime=()=>`<button class="sqt t-green" style="--i:${ti++}" data-primary>${liveToday('p5')||liveToday('p5s')?LIVE_B:''}<span class="sqt-art">${art('kids')}</span><b>পঞ্চম শ্রেণি</b><span class="sqt-sub">গণিত ও বিজ্ঞান</span><span class="sqt-fee ${S.joined?'ok':'free'}">${S.joined?'✓ যুক্ত হয়েছ':'সম্পূর্ণ ফ্রী'}</span></button>`;
   const anim=!HOME_ANIM_DONE; if(anim) setTimeout(()=>{ HOME_ANIM_DONE=true; },1500);
   return `<div class="screen home ${anim?'enter':''}">
     <header class="hero">
@@ -1380,7 +1402,7 @@ function vHome(){
     ${SECTIONS.map(sec=>`<section class="panel">
       <div class="panel-head">${art(sec.art)}<h2>${sec.title}</h2><span class="rule"></span>
         <span class="chev" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
-      ${sec.rows.map(r=>r.kind==='primary'?primaryCard():`<div class="tiles grid ${r.cls}">${r.ids.map(id=>tile(id,r.kind)).join('')}</div>`).join('')}
+      <div class="tiles sqgrid">${sec.rows.map(r=>r.kind==='primary'?sqPrime():r.ids.map(id=>sqTile(id,r.kind)).join('')).join('')}</div>
     </section>`).join('')}
   </div>`;
 }
