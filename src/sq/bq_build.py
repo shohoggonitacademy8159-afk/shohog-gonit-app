@@ -2,7 +2,7 @@
 # চালাও: python3 src/sq/bq_build.py   (নতুন বোর্ডের প্রশ্ন: gen_bq_<বোর্ড><সাল>.py বানিয়ে নিচের তালিকায় যোগ করো)
 import json, os, sys, glob, importlib
 here=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,here)
-PAPERS=['gen_bq_my25','gen_bq_dn25']
+PAPERS=['gen_bq_my25','gen_bq_dn25','gen_bq_sy25']
 by={}
 for mod in PAPERS:
     for ch,it in importlib.import_module(mod).ITEMS: by.setdefault(ch,[]).append(it)

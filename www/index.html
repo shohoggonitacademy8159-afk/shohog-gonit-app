@@ -3066,9 +3066,10 @@ function qmBreak(calc){
 /* ---------- প্রশ্নপত্রের ডিজাইন: ফন্ট, লেখার সাইজ, কলাম, ওয়াটারমার্ক, প্রতিষ্ঠানের নাম ---------- */
 const QM_FONTS={nikosh:['নিকস',"'Nikosh','Hind Siliguri',sans-serif"],kalpurush:['কালপুরুষ',"'Kalpurush','Hind Siliguri',sans-serif"],hind:['হিন্দ শিলিগুড়ি',"'Hind Siliguri','Noto Sans Bengali',sans-serif"]};
 const QM_FS=[[13,'ছোট'],[15,'মাঝারি'],[17,'বড়'],[19,'অনেক বড়']];
-function qmDef(){ const p=S.qmPref||{}; return {font:QM_FONTS[p.font]?p.font:'nikosh',fs:QM_FS.some(x=>x[0]===+p.fs)?+p.fs:15,cols:[1,2,3].includes(+p.cols)?+p.cols:1,oc:[0,1,2,4].includes(+p.oc)?+p.oc:0,inst:p.inst||'',inst2:p.inst2||'',wm:p.wm||''}; }
+const QM_BT_RE=/\s*\[[^\[\]\n]*বো\.\s*'[০-৯]{2}[^\[\]\n]*\]/g;
+function qmDef(){ const p=S.qmPref||{}; return {font:QM_FONTS[p.font]?p.font:'nikosh',fs:QM_FS.some(x=>x[0]===+p.fs)?+p.fs:15,cols:[1,2,3].includes(+p.cols)?+p.cols:1,oc:[0,1,2,4].includes(+p.oc)?+p.oc:0,bt:+p.bt===0?0:1,inst:p.inst||'',inst2:p.inst2||'',wm:p.wm||''}; }
 function qmD(oid){ if(oid){ const o=(S.qorders||{})[oid]; if(!o) return qmDef(); return o.d=Object.assign(qmDef(),o.d||{}); } const m=qmInit(); return m.d=m.d||qmDef(); }
-function qmSetD(oid,k,v){ const d=qmD(oid); d[k]=['fs','cols','oc'].includes(k)?+v:k==='font'?v:String(v).slice(0,k==='wm'?30:k==='inst2'?90:70);
+function qmSetD(oid,k,v){ const d=qmD(oid); d[k]=['fs','cols','oc','bt'].includes(k)?+v:k==='font'?v:String(v).slice(0,k==='wm'?30:k==='inst2'?90:70);
   S.qmPref=Object.assign({},d); persist(); }
 function qmDesignForm(d,oid){
   const seg=(k,opts)=>`<div class="qm-seg" role="group">${opts.map(([v,l])=>`<button type="button" aria-pressed="${String(d[k])===String(v)}" data-qmdset="${k}:${v}" data-qmo="${oid||''}">${l}</button>`).join('')}</div>`;
@@ -3077,6 +3078,7 @@ function qmDesignForm(d,oid){
     <div class="qm-lab">লেখার সাইজ</div>${seg('fs',QM_FS)}
     <div class="qm-lab">পাতায় কলাম</div>${seg('cols',[[1,'১ কলাম'],[2,'২ কলাম'],[3,'৩ কলাম']])}
     <div class="qm-lab">MCQ অপশন এক লাইনে কয়টি</div>${seg('oc',[[0,'অটো'],[1,'১টি'],[2,'২টি'],[4,'৪টি']])}
+    <div class="qm-lab">বোর্ড প্রশ্নে বোর্ডের নাম ও সাল</div>${seg('bt',[[1,'রাখো'],[0,'বাদ দাও']])}
     <div class="field"><label>প্রতিষ্ঠানের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst" data-qmo="${oid||''}" maxlength="70" placeholder="যেমন: আদর্শ উচ্চ বিদ্যালয়" value="${esc(d.inst)}"></div>
     <div class="field"><label>ঠিকানা / শাখা / শিক্ষকের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst2" data-qmo="${oid||''}" maxlength="90" value="${esc(d.inst2)}"></div>
     <div class="field"><label>ওয়াটারমার্ক (ঐচ্ছিক)</label><input class="input" data-qmd="wm" data-qmo="${oid||''}" maxlength="30" placeholder="যেমন: প্রতিষ্ঠানের নাম বা গোপনীয়" value="${esc(d.wm)}"></div>
@@ -3308,6 +3310,7 @@ let PDFLIB=null;
 const loadPdfLib=()=>PDFLIB||(PDFLIB=new Promise((ok,no)=>{ if(window.SohogPDF) return ok(window.SohogPDF); const s=document.createElement('script'); s.src='pdfgen.js'; s.onload=()=>window.SohogPDF?ok(window.SohogPDF):no(); s.onerror=()=>{ PDFLIB=null; no(); }; document.head.appendChild(s); }));
 function qmBlocks(o,answers,d){
   d=d||qmDef(); const items=o.items.map(qmItem).filter(x=>!x.missing), by=t=>items.filter(x=>x.t===t), B=[];
+  const bt=v=>d.bt===0?String(v||'').replace(QM_BT_RE,''):v;   /* বোর্ড প্রশ্নের [ম. বো. '২৫] ধরনের চিহ্ন বাদ দেওয়ার অপশন */
   const plain=h=>String(h).replace(/<[^>]+>/g,'').replace(/&[a-z#0-9]+;/gi,'x').trim();
   const ocOf=os=>{ if(d.oc) return d.oc; const wide=os.some(h=>/class="(mx|stbl)/.test(h)), L=Math.max(0,...os.map(h=>[...plain(h)].length));
     if(d.cols===1) return wide?2:L<=14?4:2; if(d.cols===2) return wide?1:L<=6?4:L<=16?2:1; return !wide&&L<=9?2:1; };
@@ -3319,9 +3322,9 @@ function qmBlocks(o,answers,d){
     if(answers&&t==='m'){ B.push(`<div class="qp-akey">${L.map((x,i)=>`<span><b>${bn(no+i+1)}.</b> ${'কখগঘ'[x.a]||'—'}</span>`).join('')}</div>`);
       L.forEach((x,i)=>{ if(x.e) B.push(`<div class="qp-q"><b>${bn(no+i+1)}.</b> ${mq(x.e)}</div>`); }); no+=L.length; return; }
     L.forEach(x=>{ no++;
-      if(t==='m'){ const os=(x.o||[]).map(mq); B.push(`<div class="qp-q"><div><b>${bn(no)}.</b> ${mq(x.q)}</div><div class="qp-opts oc${ocOf(os)}">${os.map((op,j)=>`<span>${'কখগঘ'[j]}) ${op}</span>`).join('')}</div></div>`); }
-      else if(t==='s') B.push(`<div class="qp-q"><b>${bn(no)}.</b> ${mq(x.q)}${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
-      else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(x.stem)}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span><span class="qp-pt">${mq(p)}</span><i>${bn(qmCqMarks(x)[j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
+      if(t==='m'){ const os=(x.o||[]).map(mq); B.push(`<div class="qp-q"><div><b>${bn(no)}.</b> ${mq(bt(x.q))}</div><div class="qp-opts oc${ocOf(os)}">${os.map((op,j)=>`<span>${'কখগঘ'[j]}) ${op}</span>`).join('')}</div></div>`); }
+      else if(t==='s') B.push(`<div class="qp-q"><b>${bn(no)}.</b> ${mq(bt(x.q))}${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
+      else B.push(`<div class="qp-q qp-cq"><div><b>${bn(no)}.</b> ${mq(bt(x.stem))}</div><div class="qp-parts">${(x.p||[]).map((p,j)=>`<div><span>${'কখগঘ'[j]})</span><span class="qp-pt">${mq(p)}</span><i>${bn(qmCqMarks(x)[j])}</i></div>`).join('')}</div>${answers?`<div class="qp-ans">${x.a?mq(x.a):'<i>উত্তর দেওয়া নেই</i>'}</div>`:''}</div>`);
     }); };
   sec('m','বহুনির্বাচনি প্রশ্ন',QM_MARK.m); sec('s','সংক্ষিপ্ত প্রশ্ন',QM_MARK.s); sec('c','সৃজনশীল প্রশ্ন',QM_MARK.c);
   return B;
