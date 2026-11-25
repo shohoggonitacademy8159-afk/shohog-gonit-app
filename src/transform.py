@@ -71,6 +71,7 @@ head = """<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1F6FE5">
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="google-site-verification" content="-tkQG9L7FuHVf6N25oknWEmNP1z6DqOtcu21UBeZNsI">
 <meta name="description" content="অংকবাড়ি — সহগ গণিত একাডেমির গণিত শেখার অ্যাপ। ৫ম শ্রেণি থেকে এসএসসি ও এইচএসসি পর্যন্ত লাইভ ও রেকর্ড ক্লাস, প্রতিদিনের লাইভ পরীক্ষা, অধ্যায়ভিত্তিক MCQ, সংক্ষিপ্ত ও সৃজনশীল প্রশ্নব্যাংক, বোর্ড প্রশ্ন এবং নিজের প্রশ্নপত্র PDF তৈরি।">
 <link rel="canonical" href="https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/">
 <meta property="og:type" content="website">
