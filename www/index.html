@@ -167,7 +167,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .skill .row{display:flex;justify-content:space-between;font-size:15px;font-weight:600}
 .empty{padding:20px;text-align:center;color:var(--muted);font-size:15px}
 .qm-home{display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:18px;border:0;font:inherit;text-align:left;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0f766e,#2563eb);box-shadow:0 8px 20px rgba(37,99,235,.25)}
-.qm-home b{display:block;font-size:17px}.qm-home small{display:block;font-size:12.5px;opacity:.92}.qm-home-ic{font-size:28px}.qm-home .arrow{margin-left:auto;font-size:24px}
+.qm-home b{display:block;font-size:17px}.qm-home small{display:block;font-size:12.5px;opacity:.92}.qm-home .qm-home-cta{display:block;margin:3px 0 2px;font-size:14px;font-weight:800;line-height:1.35}.qm-home-ic{font-size:28px}.qm-home .arrow{margin-left:auto;font-size:24px}
 .qm-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:12.5px;font-weight:700;text-align:center}
 .qm-steps span{padding:6px 2px;border-radius:10px;background:rgba(127,127,127,.12);color:var(--muted)}
 .qm-steps .on{background:var(--accent);color:#fff}.qm-steps .done{background:rgba(22,163,74,.15);color:#16a34a}
@@ -1423,7 +1423,7 @@ function vHome(){
     ${updBanner()}${todayExamBanner()}
     ${myPkgBar()}
     <section class="cls-home"><h2>🎥 লাইভ ও রেকর্ড ক্লাস</h2>${classBtns(hubCourse())}</section>
-    <button class="qm-home" data-go="qm"><span class="qm-home-ic" aria-hidden="true">📝</span><span><b>কাস্টম প্রশ্ন তৈরি</b><small>প্রশ্নব্যাংক থেকে বেছে নিজের প্রশ্নপত্র PDF · MCQ ৳${tk(qmCfg().m)}/টি</small></span><span class="arrow" aria-hidden="true">›</span></button>
+    <button class="qm-home" data-go="qm"><span class="qm-home-ic" aria-hidden="true">📝</span><span><b>কাস্টম প্রশ্ন তৈরি</b><strong class="qm-home-cta">আপনার প্রতিষ্ঠানের জন্য প্রশ্ন তৈরি করতে ক্লিক করুন</strong><small>প্রশ্নব্যাংক থেকে বেছে নিজের প্রশ্নপত্র PDF · MCQ ৳${tk(qmCfg().m)}/টি</small></span><span class="arrow" aria-hidden="true">›</span></button>
     ${SECTIONS.map(sec=>`<section class="panel">
       <div class="panel-head">${art(sec.art)}<h2>${sec.title}</h2><span class="rule"></span>
         <span class="chev" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
