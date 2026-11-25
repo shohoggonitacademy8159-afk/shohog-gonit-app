@@ -3002,7 +3002,7 @@ const qmPaid=o=>o&&(o.status==='paid'||o.free);
 function vQm(){
   const m=qmInit(); if(m.step==='paper') return vQmPaper(); if(m.step==='pay') return vQmPay(); if(m.step==='orders') return vQmOrders();
   const ids=OFFER_IDS(), c=COURSES[m.cid]||COURSES[ids[0]], chs=c.chapters||[];
-  const exs=((c.exs||{})[m.ch]||[]).concat(m.t!=='m'&&qmPool(m.cid,m.ch,m.t).some(x=>x.ex==='সমন্বিত')?['সমন্বিত']:[]); if(m.ex&&!exs.includes(m.ex)) m.ex='';
+  const qmP0=qmPool(m.cid,m.ch,m.t), exs=((c.exs||{})[m.ch]||[]).concat(['সমন্বিত','বোর্ড'].filter(k=>qmP0.some(x=>x.ex===k))); if(m.ex&&!exs.includes(m.ex)) m.ex='';
   const byEx=a=>m.ex?a.filter(x=>x.ex===m.ex):a, ownDoc=SYL[`${m.t==='s'?'sq':'cq'}_${m.cid}_${m.ch}`];
   const impN=CAN_EDIT&&m.t!=='m'?(()=>{ const imp=qmImpSet(ownDoc); return qmBuiltin(m.cid,m.ch,m.t).filter(x=>!imp.has(String(x.n))).length; })():0, ownN=new Set(((ownDoc&&ownDoc.items)||[]).map(x=>String(x.n)));
   const pool=byEx(qmPool(m.cid,m.ch,m.t)), qq=String(m.q||'').trim().toLowerCase();
@@ -3012,7 +3012,7 @@ function vQm(){
   const isSel=x=>!!m.sel[qmKey(m.t,m.cid,m.ch,x.n)];
   const card=(x,i)=>{ const on=isSel(x), no=m.page*PER+i+1;
     const body=m.t==='m'?`<div class="qm-q">${mq(x.q)}</div><div class="qm-o">${(x.o||[]).map((o,j)=>`<span>${'কখগঘ'[j]}) ${mq(o)}</span>`).join('')}</div>`
-      :m.t==='s'?`<div class="qm-q">${x.ex||x.lv?`<span class="qm-tag">${x.ex?(x.ex==='সমন্বিত'?'সমন্বিত':'অনু. '+bn(exName(x.ex))):''}${x.ex&&x.lv?' · ':''}${x.lv?esc(x.lv):''}</span> `:''}${mq(x.q)}</div>`
+      :m.t==='s'?`<div class="qm-q">${x.ex||x.lv?`<span class="qm-tag">${x.ex?(x.ex==='সমন্বিত'||x.ex==='বোর্ড'?x.ex:'অনু. '+bn(exName(x.ex))):''}${x.ex&&x.lv?' · ':''}${x.lv?esc(x.lv):''}</span> `:''}${mq(x.q)}</div>`
       :`<div class="qm-q">${x.lv?`<span class="qm-tag">${esc(x.lv)}</span> `:''}<b>উদ্দীপক:</b> ${mq(x.stem)}</div><div class="qm-cq">${(x.p||[]).map((p,j)=>`<span>${'কখগঘ'[j]}) ${mq(p)} <small class="muted">[${bn(qmCqMarks(x)[j])}]</small></span>`).join('')}</div>`;
     return `<label class="qm-card ${on?'on':''}"><input type="checkbox" data-qmpick="${esc(String(x.n))}" ${on?'checked':''}><span class="qm-no">${bn(no)}</span><div class="qm-body">${body}</div>${CAN_EDIT&&m.t!=='m'&&ownN.has(String(x.n))?`<button class="link danger" data-qmdel="${esc(String(x.n))}" style="align-self:flex-start">মুছুন</button>`:''}</label>`; };
   return `<div class="screen qm">
@@ -3022,7 +3022,7 @@ function vQm(){
     <div class="qm-filters">
       ${qmLevelSel(m.cid)}
       <div class="field"><label for="qmCh">অধ্যায়</label><select class="input" id="qmCh" data-qmf="ch">${chs.map((n,j)=>`<option value="${j+1}" ${String(j+1)===String(m.ch)?'selected':''}>${bn(j+1)}. ${esc(n)}</option>`).join('')}</select></div>
-      ${exs.length?`<div class="field"><label for="qmEx">অনুশীলনী</label><select class="input" id="qmEx" data-qmf="ex"><option value="">সব অনুশীলনী</option>${exs.map(x=>`<option value="${x}" ${m.ex===x?'selected':''}>${x==='সমন্বিত'?'সমন্বিত প্রশ্ন':'অনুশীলনী '+bn(exName(x))}</option>`).join('')}</select></div>`:''}
+      ${exs.length?`<div class="field"><label for="qmEx">অনুশীলনী</label><select class="input" id="qmEx" data-qmf="ex"><option value="">সব অনুশীলনী</option>${exs.map(x=>`<option value="${x}" ${m.ex===x?'selected':''}>${x==='সমন্বিত'?'সমন্বিত প্রশ্ন':x==='বোর্ড'?'বোর্ড প্রশ্ন':'অনুশীলনী '+bn(exName(x))}</option>`).join('')}</select></div>`:''}
     </div>
     <div class="qm-lab2">প্রশ্নের ধরন বাছাই করুন</div>
     <div class="qm-types" role="tablist">${['m','s','c'].map(t=>{ const n=byEx(qmPool(m.cid,m.ch,t)).length, k=m.order.filter(x=>x[0]===t).length;
