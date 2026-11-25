@@ -350,6 +350,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qm-card .stbl{font-size:.78em}
 .qm-adm-act{display:flex;flex-direction:column;gap:6px;align-self:flex-start;align-items:flex-end}.qm-adm-act .link{font-size:13px;padding:2px 0}
 .qm-editbox{margin:-4px 0 10px}
+.rdot{position:relative;display:inline-block}.rdot::after{content:'';position:absolute;left:50%;top:-.02em;width:.17em;height:.17em;margin-left:-.085em;border-radius:50%;background:currentColor}
 .q-fig{display:block;max-width:min(100%,300px);height:auto;margin:6px auto;background:#fff;border-radius:4px}
 .sqgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .sqt{position:relative;aspect-ratio:1/1;min-width:0;background:var(--surface);border:1.5px solid var(--tb,var(--line));border-radius:14px;box-shadow:0 1px 4px rgba(16,35,63,.07);color:var(--fg);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;text-align:center;transition:transform .15s}
@@ -1090,7 +1091,7 @@ function mxHTML(s){ return supHTML(frHTML(statTable(mxSemi(texConv(s))))).replac
   return `<span class="mx ${o==='['?'mx-m':'mx-d'}" role="math" aria-label="${o==='['?'ম্যাট্রিক্স':'নির্ণায়ক'}"><span class="mx-g" style="grid-template-columns:repeat(${n},auto)">${rows.flat().map(x=>`<span>${x}</span>`).join('')}</span></span>`; }); }
 /* প্রশ্নের লেখায় চিত্র: [[চিত্র:qimg/নাম.png]] (অ্যাপের qimg/ ফোল্ডারের ছবি; PDF-এও আসে) */
 const mq=s=>{ const F=[]; s=String(s==null?'':s).replace(/\[\[চিত্র:([\w.\/-]+\.(?:png|jpg|svg))\]\]/g,(x,p)=>(F.push(p),`\u0001${'abcdefghij'[F.length-1]||'z'}\u0001`));
-  return mxHTML(esc(s)).replace(/\u0001([a-z])\u0001/g,(x,k)=>{ const p=F['abcdefghij'.indexOf(k)]; return p&&!/\.\./.test(p)?`<img class="q-fig" src="${esc(p)}" alt="চিত্র">`:''; }); };
+  return mxHTML(esc(s)).replace(/(\d)\u0307/g,'<span class="rdot">$1</span>').replace(/\u0001([a-z])\u0001/g,(x,k)=>{ const p=F['abcdefghij'.indexOf(k)]; return p&&!/\.\./.test(p)?`<img class="q-fig" src="${esc(p)}" alt="চিত্র">`:''; }); };
 
 const ICONS = {
   monitor:'<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M9 20h6M12 16.5V20"/>',

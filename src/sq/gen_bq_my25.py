@@ -1,6 +1,6 @@
 # বোর্ড প্রশ্ন: ময়মনসিংহ বোর্ড ২০২৫, গণিত (সৃজনশীল) — হুবহু প্রশ্ন, শুধু উত্তর (সমাধান নয়)
 # ব্যবহারকারীর দেওয়া অধ্যায় অনুযায়ী: ১→৩, ২→৪, ৩→১৩, ৪→৬, ৫ ও ৬→৮, ৭→৯, ৮→১০, ৯→১৬, ১০ ও ১১→১৭
-# লেখে cqb_c10_<ch>.json (build_sq.py এগুলো ঐ অধ্যায়ের সৃজনশীলের শেষে যোগ করে)। প্রশ্ন নম্বর n = 'my25_<প্রশ্ন নং>'
+# ITEMS দেয়; bq_build.py সব বোর্ডের প্রশ্ন মিলিয়ে cqb_c10_<ch>.json লেখে। প্রশ্ন নম্বর n = 'my25_<প্রশ্ন নং>'
 import json, os, math, sympy as sp
 from sympy import sqrt, Rational as R
 x,a,b,c,m,t=sp.symbols('x a b c m t')
@@ -64,10 +64,9 @@ Q=[  # (অধ্যায়, প্রশ্ন নং, উদ্দীপক,
  ["প্রদত্ত সারণি হতে ক্রমোযোজিত গণসংখ্যা সারণি তৈরি কর।","গণসংখ্যা নিবেশন সারণি হতে প্রচুরক নির্ণয় কর।","বর্ণনাসহ প্রদত্ত উপাত্তের অজিভ রেখা আঁক।"],
  "ক) ক্রমোযোজিত গণসংখ্যা: 5, 12, 30, 45, 59, 67, 70\nখ) প্রচুরক ≈ 50.64 কেজি\nগ) অঙ্কন"),
 ]
-here=os.path.dirname(os.path.abspath(__file__)); by={}
+ITEMS=[]   # (অধ্যায়, প্রশ্ন) — ফাইল লেখে bq_build.py
 for ch,no,st,p_,ans in Q:
     assert len(p_)==3 and ans.count('ক)')==1 and ans.count('খ)')==1 and ans.count('গ)')==1
-    by.setdefault(ch,[]).append({'n':f'my25_{no}','ex':'বোর্ড','stem':st+('\n'+TAG.strip() if '|' in st.split('\n')[-1] else TAG),'p':p_,'a':ans})
-for ch,items in by.items():
-    json.dump(items,open(os.path.join(here,f'cqb_c10_{ch}.json'),'w'),ensure_ascii=False,indent=1)
-print({ch:len(v) for ch,v in sorted(by.items())})
+    ITEMS.append((ch,{'n':f'my25_{no}','ex':'বোর্ড','stem':st+('\n'+TAG.strip() if '|' in st.split('\n')[-1] else TAG),'p':p_,'a':ans}))
+if __name__=='__main__':
+    import bq_build
