@@ -120,7 +120,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .st-r{display:table-row}
 .st-c{display:table-cell;border:1.5px solid currentColor;padding:5px 7px;text-align:center;white-space:nowrap;min-width:2.4em;font-weight:500}
 .st-h{font-weight:700;text-align:left;background:rgba(127,127,127,.12)}
-.sb{font-size:.7em;vertical-align:-.25em;line-height:0}
+.sb{font-size:.72em;vertical-align:-.42em;line-height:0;margin:0 1px 0 1px}
 .sp{display:inline-block;font-size:.7em;line-height:1;vertical-align:.55em;margin-left:1px}.sp .frc{font-size:1em;vertical-align:bottom;line-height:1}.sp .frc>span:first-child{border-bottom-width:1px}
 .frc{display:inline-flex;flex-direction:column;align-items:stretch;text-align:center;vertical-align:middle;line-height:1.08;margin:0 2px;font-size:.9em}
 .frc>span{padding:0 3px}.frc>span:first-child{border-bottom:1.6px solid currentColor}
@@ -1023,6 +1023,8 @@ function frRight(s,i){ let k=i+1; if(k>=s.length) return null; let sg='';
     const inner=frHTML(s.slice(k+1,e)); return z>e+1||sg?{R:z,t:sg+'('+inner+')'+s.slice(e+1,z)}:{R:z,t:inner,g:true}; }
   if(s[k]==='|'){ const e=s.indexOf('|',k+1); if(e<0||e-k<2) return null; return {R:e+1,t:sg+s.slice(k,e+1)}; }
   let e=k; while(e<s.length){
+    if(s[e]==='_'&&s[e+1]==='('&&e>k){ const z=frMatch(s,e+1,1,')','('); if(z<0) break; const lg=/log$/.test(s.slice(k,e)); e=z+1;   /* লগের ভিত্তি হরের সাথেই থাকে: 1/log_a b */
+      if(lg&&s[e]===' '&&/[0-9A-Za-zθ√]/.test(s[e+1]||'')){ e++; while(e<s.length&&/[0-9A-Za-zθ√.]/.test(s[e])) e++; } continue; }
     if(s[e]==='^'&&e>k){ if(s[e+1]==='('){ const z=frMatch(s,e+1,1,')','('); if(z<0) break; e=z+1; continue; } if(/[−\-0-9০-৯A-Za-zθπ]/.test(s[e+1]||'')){ e+=2; continue; } break; }
     if(FR_TOK.test(s[e])&&s[e]!=='.'||s[e]==='.'&&/[0-9০-৯]/.test(s[e-1]||'')&&/[0-9০-৯]/.test(s[e+1]||'')){ e++; continue; } break; }
   if(e===k) return null;
@@ -1106,7 +1108,11 @@ function mxSemi(s){ return String(s).replace(/([\[|])([^\[\]|()]*;[^\[\]|()]*)([
   const rows=body.split(';').map(r=>r.trim()).filter(Boolean).map(r=>r.split(/\s*,\s*|\s+(?![+−\-×÷=]\s)(?<![+−\-×÷=]\s)/).filter(Boolean));
   if(rows.length<2||rows[0].length<2||rows.some(r=>r.length!==rows[0].length)) return m;
   const inner=rows.map(r=>'('+r.join(', ')+')').join(', '); return o==='|'?'|'+inner+'|':'['+inner+']'; }); }
-function mxHTML(s){ return supHTML(frHTML(statTable(mxSemi(texConv(s))))).replace(/\n/g,'<br>').replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
+/* লগের ভিত্তি: log₂x, logₐx, log_2 x, log_√3 81, log_b a, log_(4a) — সব একইভাবে log এর নিচে ছোট করে (log<sub>a</sub> b) */
+const LOG_SUB='₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜ', LOG_SUBA='0123456789aeoxhklmnpst';
+const logBase=s=>String(s).replace(/log([₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜ]+)/g,(m,b)=>'log_('+[...b].map(c=>LOG_SUBA[[...LOG_SUB].indexOf(c)]).join('')+')')
+  .replace(/log_(?!\()(√?[0-9]+(?:\.[0-9]+)?|√?[A-Za-zθ])/g,'log_($1)');
+function mxHTML(s){ return supHTML(frHTML(statTable(mxSemi(texConv(logBase(s)))))).replace(/\n/g,'<br>').replace(MX_DET,'|$1|').replace(MX_RE,(m,o,body,c)=>{ if(o==='['?c!==']':c!=='|') return m;
   const rows=body.match(new RegExp(MX_R,'g')).map(r=>r.trim().slice(1,-1).split(',').map(x=>x.trim())), n=rows[0].length;
   if(rows.some(r=>r.length!==n)||(o==='|'&&(rows.length<2||n<2))||(rows.length<2&&n<2)) return m;
   return `<span class="mx ${o==='['?'mx-m':'mx-d'}" role="math" aria-label="${o==='['?'ম্যাট্রিক্স':'নির্ণায়ক'}"><span class="mx-g" style="grid-template-columns:repeat(${n},auto)">${rows.flat().map(x=>`<span>${x}</span>`).join('')}</span></span>`; }); }
