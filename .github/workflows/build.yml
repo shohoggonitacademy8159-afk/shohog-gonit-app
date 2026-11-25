@@ -80,6 +80,15 @@ jobs:
           fi
           cp app/build/outputs/apk/release/app-release.apk ../sohog-ganit-academy.apk
 
+      - name: এক চাপে আপডেটের বান্ডেল (রিলিজের সাথে একসাথে প্রকাশের জন্য)
+        run: |
+          N=${{ github.run_number }}; FP=$(bash scripts/native-fp.sh)
+          B=$RUNNER_TEMP/otab; rm -rf "$B"; cp -r www "$B"; rm -rf "$B/pdf" "$B/ota" "$B"/_*.html
+          echo "window.SOHOG_BUILD=$N;window.SOHOG_NATIVE='$FP';window.SOHOG_OTA=1;" > "$B/build.js"
+          (cd "$B" && zip -qr9 "$GITHUB_WORKSPACE/ota.zip" .)
+          SUM=$(sha256sum ota.zip | cut -d' ' -f1)
+          mv ota.zip "ota-b$N-n$FP-s$SUM.zip"; ls -la ota-*.zip
+
       - name: APK সংরক্ষণ
         uses: actions/upload-artifact@v4
         with:
@@ -92,7 +101,9 @@ jobs:
           tag_name: v1.0.${{ github.run_number }}
           name: সহগ গণিত একাডেমি ১.০.${{ github.run_number }}
           body: শিক্ষার্থীদের পাঠানোর জন্য নিচের sohog-ganit-academy.apk ফাইলটি ডাউনলোড করুন।
-          files: sohog-ganit-academy.apk
+          files: |
+            sohog-ganit-academy.apk
+            ota-b*.zip
           make_latest: true
 
   web:

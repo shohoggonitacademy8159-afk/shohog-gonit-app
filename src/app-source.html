@@ -3492,10 +3492,15 @@ async function checkUpdate(force){
       fetch('https://api.github.com/repos/shohoggonitacademy8159-afk/shohog-gonit-app/releases/latest',{headers:{Accept:'application/vnd.github+json'},cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()),
       fetch(FILE_BASE+'ota/latest.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject())]);
     const nRel=rel.status==='fulfilled'?(+(String(rel.value.tag_name||'').split('.').pop())||0):0;
-    const o=ota.status==='fulfilled'&&ota.value&&+ota.value.build?{build:+ota.value.build,native:String(ota.value.native||''),url:String(ota.value.url||''),sum:String(ota.value.sha256||'')}:null;
+    const oWeb=ota.status==='fulfilled'&&ota.value&&+ota.value.build?{build:+ota.value.build,native:String(ota.value.native||''),url:String(ota.value.url||''),sum:String(ota.value.sha256||'')}:null;
+    /* রিলিজের সাথেই প্রকাশিত বান্ডেল (ota-b<নং>-n<আঙুলছাপ>-s<sha256>.zip) — APK ও আপডেট-ফাইল একই মুহূর্তে আসে, তাই এটাই আগে */
+    const oRel=rel.status==='fulfilled'?(rel.value.assets||[]).map(x=>{ const mm=String(x.name||'').match(/^ota-b(\d+)-n([0-9a-f]+)-s([0-9a-f]{64})\.zip$/); return mm&&x.browser_download_url?{build:+mm[1],native:mm[2],url:String(x.browser_download_url),sum:mm[3]}:null; }).find(Boolean)||null:null;
+    const o=oRel&&(!oWeb||oRel.build>=oWeb.build)?oRel:oWeb;
     if(nRel||o){
       const was=!!UPD; UPD=updFrom(nRel,o); const n=UPD?UPD.n:Math.max(nRel,APP_BUILD);
-      NTF_ST.updAt=Date.now(); NTF_ST.updLatest=n; NTF_ST.updRel=nRel; NTF_ST.updOta=o; ntfSave();
+      const pend=UPD&&!UPD.ota&&o&&o.native===window.SOHOG_NATIVE&&otaOk()&&o.build<nRel;
+      NTF_ST.updAt=pend?Date.now()-3*3600e3+5*60e3:Date.now(); NTF_ST.updLatest=n; NTF_ST.updRel=nRel; NTF_ST.updOta=o; ntfSave();
+      if(pend) UPD_WHY='এক চাপের আপডেট-ফাইল প্রস্তুত হচ্ছে — কয়েক মিনিট পর "আপডেট আছে কি না দেখো" চাপো, তখন APK ছাড়াই হবে';
       if(UPD&&NTF_ST.updNotified!==n){ NTF_ST.updNotified=n; ntfSave();
         if(NTF&&NTF.native&&!S.ntfOff) NTF.schedule([{id:ntfId('upd#'+n),title:'🆕 অ্যাপের নতুন সংস্করণ এসেছে',body:`সংস্করণ ${verName(n)} — ${UPD.ota?'এক চাপেই আপডেট হবে।':'চাপ দিয়ে এখনই আপডেট করো।'}`,extra:{go:'downloads'}}]); }
       if(force&&!UPD) toast('তোমার অ্যাপ সর্বশেষ সংস্করণে আছে ✓');
