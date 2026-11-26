@@ -1098,14 +1098,15 @@ const ST_N='[0-9০-৯.]+', ST_RG=`${ST_N}\\s*[-–—−]\\s*${ST_N}`, ST_K=`(
 const ST_RUN=new RegExp(`(${ST_K})\\s*:\\s*(${ST_N})(?:\\s*,\\s*${ST_K}\\s*:\\s*${ST_N}){2,}`,'g');
 const stRange=t=>t.replace(/\s*[-–—−]\s*/,'–');
 function stHTML(rows){ const w=Math.max(...rows.map(r=>r.length));
-  return `<span class="stbl-w"><span class="stbl" role="table">${rows.map((r,i)=>`<span class="st-r" role="row">${Array.from({length:w},(_,j)=>`<span class="st-c${j===0?' st-h':''}" role="${j===0?'rowheader':'cell'}">${r[j]==null?'':r[j]}</span>`).join('')}</span>`).join('')}</span></span>`; }
+  return `<span class="stbl-w"><span class="stbl" role="table">${rows.map((r,i)=>`<span class="st-r" role="row">${Array.from({length:w},(_,j)=>`<span class="st-c${(w===2?i===0:j===0)?' st-h':''}" role="${(w===2?i===0:j===0)?'rowheader':'cell'}">${r[j]==null?'':r[j]}</span>`).join('')}</span>`).join('')}</span></span>`; }
 function statTable(s){ s=String(s);
   // ১) লাইনে লাইনে "|" দিয়ে আলাদা করা সারণি (অ্যাডমিন সহজে লিখতে পারবেন)
   if(s.includes('|')&&s.includes('\n')){
     const L=s.split('\n'), out=[]; let buf=[];
-    const isRow=l=>/^[^|]+(\|[^|]+){2,}$/.test(l.trim())&&!/^\|/.test(l.trim());
-    const flush=()=>{ if(buf.length>=2) out.push(stHTML(buf)); else out.push(...buf.map(r=>r.raw)); buf=[]; };
-    L.forEach(l=>{ if(isRow(l)){ const r=l.split('|').map(c=>c.trim()); r.raw=l; buf.push(Object.assign(r.map((c,j)=>j&&new RegExp(`^${ST_RG}$`).test(c)?stRange(c):c),{raw:l})); } else { flush(); out.push(l); } });
+    // দুই কলামের (খাড়া) সারণিও চলবে, তবে কমপক্ষে ৩ লাইন হলে
+    const isRow=l=>/^[^|]+(\|[^|]+){1,}$/.test(l.trim())&&!/^\|/.test(l.trim());
+    const flush=()=>{ const w=buf.length?Math.max(...buf.map(r=>r.length)):0; if(buf.length>=(w>=3?2:3)) out.push(stHTML(buf)); else out.push(...buf.map(r=>r.raw)); buf=[]; };
+    L.forEach(l=>{ if(isRow(l)){ const r=l.split('|').map(c=>c.trim()); r.raw=l; buf.push(Object.assign(r.map((c,j)=>(j||r.length===2)&&new RegExp(`^${ST_RG}$`).test(c)?stRange(c):c),{raw:l})); } else { flush(); out.push(l); } });
     flush(); s=out.join('\n').replace(/\n?(<span class="stbl-w">)/g,'$1').replace(/(<\/span><\/span><\/span>)\n/g,'$1');
   }
   // ২) "শ্রেণি: গণসংখ্যা" জোড়ার তালিকা (কমপক্ষে ৩টি)
