@@ -76,12 +76,13 @@ head = """<!doctype html>
 <link rel="canonical" href="https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="অংকবাড়ি">
-<meta property="og:title" content="অংকবাড়ি — সহগ গণিত একাডেমি">
+<meta property="og:title" content="অংকবাড়ি">
 <meta property="og:description" content="অংকবাড়ি — সহগ গণিত একাডেমির গণিত শেখার অ্যাপ। ৫ম শ্রেণি থেকে এসএসসি ও এইচএসসি পর্যন্ত লাইভ ও রেকর্ড ক্লাস, প্রতিদিনের লাইভ পরীক্ষা, অধ্যায়ভিত্তিক MCQ, সংক্ষিপ্ত ও সৃজনশীল প্রশ্নব্যাংক, বোর্ড প্রশ্ন এবং নিজের প্রশ্নপত্র PDF তৈরি।">
 <meta property="og:url" content="https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/">
 <meta property="og:image" content="https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/icon-512.png">
 <meta property="og:locale" content="bn_BD">
 <meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"অংকবাড়ি","alternateName":["Ongkobari","অঙ্কবাড়ি"],"url":"https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"অংকবাড়ি","alternateName":["অঙ্কবাড়ি","Ongkobari","ongkobari","সহগ গণিত একাডেমি","Shohog Gonit Academy"],"url":"https://shohoggonitacademy8159-afk.github.io/shohog-gonit-app/","inLanguage":"bn","applicationCategory":"EducationalApplication","operatingSystem":"Android, Web","description":"অংকবাড়ি — সহগ গণিত একাডেমির গণিত শেখার অ্যাপ। ৫ম শ্রেণি থেকে এসএসসি ও এইচএসসি পর্যন্ত লাইভ ও রেকর্ড ক্লাস, প্রতিদিনের লাইভ পরীক্ষা, অধ্যায়ভিত্তিক MCQ, সংক্ষিপ্ত ও সৃজনশীল প্রশ্নব্যাংক, বোর্ড প্রশ্ন এবং নিজের প্রশ্নপত্র PDF তৈরি।","publisher":{"@type":"EducationalOrganization","name":"সহগ গণিত একাডেমি"}}</script>
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
