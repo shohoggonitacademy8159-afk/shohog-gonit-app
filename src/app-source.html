@@ -187,6 +187,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qm-type[aria-selected=true] b{color:var(--accent,#1F6FE5)}
 .qm-dz{border:1px solid var(--line,#dbe3ee);border-radius:14px;padding:12px;margin:6px 0 10px;display:flex;flex-direction:column;gap:8px;background:var(--card,#fff)}
 .qm-dz h4{margin:0;font-size:15px}.qm-dz .qm-lab{font-size:13px;font-weight:600;color:var(--muted,#5B6B82);margin-top:2px}
+.qm-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:6px}.qm-dl{display:flex;flex-direction:column;gap:4px;min-width:0}.qm-dl .qm-lab{margin:0}.qm-sel{width:100%;padding:8px 10px;font-size:14px}.qm-step{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line,#cbd5e1);border-radius:10px;padding:3px}.qm-step button{width:40px;height:34px;border-radius:8px;border:0;background:var(--brand,#1E5BD8);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer}.qm-step button:disabled{opacity:.35;cursor:default}.qm-step b{font-size:16px}
 .qm-seg{display:flex;flex-wrap:wrap;gap:6px}.qm-seg button{flex:1 1 auto;min-width:56px;padding:7px 10px;border-radius:10px;border:1px solid var(--line,#cbd5e1);background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
 .qm-seg button[aria-pressed=true]{background:var(--accent,#1F6FE5);border-color:var(--accent,#1F6FE5);color:#fff;font-weight:600}
 .qp-prev{position:relative;width:min(100%,340px);margin:4px auto 2px;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;box-shadow:0 6px 18px -10px rgba(16,35,63,.45);background:#fff}
@@ -3021,19 +3022,22 @@ function qmBreak(calc){
 /* ---------- প্রশ্নপত্রের তথ্য ---------- */
 /* ---------- প্রশ্নপত্রের ডিজাইন: ফন্ট, লেখার সাইজ, কলাম, ওয়াটারমার্ক, প্রতিষ্ঠানের নাম ---------- */
 const QM_FONTS={nikosh:['নিকস',"'Nikosh','Hind Siliguri',sans-serif"],kalpurush:['কালপুরুষ',"'Kalpurush','Hind Siliguri',sans-serif"],hind:['হিন্দ শিলিগুড়ি',"'Hind Siliguri','Noto Sans Bengali',sans-serif"]};
-const QM_FS=[[13,'ছোট'],[15,'মাঝারি'],[17,'বড়'],[19,'অনেক বড়']];
+const QM_FSMIN=10, QM_FSMAX=26;
 const QM_BT_RE=/\s*\[[^\[\]\n]*বো\.\s*'[০-৯]{2}[^\[\]\n]*\]/g;
-function qmDef(){ const p=S.qmPref||{}; return {font:QM_FONTS[p.font]?p.font:'nikosh',fs:QM_FS.some(x=>x[0]===+p.fs)?+p.fs:15,cols:[1,2,3].includes(+p.cols)?+p.cols:1,oc:[0,1,2,4].includes(+p.oc)?+p.oc:0,bt:+p.bt===0?0:1,inst:p.inst||'',inst2:p.inst2||'',wm:p.wm||''}; }
+function qmDef(){ const p=S.qmPref||{}; return {font:QM_FONTS[p.font]?p.font:'nikosh',fs:Number.isInteger(+p.fs)&&+p.fs>=QM_FSMIN&&+p.fs<=QM_FSMAX?+p.fs:15,cols:[1,2,3].includes(+p.cols)?+p.cols:1,oc:[0,1,2,4].includes(+p.oc)?+p.oc:0,bt:+p.bt===0?0:1,inst:p.inst||'',inst2:p.inst2||'',wm:p.wm||''}; }
 function qmD(oid){ if(oid){ const o=(S.qorders||{})[oid]; if(!o) return qmDef(); return o.d=Object.assign(qmDef(),o.d||{}); } const m=qmInit(); return m.d=m.d||qmDef(); }
 function qmSetD(oid,k,v){ const d=qmD(oid); d[k]=['fs','cols','oc','bt'].includes(k)?+v:k==='font'?v:String(v).slice(0,k==='wm'?30:k==='inst2'?90:70);
   S.qmPref=Object.assign({},d); persist(); }
 function qmDesignForm(d,oid){
+  const sel=(k,opts)=>`<select class="input qm-sel" data-qmd="${k}" data-qmo="${oid||''}">${opts.map(([v,l])=>`<option value="${v}" ${String(d[k])===String(v)?'selected':''}>${l}</option>`).join('')}</select>`;
   const seg=(k,opts)=>`<div class="qm-seg" role="group">${opts.map(([v,l])=>`<button type="button" aria-pressed="${String(d[k])===String(v)}" data-qmdset="${k}:${v}" data-qmo="${oid||''}">${l}</button>`).join('')}</div>`;
   return `<section class="qm-dz"><h4>🎨 প্রশ্নপত্রের ডিজাইন</h4>
-    <div class="qm-lab">ফন্ট</div>${seg('font',Object.entries(QM_FONTS).map(([k,[l]])=>[k,`<span style="font-family:${l==='নিকস'?"'Nikosh'":l==='কালপুরুষ'?"'Kalpurush'":"'Hind Siliguri'"}">${l}</span>`]))}
-    <div class="qm-lab">লেখার সাইজ</div>${seg('fs',QM_FS)}
-    <div class="qm-lab">পাতায় কলাম</div>${seg('cols',[[1,'১ কলাম'],[2,'২ কলাম'],[3,'৩ কলাম']])}
-    <div class="qm-lab">MCQ অপশন এক লাইনে কয়টি</div>${seg('oc',[[0,'অটো'],[1,'১টি'],[2,'২টি'],[4,'৪টি']])}
+    <div class="qm-dgrid">
+      <label class="qm-dl"><span class="qm-lab">ফন্ট</span>${sel('font',Object.entries(QM_FONTS).map(([k,[l]])=>[k,l]))}</label>
+      <div class="qm-dl"><span class="qm-lab">লেখার সাইজ</span><div class="qm-step" role="group" aria-label="লেখার সাইজ"><button type="button" data-qmfs="-1" data-qmo="${oid||''}" aria-label="ছোট করো" ${d.fs<=QM_FSMIN?'disabled':''}>−</button><b>${bn(d.fs)}</b><button type="button" data-qmfs="1" data-qmo="${oid||''}" aria-label="বড় করো" ${d.fs>=QM_FSMAX?'disabled':''}>+</button></div></div>
+      <label class="qm-dl"><span class="qm-lab">পাতায় কলাম</span>${sel('cols',[[1,'১ কলাম'],[2,'২ কলাম'],[3,'৩ কলাম']])}</label>
+      <label class="qm-dl"><span class="qm-lab">MCQ অপশনের কলাম</span>${sel('oc',[[0,'অটো'],[1,'১ কলাম'],[2,'২ কলাম'],[4,'৪ কলাম']])}</label>
+    </div>
     <div class="qm-lab">বোর্ড প্রশ্নে বোর্ডের নাম ও সাল</div>${seg('bt',[[1,'রাখো'],[0,'বাদ দাও']])}
     <div class="field"><label>প্রতিষ্ঠানের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst" data-qmo="${oid||''}" maxlength="70" placeholder="যেমন: আদর্শ উচ্চ বিদ্যালয়" value="${esc(d.inst)}"></div>
     <div class="field"><label>ঠিকানা / শাখা / শিক্ষকের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst2" data-qmo="${oid||''}" maxlength="90" value="${esc(d.inst2)}"></div>
@@ -4445,6 +4449,7 @@ app.addEventListener('click',e=>{
   if(t.dataset.qmodel){ const id=t.dataset.qmodel; if(S.qmArmed===id){ S.qmArmed=''; delete S.qorders[id]; persist(); toast('মুছে ফেলা হয়েছে'); } else S.qmArmed=id; return render(); }
   if(t.dataset.qmimport){ qmAdminImport(); return; }
   if(t.dataset.qmdset){ const [k,v]=t.dataset.qmdset.split(':'); qmSetD(t.dataset.qmo||'',k,v); return render(); }
+  if(t.dataset.qmfs){ const oid=t.dataset.qmo||'', d=qmD(oid); qmSetD(oid,'fs',Math.max(QM_FSMIN,Math.min(QM_FSMAX,d.fs+(+t.dataset.qmfs)))); return render(); }
   if(t.dataset.qmdz){ S.qmDzOpen=S.qmDzOpen===t.dataset.qmdz?null:t.dataset.qmdz; return render(); }
   if(t.dataset.qmpdf){ qmMakePdf(t.dataset.qmpdf,false); return; }
   if(t.dataset.qmpdfa){ qmMakePdf(t.dataset.qmpdfa,true); return; }
