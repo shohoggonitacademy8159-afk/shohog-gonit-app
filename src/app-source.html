@@ -187,6 +187,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qm-type[aria-selected=true] b{color:var(--accent,#1F6FE5)}
 .qm-dz{border:1px solid var(--line,#dbe3ee);border-radius:14px;padding:12px;margin:6px 0 10px;display:flex;flex-direction:column;gap:8px;background:var(--card,#fff)}
 .qm-dz h4{margin:0;font-size:15px}.qm-dz .qm-lab{font-size:13px;font-weight:600;color:var(--muted,#5B6B82);margin-top:2px}
+.qm .input{height:44px;padding:0 13px;font-size:15px;border-radius:12px}.qm .nb-row{gap:10px}.qm .nb-row .input{flex:1 1 0;min-width:0}.qm .field{gap:5px}.qp-prev{background:#e2e8f0}
 .qm-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:6px}.qm-dl{display:flex;flex-direction:column;gap:4px;min-width:0}.qm-dl .qm-lab{margin:0}.qm-sel{width:100%;padding:8px 10px;font-size:14px}.qm-step{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line,#cbd5e1);border-radius:10px;padding:3px}.qm-step button{width:40px;height:34px;border-radius:8px;border:0;background:var(--brand,#1E5BD8);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer}.qm-step button:disabled{opacity:.35;cursor:default}.qm-step b{font-size:16px}
 .qm-seg{display:flex;flex-wrap:wrap;gap:6px}.qm-seg button{flex:1 1 auto;min-width:56px;padding:7px 10px;border-radius:10px;border:1px solid var(--line,#cbd5e1);background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
 .qm-seg button[aria-pressed=true]{background:var(--accent,#1F6FE5);border-color:var(--accent,#1F6FE5);color:#fff;font-weight:600}
@@ -3029,26 +3030,27 @@ function qmD(oid){ if(oid){ const o=(S.qorders||{})[oid]; if(!o) return qmDef();
 function qmSetD(oid,k,v){ const d=qmD(oid); d[k]=['fs','cols','oc','bt'].includes(k)?+v:k==='font'?v:String(v).slice(0,k==='wm'?30:k==='inst2'?90:70);
   S.qmPref=Object.assign({},d); persist(); }
 function qmDesignForm(d,oid){
-  const sel=(k,opts)=>`<select class="input qm-sel" data-qmd="${k}" data-qmo="${oid||''}">${opts.map(([v,l])=>`<option value="${v}" ${String(d[k])===String(v)?'selected':''}>${l}</option>`).join('')}</select>`;
+  const sel=(k,opts,al)=>`<select class="input qm-sel" data-qmd="${k}" data-qmo="${oid||''}"${al?` aria-label="${al}"`:''}>${opts.map(([v,l])=>`<option value="${v}" ${String(d[k])===String(v)?'selected':''}>${l}</option>`).join('')}</select>`;
   const seg=(k,opts)=>`<div class="qm-seg" role="group">${opts.map(([v,l])=>`<button type="button" aria-pressed="${String(d[k])===String(v)}" data-qmdset="${k}:${v}" data-qmo="${oid||''}">${l}</button>`).join('')}</div>`;
   return `<section class="qm-dz"><h4>🎨 প্রশ্নপত্রের ডিজাইন</h4>
     <div class="qm-dgrid">
       <label class="qm-dl"><span class="qm-lab">ফন্ট</span>${sel('font',Object.entries(QM_FONTS).map(([k,[l]])=>[k,l]))}</label>
       <div class="qm-dl"><span class="qm-lab">লেখার সাইজ</span><div class="qm-step" role="group" aria-label="লেখার সাইজ"><button type="button" data-qmfs="-1" data-qmo="${oid||''}" aria-label="ছোট করো" ${d.fs<=QM_FSMIN?'disabled':''}>−</button><b>${bn(d.fs)}</b><button type="button" data-qmfs="1" data-qmo="${oid||''}" aria-label="বড় করো" ${d.fs>=QM_FSMAX?'disabled':''}>+</button></div></div>
-      <label class="qm-dl"><span class="qm-lab">পাতায় কলাম</span>${sel('cols',[[1,'১ কলাম'],[2,'২ কলাম'],[3,'৩ কলাম']])}</label>
-      <label class="qm-dl"><span class="qm-lab">MCQ অপশনের কলাম</span>${sel('oc',[[0,'অটো'],[1,'১ কলাম'],[2,'২ কলাম'],[4,'৪ কলাম']])}</label>
+      <div class="qm-dl">${sel('cols',[[1,'পাতায় ১ কলাম'],[2,'পাতায় ২ কলাম'],[3,'পাতায় ৩ কলাম']],'পাতায় কলাম')}</div>
+      <div class="qm-dl">${sel('oc',[[0,'MCQ অপশন: অটো'],[1,'MCQ অপশন ১ কলামে'],[2,'MCQ অপশন ২ কলামে'],[4,'MCQ অপশন ৪ কলামে']],'MCQ অপশনের কলাম')}</div>
     </div>
     <div class="qm-lab">বোর্ড প্রশ্নে বোর্ডের নাম ও সাল</div>${seg('bt',[[1,'রাখো'],[0,'বাদ দাও']])}
-    <div class="field"><label>প্রতিষ্ঠানের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst" data-qmo="${oid||''}" maxlength="70" placeholder="যেমন: আদর্শ উচ্চ বিদ্যালয়" value="${esc(d.inst)}"></div>
-    <div class="field"><label>ঠিকানা / শাখা / শিক্ষকের নাম (ঐচ্ছিক)</label><input class="input" data-qmd="inst2" data-qmo="${oid||''}" maxlength="90" value="${esc(d.inst2)}"></div>
-    <div class="field"><label>ওয়াটারমার্ক (ঐচ্ছিক)</label><input class="input" data-qmd="wm" data-qmo="${oid||''}" maxlength="30" placeholder="যেমন: প্রতিষ্ঠানের নাম বা গোপনীয়" value="${esc(d.wm)}"></div>
-    <div class="qm-lab">নমুনা (প্রথম পাতা)</div><div class="qp-prev" data-qmo="${oid||''}"></div>
+    <input class="input" data-qmd="inst" data-qmo="${oid||''}" maxlength="70" aria-label="প্রতিষ্ঠানের নাম" placeholder="প্রতিষ্ঠানের নাম লিখুন (ঐচ্ছিক)" value="${esc(d.inst)}">
+    <input class="input" data-qmd="inst2" data-qmo="${oid||''}" maxlength="90" aria-label="ঠিকানা / শাখা / শিক্ষকের নাম" placeholder="ঠিকানা / শাখা / শিক্ষকের নাম লিখুন (ঐচ্ছিক)" value="${esc(d.inst2)}">
+    <input class="input" data-qmd="wm" data-qmo="${oid||''}" maxlength="30" aria-label="ওয়াটারমার্ক" placeholder="ওয়াটারমার্ক লিখুন (ঐচ্ছিক)" value="${esc(d.wm)}">
+    <div class="qm-lab">নমুনা (সম্পূর্ণ প্রশ্নপত্র)</div><div class="qp-prev" data-qmo="${oid||''}"></div>
     <p class="muted" style="margin:0;font-size:12px">ডিজাইন বদলাতে বাড়তি টাকা লাগে না। পরে "আমার তৈরি প্রশ্ন" থেকেও বদলাতে পারবেন।</p></section>`;
 }
+function qmTitleOf(m){ const t=String(m.title||'').trim().slice(0,80); if(t) return t; const L=qmLbl(m.cid); return `${L.cls} ${L.subj} — মডেল টেস্ট`.trim(); }
 function qmPrevOrder(oid){
   if(oid) return (S.qorders||{})[oid];
   const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
-  return {title:String(m.title||'মডেল টেস্ট'),...qmLbl(m.cid),time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),items:m.order.slice(0,40),d:m.d};
+  return {...qmLbl(m.cid),title:qmTitleOf(m),...(String(m.cls||'').trim()?{cls:String(m.cls).trim().slice(0,40)}:{}),time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),items:m.order.slice(0,300),d:m.d};
 }
 /* পাতা সাজানো: শিরোনাম পুরো প্রস্থে, বাকি ব্লক কলাম ধরে ভরে; জায়গা না হলে পরের কলাম/পাতা */
 function qmLayout(host,o,answers,d,maxPages){
@@ -3076,23 +3078,24 @@ function qmLayout(host,o,answers,d,maxPages){
 function qmFillPreview(el){
   const oid=el.dataset.qmo||'', o=qmPrevOrder(oid); if(!o) return;
   const d=qmD(oid); el.innerHTML='';
-  const [pg]=qmLayout(el,o,false,d,1); if(!pg) return;
-  qmFoot(pg,d,1,1,true);
-  const sc=(el.clientWidth||300)/794; pg.style.transform=`scale(${sc})`; el.style.height=Math.round(1123*sc)+'px';
+  const pages=qmLayout(el,o,false,d,0); if(!pages.length) return;
+  const sc=(el.clientWidth||300)/794, H=Math.round(1123*sc), gap=10;
+  pages.forEach((pg,i)=>{ qmFoot(pg,d,i+1,pages.length,pages.length===1); pg.style.top=(i*(H+gap))+'px'; pg.style.transform=`scale(${sc})`; });
+  el.style.height=(pages.length*(H+gap)-gap)+'px';
 }
 function qmFoot(p,d,i,n,one){ const f=p.querySelector('.qp-foot');
   f.innerHTML=`${esc(d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি')} — পৃষ্ঠা ${bn(i)}${one?'':'/'+bn(n)}${d.inst?'<span class="qp-mark">অংকবাড়ি</span>':''}`; }
 const qmPreviewAll=()=>app.querySelectorAll('.qp-prev').forEach(qmFillPreview);
 function vQmPaper(){
   const m=qmInit(), calc=qmCalc(m.order), c=COURSES[m.cid]||{};
-  if(!m.title) { const L=qmLbl(m.cid); m.title=`${L.cls} ${L.subj} — মডেল টেস্ট`.trim(); }
   const autoTime=Math.max(10,calc.c.m*1+calc.c.s*3+calc.c.c*25);
   return `<div class="screen qm">${backTop('প্রশ্নপত্রের তথ্য','qm')}
     <div class="qm-steps"><span class="done">১ বাছাই</span><span class="on">২ প্রশ্নপত্র</span><span>৩ পেমেন্ট</span><span>৪ PDF</span></div>
-    <div class="field"><label for="qmTi">পরীক্ষার নাম / শিরোনাম</label><input class="input" id="qmTi" data-qmf="title" maxlength="80" value="${esc(m.title)}"></div>
-    <div class="nb-row"><div class="field" style="flex:1"><label for="qmTm">সময় (মিনিট)</label><input class="input" id="qmTm" data-qmf="time" inputmode="numeric" maxlength="3" placeholder="${bn(autoTime)}" value="${esc(m.time)}"></div>
-      <div class="field" style="flex:1"><label for="qmMk">পূর্ণমান</label><input class="input" id="qmMk" data-qmf="marks" inputmode="numeric" maxlength="4" placeholder="${bn(calc.marks)}" value="${esc(m.marks)}"></div></div>
-    <p class="muted" style="margin:-4px 0 0;font-size:13px">ফাঁকা রাখলে সময় ${bn(autoTime)} মিনিট ও পূর্ণমান ${bn(calc.marks)} (MCQ ১, সংক্ষিপ্ত ২, সৃজনশীল ১০ নম্বর করে) বসবে।</p>
+    <input class="input" id="qmTi" data-qmf="title" maxlength="80" aria-label="পরীক্ষার নাম" placeholder="পরীক্ষার নাম লিখুন" value="${esc(m.title||'')}">
+    <input class="input" id="qmCl" data-qmf="cls" maxlength="40" aria-label="শ্রেণি" placeholder="শ্রেণি লিখুন" value="${esc(m.cls||'')}">
+    <div class="nb-row"><input class="input" id="qmTm" data-qmf="time" inputmode="numeric" maxlength="3" aria-label="সময় (মিনিট)" placeholder="সময় লিখুন (মিনিট)" value="${esc(m.time)}" style="flex:1">
+      <input class="input" id="qmMk" data-qmf="marks" inputmode="numeric" maxlength="4" aria-label="পূর্ণমান" placeholder="পূর্ণমান লিখুন" value="${esc(m.marks)}" style="flex:1"></div>
+    <p class="muted" style="margin:-2px 0 0;font-size:12px">পরীক্ষার নাম ফাঁকা রাখলে "${esc(qmTitleOf({cid:m.cid}))}", শ্রেণি ফাঁকা রাখলে "${esc(qmLbl(m.cid).cls)}", সময় ${bn(autoTime)} মিনিট ও পূর্ণমান ${bn(calc.marks)} (MCQ ১, সংক্ষিপ্ত ২, সৃজনশীল ১০ নম্বর করে) বসবে।</p>
     <label class="chk"><input type="checkbox" data-qmf="ans" ${m.ans?'checked':''}> উত্তরপত্র / সমাধানও তৈরি হবে</label>
     ${qmDesignForm(qmD(''),'')}
     <h3 class="m-sec">বিল</h3>${qmBreak(calc)}
@@ -3104,11 +3107,11 @@ function vQmPaper(){
 function qmCreateOrder(){
   const m=qmInit(), calc=qmCalc(m.order); if(!calc.n) return;
   const id='q'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), c=COURSES[m.cid]||{};
-  const o={id,at:new Date().toISOString(),title:String(m.title||'').trim().slice(0,80)||'মডেল টেস্ট',cid:m.cid,...qmLbl(m.cid),
+  const o={id,at:new Date().toISOString(),title:qmTitleOf(m),cid:m.cid,...qmLbl(m.cid),...(String(m.cls||'').trim()?{cls:String(m.cls).trim().slice(0,40)}:{}),
     time:Math.round(+en(String(m.time))||Math.max(10,calc.c.m+calc.c.s*3+calc.c.c*25)),marks:Math.round(+en(String(m.marks))||calc.marks),ans:!!m.ans,
     items:m.order.slice(0,300),d:Object.assign({},qmD('')),count:calc.c,net:calc.net,amount:calc.pay,free:CAN_EDIT||calc.pay===0,status:CAN_EDIT||calc.pay===0?'paid':'draft'};
   S.qorders=S.qorders||{}; S.qorders[id]=o; persist();
-  m.sel={}; m.order=[]; m.title=''; m.time=''; m.marks=''; m.cur=id;
+  m.sel={}; m.order=[]; m.title=''; m.cls=''; m.time=''; m.marks=''; m.cur=id;
   if(o.free){ m.step='orders'; toast('প্রশ্নপত্র তৈরি হয়েছে — এখন PDF ডাউনলোড করুন'); }
   else { m.step='pay'; m.pay=null; }
   render();
@@ -4662,7 +4665,7 @@ app.addEventListener('input',e=>{
     else if(!['cid','ch','ans','ex','lvl'].includes(k)) m[k]=t.value; }
   if(t.dataset.qmp){ const m=qmInit(); if(m.pay) m.pay[t.dataset.qmp]=t.value; }
   if(t.dataset.qmd){ qmSetD(t.dataset.qmo||'',t.dataset.qmd,t.value); clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,300); }
-  if(t.dataset.qmf==='title'||t.dataset.qmf==='time'||t.dataset.qmf==='marks'){ clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,400); }
+  if(['title','cls','time','marks'].includes(t.dataset.qmf)){ clearTimeout(S.qmPT); S.qmPT=setTimeout(qmPreviewAll,400); }
   if(t.dataset.clf){ cfInitC()[t.dataset.clf]=t.value; }
   if(t.dataset.payf&&S.buy){ S.buy[t.dataset.payf]=t.value; }
   if(t.dataset.pcf&&t.type!=='checkbox'){ pcInit()[t.dataset.pcf]=t.value; }
