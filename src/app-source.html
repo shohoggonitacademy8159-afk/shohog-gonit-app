@@ -3281,7 +3281,7 @@ function qmBlocks(o,answers,d){
     <div class="qp-meta"><span>শ্রেণি: ${esc(o.cls)}</span><span>বিষয়: ${esc(o.subj)}</span>${answers?'':`<span>সময়: ${bn(o.time)} মিনিট</span><span>পূর্ণমান: ${bn(o.marks)}</span>`}</div>
     ${answers?'':`<div class="qp-info"><span>নাম: ……………………………</span><span>রোল: …………</span></div>`}</div>`;
   B.push(head);
-  let no=0; const sec=(t,label,mk)=>{ const L=by(t); if(!L.length) return; B.push(`<h2 class="qp-sec">${label} <small>(${answers?'উত্তর':`প্রতিটি ${bn(mk)} নম্বর`})</small></h2>`);
+  let no=0; const sec=(t,label,mk)=>{ const L=by(t); if(!L.length) return; no=0; B.push(`<h2 class="qp-sec">${label} <small>(${answers?'উত্তর':`প্রতিটি ${bn(mk)} নম্বর`})</small></h2>`);
     if(answers&&t==='m'){ B.push(`<div class="qp-akey">${L.map((x,i)=>`<span><b>${bn(no+i+1)}.</b> ${'কখগঘ'[x.a]||'—'}</span>`).join('')}</div>`);
       L.forEach((x,i)=>{ if(x.e) B.push(`<div class="qp-q"><b>${bn(no+i+1)}.</b> ${mq(x.e)}</div>`); }); no+=L.length; return; }
     L.forEach(x=>{ no++;
