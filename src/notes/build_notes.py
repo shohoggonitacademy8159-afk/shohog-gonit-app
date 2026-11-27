@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""src/notes/<course>_<index>.md → www/notes.js (window.SOHOG_NOTES)
+"""src/notes/<course>_<index>[_<ক্রম>].md → www/notes.js (একটি অধ্যায়ে একাধিক নোট) (window.SOHOG_NOTES)
 অ্যাপের সাথে আসা স্থায়ী নোট: শিরোনাম (# …), টেবিল, তালিকা; [a b; c d] → ম্যাট্রিক্স, |a b; c d| → নির্ণায়ক
 চালাও: python3 src/notes/build_notes.py
 """
@@ -24,8 +24,8 @@ def math_blocks(h):
     return h
 
 notes = {}
-for f in sorted(here.glob('*.md')):
-    m = re.match(r'([a-z0-9]+)_(\d+)\.md$', f.name)
+for f in sorted(here.glob('*.md'), key=lambda f: [int(x) if x.isdigit() else x for x in re.split(r'[_.]', f.name)]):
+    m = re.match(r'([a-z0-9]+)_(\d+)(?:_(\d+))?\.md$', f.name)
     if not m: continue
     src = f.read_text(encoding='utf-8')
     tm = re.match(r'#\s+(.+)\n', src)
@@ -34,8 +34,8 @@ for f in sorted(here.glob('*.md')):
     h = markdown.markdown(body, extensions=['tables', 'fenced_code', 'sane_lists', 'nl2br'])
     h = math_blocks(h)
     h = h.replace('<table>', '<div class="bn-tw"><table>').replace('</table>', '</table></div>')
-    notes[f'{m.group(1)}:{m.group(2)}'] = {'title': title, 'html': h}
+    notes.setdefault(f'{m.group(1)}:{m.group(2)}', []).append({'title': title, 'html': h})
 
 out = root / 'www' / 'notes.js'
 out.write_text('/* স্বয়ংক্রিয়ভাবে তৈরি: src/notes/build_notes.py — হাতে বদলাবে না */\nwindow.SOHOG_NOTES=' + json.dumps(notes, ensure_ascii=False) + ';\n', encoding='utf-8')
-print('notes', {k: len(v['html']) for k, v in notes.items()})
+print('notes', {k: [n['title'][:20] for n in v] for k, v in notes.items()})

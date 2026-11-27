@@ -1578,7 +1578,7 @@ function vCourse(){
     ${c.offer&&!c.pkg&&!S.cview?'':(c.parts?c.parts:[{from:0,n:c.chapters.length}]).map(pt=>`${pt.t?`<div class="adm-part"><h2>${esc(pt.t)}</h2><span class="muted">${esc(pt.s||'')}</span></div>`:''}<div class="list" role="list">
       ${c.chapters.slice(pt.from,pt.from+pt.n).map((ch,j)=>{const i=pt.from+j, no=j;const done=!!S.done[id+':'+i];const bn_=bNote(id,i);return bn_&&!c.content?`<button class="item" role="listitem" data-bnote="${id}:${i}">
         <span class="num">${bn(no+1)}</span>
-        <span class="t">${ch}<br><span class="s">📘 ${esc(bn_.title)} · চাপ দিয়ে পড়ুন</span></span>
+        <span class="t">${ch}<br><span class="s">📘 ${bNotes(id,i).length>1?bn(bNotes(id,i).length)+'টি শর্টকাট নোট':esc(bn_.title)} · চাপ দিয়ে পড়ুন</span></span>
         <span class="pill ${done?'done':'todo'}">${done?'সম্পন্ন':'পড়ুন'}</span></button>`:c.content?`<button class="item" role="listitem" data-opench="${i}">
         <span class="num">${bn(no+1)}</span>
         <span class="t">${esc(chTitle(id,i))}<br><span class="s">${chDoc(id,i)?'নোট আছে · চাপ দিয়ে পড়ুন':'নোট শিগগিরই আসবে'}</span></span>`:`<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
@@ -3913,17 +3913,27 @@ function whenISO(st){
 /* ---------- অধ্যায়ভিত্তিক নোট (অ্যাডমিন প্রকাশ করে, এক্সপ্লোরে দেখা যায়) ---------- */
 const chId=(cid,i)=>`ch_${cid}_${pad2(i+1)}`;
 /* অ্যাপের সাথে আসা স্থায়ী নোট (www/notes.js ← src/notes/*.md) */
-const bNote=(cid,i)=>{ const n=window.SOHOG_NOTES&&window.SOHOG_NOTES[cid+':'+i]; return n&&n.html?n:null; };
+const bNotes=(cid,i)=>{ const n=window.SOHOG_NOTES&&window.SOHOG_NOTES[cid+':'+i]; return (Array.isArray(n)?n:n?[n]:[]).filter(x=>x&&x.html); };
+const bNote=(cid,i)=>bNotes(cid,i)[0]||null;
 function vBNote(){
-  const [cid,si]=String(S.bnoteKey||'').split(':'), i=+si, c=COURSES[cid], n=bNote(cid,i);
-  if(!c||!n) return vHome();
+  const [cid,si]=String(S.bnoteKey||'').split(':'), i=+si, c=COURSES[cid], L=c?bNotes(cid,i):[];
+  if(!c||!L.length) return vHome();
   const pt=(c.parts||[]).find(p=>i>=p.from&&i<p.from+p.n), k=cid+':'+i, d=!!S.done[k];
+  const back=`<div class="topbar"><button class="iconbtn" ${L.length>1&&S.bnoteIdx!=null?'data-bnlist="1"':`data-course="${cid}"`} aria-label="ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><span></span><span style="width:44px"></span></div>`;
+  const tag=`<span class="offer-tag">${esc(c.name)}${pt?' · '+esc(pt.t):''} · ${esc(c.chapters[i])}</span>`;
+  if(L.length>1&&S.bnoteIdx==null) return `<div class="screen">${back}
+    <div>${tag}<h1 class="display" style="font-size:24px;margin-top:8px">${esc(c.chapters[i])}</h1><span class="muted">${bn(L.length)}টি নোট</span></div>
+    <div class="list" role="list">${L.map((n,j)=>`<button class="item" role="listitem" data-bnidx="${j}"><span class="num">${bn(j+1)}</span><span class="t">${esc(n.title)}<br><span class="s">📘 চাপ দিয়ে পড়ুন</span></span><span class="pill todo">পড়ুন</span></button>`).join('')}</div>
+    <button class="btn ${d?'ghost':''}" data-bndone="${k}" style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>
+  </div>`;
+  const j=Math.min(L.length-1,Math.max(0,+S.bnoteIdx||0)), n=L[j];
   return `<div class="screen">
-    <div class="topbar"><button class="iconbtn" data-course="${cid}" aria-label="ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><span></span><span style="width:44px"></span></div>
-    <div><span class="offer-tag">${esc(c.name)}${pt?' · '+esc(pt.t):''} · ${esc(c.chapters[i])}</span>
+    ${back}
+    <div>${tag}
       <h1 class="display" style="font-size:24px;margin-top:8px">${esc(n.title)}</h1></div>
     <article class="bnote">${n.html}</article>
-    <button class="btn ${d?'ghost':''}" data-bndone="${k}" style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>
+    ${L.length>1?`<div style="display:flex;gap:10px">${j>0?`<button class="btn ghost" style="flex:1" data-bnidx="${j-1}">আগের নোট</button>`:''}${j<L.length-1?`<button class="btn ghost" style="flex:1" data-bnidx="${j+1}">পরের নোট</button>`:''}</div>`
+      :`<button class="btn ${d?'ghost':''}" data-bndone="${k}" style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>`}
   </div>`;
 }
 function chDoc(cid,i){ const r=SYL[chId(cid,i)]; return r&&canSee(r)?r:null; }
@@ -4493,7 +4503,9 @@ app.addEventListener('click',e=>{
   if(t.dataset.openex){ return go('exercise',{exKey:t.dataset.openex}); }
   if(t.hasAttribute('data-exdone')){ const k=`${S.course}:ex:${S.exKey}`; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); return; }
   if(t.dataset.opench!==undefined){ return go('chapter',{chIdx:+t.dataset.opench}); }
-  if(t.dataset.bnote){ return go('bnote',{bnoteKey:t.dataset.bnote}); }
+  if(t.dataset.bnote){ return go('bnote',{bnoteKey:t.dataset.bnote,bnoteIdx:null}); }
+  if(t.dataset.bnidx!==undefined){ S.bnoteIdx=+t.dataset.bnidx; render(); return window.scrollTo(0,0); }
+  if(t.dataset.bnlist){ S.bnoteIdx=null; render(); return window.scrollTo(0,0); }
   if(t.dataset.bndone){ const k=t.dataset.bndone; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); return toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); }
   if(t.hasAttribute('data-chdone')){ const k=S.course+':'+S.chIdx; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); return; }
   if(t.hasAttribute('data-cpublish')){ if(!S.cpublishing) publishChapter(); return; }
