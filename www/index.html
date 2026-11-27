@@ -31,6 +31,7 @@ img{max-width:100%}
 <script src="db.js"></script>
 <script src="mcq.js"></script>
 <script src="sq.js"></script>
+<script src="notes.js"></script>
 <title>অংকবাড়ি</title>
 <script>/* আপডেট-প্লাগইনের লগ ([CapgoUpdater] …) ধরে রাখা, যাতে এক চাপের আপডেট ব্যর্থ হলে আসল কারণ ডাউনলোড পাতায় দেখানো যায় */(function(){try{var K='sohog-ota-log';['error','warn','info'].forEach(function(l){var o=console[l];console[l]=function(){try{var m=String(arguments[0]);if(m.indexOf('[CapgoUpdater]')===0){var a=JSON.parse(localStorage.getItem(K)||'[]');a.push({t:Date.now(),l:l,m:m.slice(15,400)});localStorage.setItem(K,JSON.stringify(a.slice(-40)));}}catch(e){}return o.apply(console,arguments);};});}catch(e){}})();</script>
 <script>/* রং: ডিফল্ট লাইট, সব ফোনে একই রকম; মেনু থেকে ডার্ক বেছে নেওয়া যায় */try{document.documentElement.dataset.theme=(JSON.parse(localStorage.getItem('sohog-ganit-v1')||'{}')||{}).theme==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
@@ -220,6 +221,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qm-dz{border:1px solid var(--line,#dbe3ee);border-radius:14px;padding:12px;margin:6px 0 10px;display:flex;flex-direction:column;gap:8px;background:var(--card,#fff)}
 .qm-dz h4{margin:0;font-size:15px}.qm-dz .qm-lab{font-size:13px;font-weight:600;color:var(--muted,#5B6B82);margin-top:2px}
 .web-apk{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#1F6FE5,#1447b8);color:#fff;text-decoration:none;box-shadow:0 10px 24px -12px rgba(20,71,184,.7);margin:4px 0}.web-apk-ic{font-size:26px;line-height:1}.web-apk-t{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left}.web-apk-t b{font-size:16px}.web-apk-t small{font-size:12.5px;opacity:.85}.web-apk-go{flex:none;padding:8px 14px;border-radius:999px;background:#ff8a00;color:#fff;font-weight:700;font-size:14px}
+.bnote{background:var(--card,#fff);border:1px solid var(--line);border-radius:18px;padding:14px 14px 6px;font-size:15.5px;line-height:1.7;overflow-wrap:anywhere}.bnote h2{font-size:18px;margin:18px 0 8px;padding:6px 10px;border-radius:10px;background:var(--tbg,#eaf2ff);color:var(--accent)}.bnote h2:first-child{margin-top:0}.bnote p{margin:6px 0}.bnote ul{margin:6px 0;padding-left:20px}.bnote li{margin:4px 0}.bnote .bn-tw{overflow-x:auto;margin:8px 0}.bnote table{border-collapse:collapse;width:100%;font-size:14px}.bnote th,.bnote td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle}.bnote th{background:var(--tbg,#eaf2ff)}.bnote code{font-size:13px}.bnote .mx-g i{font-style:normal}
 .adm-part{display:flex;flex-direction:column;gap:2px;margin:10px 2px 0;padding-left:10px;border-left:4px solid #16A34A}.adm-part h2{margin:0;font-size:19px}.adm-part .muted{font-size:13px}
 .qm .input{height:44px;padding:0 13px;font-size:15px;border-radius:12px}.qm .nb-row{gap:10px}.qm .nb-row .input{flex:1 1 0;min-width:0}.qm .field{gap:5px}.qp-prev{background:#e2e8f0}
 .qm-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:6px}.qm-dl{display:flex;flex-direction:column;gap:4px;min-width:0}.qm-dl .qm-lab{margin:0}.qm-sel{width:100%;padding:8px 10px;font-size:14px}.qm-step{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line,#cbd5e1);border-radius:10px;padding:3px}.qm-step button{width:40px;height:34px;border-radius:8px;border:0;background:var(--brand,#1E5BD8);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer}.qm-step button:disabled{opacity:.35;cursor:default}.qm-step b{font-size:16px}
@@ -1609,7 +1611,10 @@ function vCourse(){
     ${c.offer&&!c.pkg&&!S.cview?offerCard(id,c.offer):''}
     ${c.pkg||S.cview?'':sylCard(id)}
     ${c.offer&&!c.pkg&&!S.cview?'':(c.parts?c.parts:[{from:0,n:c.chapters.length}]).map(pt=>`${pt.t?`<div class="adm-part"><h2>${esc(pt.t)}</h2><span class="muted">${esc(pt.s||'')}</span></div>`:''}<div class="list" role="list">
-      ${c.chapters.slice(pt.from,pt.from+pt.n).map((ch,j)=>{const i=pt.from+j, no=j;const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
+      ${c.chapters.slice(pt.from,pt.from+pt.n).map((ch,j)=>{const i=pt.from+j, no=j;const done=!!S.done[id+':'+i];const bn_=bNote(id,i);return bn_&&!c.content?`<button class="item" role="listitem" data-bnote="${id}:${i}">
+        <span class="num">${bn(no+1)}</span>
+        <span class="t">${ch}<br><span class="s">📘 ${esc(bn_.title)} · চাপ দিয়ে পড়ুন</span></span>
+        <span class="pill ${done?'done':'todo'}">${done?'সম্পন্ন':'পড়ুন'}</span></button>`:c.content?`<button class="item" role="listitem" data-opench="${i}">
         <span class="num">${bn(no+1)}</span>
         <span class="t">${esc(chTitle(id,i))}<br><span class="s">${chDoc(id,i)?'নোট আছে · চাপ দিয়ে পড়ুন':'নোট শিগগিরই আসবে'}</span></span>`:`<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
         <span class="num">${bn(no+1)}</span>
@@ -3972,6 +3977,20 @@ function whenISO(st){
 }
 /* ---------- অধ্যায়ভিত্তিক নোট (অ্যাডমিন প্রকাশ করে, এক্সপ্লোরে দেখা যায়) ---------- */
 const chId=(cid,i)=>`ch_${cid}_${pad2(i+1)}`;
+/* অ্যাপের সাথে আসা স্থায়ী নোট (www/notes.js ← src/notes/*.md) */
+const bNote=(cid,i)=>{ const n=window.SOHOG_NOTES&&window.SOHOG_NOTES[cid+':'+i]; return n&&n.html?n:null; };
+function vBNote(){
+  const [cid,si]=String(S.bnoteKey||'').split(':'), i=+si, c=COURSES[cid], n=bNote(cid,i);
+  if(!c||!n) return vHome();
+  const pt=(c.parts||[]).find(p=>i>=p.from&&i<p.from+p.n), k=cid+':'+i, d=!!S.done[k];
+  return `<div class="screen">
+    <div class="topbar"><button class="iconbtn" data-course="${cid}" aria-label="ফিরে যান">${svg('back','width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"')}</button><span></span><span style="width:44px"></span></div>
+    <div><span class="offer-tag">${esc(c.name)}${pt?' · '+esc(pt.t):''} · ${esc(c.chapters[i])}</span>
+      <h1 class="display" style="font-size:24px;margin-top:8px">${esc(n.title)}</h1></div>
+    <article class="bnote">${n.html}</article>
+    <button class="btn ${d?'ghost':''}" data-bndone="${k}" style="width:100%">${d?'পড়া শেষ ✓ (আবার চাপলে বাতিল)':'পড়া শেষ চিহ্নিত করো'}</button>
+  </div>`;
+}
 function chDoc(cid,i){ const r=SYL[chId(cid,i)]; return r&&canSee(r)?r:null; }
 function chTitle(cid,i){ const r=SYL[chId(cid,i)]; return (r&&r.title)||COURSES[cid].chapters[i]; }
 const safeLink=u=>/^https:\/\/[^\s"'<>]+$/i.test(String(u||'').trim())?String(u).trim():'';
@@ -4452,14 +4471,14 @@ setInterval(()=>{ if(!CAN_EDIT) softRender(); },60000);
 
 const TABS=[['home','হোম','home'],['play','এক্সপ্লোর','explore'],['routine','রুটিন','calendar'],['exams','পরীক্ষা','exam'],['report','রিপোর্ট','report'],['notice','নোটিশ','bell'],['downloads','ডাউনলোড','download'],['profile','আরো','grid']];
 function renderTabs(){
-  const active = ['lclass','rclass'].includes(S.view)?(S.clsFrom==='exams'?'exams':S.clsFrom==='play'?'play':'home'):S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view==='chub'?'home':S.view==='free'?(S.freeFrom==='play'?'play':'home'):S.view;
+  const active = ['lclass','rclass'].includes(S.view)?(S.clsFrom==='exams'?'exams':S.clsFrom==='play'?'play':'home'):S.view==='course'?(S.courseFrom==='play'?'play':'home'):S.view==='chub'||S.view==='bnote'?'home':S.view==='free'?(S.freeFrom==='play'?'play':'home'):S.view;
   const live=OFFER_IDS().some(liveToday), nun=noticeUnread();
   tabs.innerHTML=TABS.map(([v,l,ic])=>`<button class="tab" data-tab="${v}" ${active===v?'aria-current="page"':''}><span class="tab-ic">${svg(ic)}${v==='exams'&&live?'<i class="tab-dot" aria-label="আজ লাইভ পরীক্ষা"></i>':''}${v==='downloads'&&UPD?'<i class="tab-dot" aria-label="অ্যাপের নতুন সংস্করণ"></i>':''}${v==='notice'&&nun?`<i class="tab-num" aria-label="${bn(nun)}টি নতুন নোটিশ">${nun>9?'৯+':bn(nun)}</i>`:''}</span>${l}</button>`).join('');
 }
 function render(){
   const authed=true;
   tabbar.hidden=!authed;
-  const V={qm:vQm,pc:vPc,lclass:()=>vClass('live'),rclass:()=>vClass('rec'),notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
+  const V={qm:vQm,pc:vPc,lclass:()=>vClass('live'),rclass:()=>vClass('rec'),notice:vNotice,chub:vCHub,study:vStudy,buy:vBuy,free:vFree,downloads:vDownloads,pay:vPay,feedback:vFeedback,weekly:vWeekly,exams:vExams,xarchive:vXArchive,xresults:vXResults,xmerit:vXMerit,xwrong:vXWrong,xfav:vXFav,xsyl:vXSyl,xnotes:vXNotes,login:vLogin,otp:vOtp,home:vHome,course:vCourse,bnote:vBNote,routine:vRoutine,admin:vAdmin,adminLogin:vAdminLogin,exercise:vExercise,leader:vLeader,student:vStudent,exam:vExam,examResult:vExamResult,chapters:vChapters,chapter:vChapter,play:vPlay,quiz:vQuiz,report:vReport,profile:vProfile}[S.view]||vHome;
   const gate=needAuth(); if(gate){ tabbar.hidden=true; app.innerHTML=vAuth(); return; }
   app.innerHTML=V()+confirmModal();
   const yb=app.querySelector('[data-xyes]'); if(yb) yb.focus({preventScroll:true});
@@ -4559,6 +4578,8 @@ app.addEventListener('click',e=>{
   if(t.dataset.openex){ return go('exercise',{exKey:t.dataset.openex}); }
   if(t.hasAttribute('data-exdone')){ const k=`${S.course}:ex:${S.exKey}`; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); return; }
   if(t.dataset.opench!==undefined){ return go('chapter',{chIdx:+t.dataset.opench}); }
+  if(t.dataset.bnote){ return go('bnote',{bnoteKey:t.dataset.bnote}); }
+  if(t.dataset.bndone){ const k=t.dataset.bndone; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); return toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); }
   if(t.hasAttribute('data-chdone')){ const k=S.course+':'+S.chIdx; if(S.done[k]) delete S.done[k]; else S.done[k]=true; persist(); render(); toast(S.done[k]?'পড়া শেষ চিহ্নিত হয়েছে':'চিহ্ন তুলে নেওয়া হয়েছে'); return; }
   if(t.hasAttribute('data-cpublish')){ if(!S.cpublishing) publishChapter(); return; }
   if(t.dataset.cdel){
