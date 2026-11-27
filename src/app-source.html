@@ -188,6 +188,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .qm-dz{border:1px solid var(--line,#dbe3ee);border-radius:14px;padding:12px;margin:6px 0 10px;display:flex;flex-direction:column;gap:8px;background:var(--card,#fff)}
 .qm-dz h4{margin:0;font-size:15px}.qm-dz .qm-lab{font-size:13px;font-weight:600;color:var(--muted,#5B6B82);margin-top:2px}
 .web-apk{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#1F6FE5,#1447b8);color:#fff;text-decoration:none;box-shadow:0 10px 24px -12px rgba(20,71,184,.7);margin:4px 0}.web-apk-ic{font-size:26px;line-height:1}.web-apk-t{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left}.web-apk-t b{font-size:16px}.web-apk-t small{font-size:12.5px;opacity:.85}.web-apk-go{flex:none;padding:8px 14px;border-radius:999px;background:#ff8a00;color:#fff;font-weight:700;font-size:14px}
+.adm-part{display:flex;flex-direction:column;gap:2px;margin:10px 2px 0;padding-left:10px;border-left:4px solid #16A34A}.adm-part h2{margin:0;font-size:19px}.adm-part .muted{font-size:13px}
 .qm .input{height:44px;padding:0 13px;font-size:15px;border-radius:12px}.qm .nb-row{gap:10px}.qm .nb-row .input{flex:1 1 0;min-width:0}.qm .field{gap:5px}.qp-prev{background:#e2e8f0}
 .qm-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:6px}.qm-dl{display:flex;flex-direction:column;gap:4px;min-width:0}.qm-dl .qm-lab{margin:0}.qm-sel{width:100%;padding:8px 10px;font-size:14px}.qm-step{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line,#cbd5e1);border-radius:10px;padding:3px}.qm-step button{width:40px;height:34px;border-radius:8px;border:0;background:var(--brand,#1E5BD8);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer}.qm-step button:disabled{opacity:.35;cursor:default}.qm-step b{font-size:16px}
 .qm-seg{display:flex;flex-wrap:wrap;gap:6px}.qm-seg button{flex:1 1 auto;min-width:56px;padding:7px 10px;border-radius:10px;border:1px solid var(--line,#cbd5e1);background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer}
@@ -1201,7 +1202,11 @@ const COURSES = {
   jb:{name:'জুনিয়র বৃত্তি গণিত', sub:'স্পেশাল ব্যাচ', art:'target', t:'yellow', chapters:['বৃত্তি পরীক্ষার সিলেবাস','অধ্যায়ভিত্তিক অনুশীলন','মানসাঙ্ক ও শর্টকাট','মডেল টেস্ট','বিগত বছরের প্রশ্ন']},
   h11:{name:'একাদশ শ্রেণি', sub:'এইচএসসি ২৮', exs:{1:['1.A','1.B'],2:['2.A','2.B','2.C'],3:['3.A','3.B','3.C','3.D','3.E','3.F','3.G'],4:['4.A','4.B'],5:['5.A','5.B'],6:['6.A','6.B','6.C'],7:['7.A','7.B','7.C','7.D','7.E','7.F','7.G'],9:['9.A','9.B','9.C','9.D','9.E','9.F','9.G','9.H','9.I'],10:['10.A','10.B','10.C','10.D','10.E','10.F','10.G']}, content:true, subj:'উচ্চতর গণিত ১ম পত্র', art:'gradM', t:'purple', chapters:['ম্যাট্রিক্স ও নির্ণায়ক','ভেক্টর','সরলরেখা','বৃত্ত','বিন্যাস ও সমাবেশ','ত্রিকোণমিতিক অনুপাত','সংযুক্ত ও যৌগিক কোণ','ফাংশন ও লেখচিত্র','অন্তরীকরণ','যোগজীকরণ']},
   h12:{name:'দ্বাদশ শ্রেণি', sub:'এইচএসসি ২৭', exs:{1:['1.A','1.B'],3:['3.A','3.B'],5:['5.A','5.B'],6:['6.A','6.B','6.C'],7:['7.A','7.B'],8:['8.A','8.B','8.C'],9:['9.A','9.B','9.C','9.D'],10:['10.A','10.B']}, content:true, subj:'উচ্চতর গণিত ২য় পত্র', art:'gradF', t:'amber', chapters:['বাস্তব সংখ্যা ও অসমতা','যোগাশ্রয়ী প্রোগ্রাম','জটিল সংখ্যা','বহুপদী ও বহুপদী সমীকরণ','দ্বিপদী বিস্তৃতি','কণিক','বিপরীত ত্রিকোণমিতিক ফাংশন','স্থিতিবিদ্যা','সমতলে বস্তুকণার গতি','বিস্তার পরিমাপ ও সম্ভাবনা']},
-  adm:{name:'এডমিশন কেয়ার', subj:'উচ্চতর গণিত (১ম ও ২য় পত্র)', art:'signpost', t:'green', chapters:['১ম পত্র: পূর্ণ রিভিশন','২য় পত্র: পূর্ণ রিভিশন','প্রকৌশল ভর্তি গণিত','ঢাবি ক-ইউনিট প্রস্তুতি','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট']}
+  adm:{name:'এডমিশন কেয়ার', subj:'কলেজ ও ভার্সিটি এডমিশন', art:'signpost', t:'green',
+    /* দুই অংশ: আগের ৬টি অধ্যায় (ভার্সিটি) সূচক ০–৫ এ থাকল, যাতে আগের "পড়া শেষ" চিহ্ন ঠিক থাকে; কলেজ অংশ সূচক ৬ থেকে */
+    parts:[{t:'কলেজ এডমিশন', s:'এসএসসি পরবর্তী: একাদশ শ্রেণিতে ভর্তি প্রস্তুতি', from:6, n:6},{t:'ভার্সিটি এডমিশন', s:'এইচএসসি পরবর্তী: বিশ্ববিদ্যালয় ও প্রকৌশল ভর্তি প্রস্তুতি', from:0, n:6}],
+    chapters:['১ম পত্র: পূর্ণ রিভিশন','২য় পত্র: পূর্ণ রিভিশন','প্রকৌশল ভর্তি গণিত','ঢাবি ক-ইউনিট প্রস্তুতি','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট',
+      'সাধারণ গণিত: পূর্ণ রিভিশন','উচ্চতর গণিত: পূর্ণ রিভিশন','শীর্ষ কলেজের ভর্তি পরীক্ষার প্রস্তুতি','বিগত বছরের ভর্তি প্রশ্ন সমাধান','শর্টকাট কৌশল','পূর্ণাঙ্গ মডেল টেস্ট']}
 };
 Object.assign(COURSES.c8,{offer:{price:49, perWeek:2, daily:{marks:20, mins:15}, friday:{marks:50, mins:40}}, exam:'৮ম শ্রেণির বার্ষিক', ptitle:'৮ম শ্রেণি গণিত ও বিজ্ঞান', bsubj:'গণিত ও বিজ্ঞান', bundle:['c8s'], banner:{badge:'Class 8', main:'গণিত ও বিজ্ঞান', sub:'প্রতি বিষয়ে সপ্তাহে ২ পরীক্ষা + রিভিশন'}});
 /* ৮ম শ্রেণির বিজ্ঞান আলাদা প্যাকেজ নয়: গণিতের (c8) প্যাকেজেই অন্তর্ভুক্ত, একই ফি */
@@ -1569,14 +1574,14 @@ function vCourse(){
     ${c.offer&&!c.pkg&&!S.cview?weeklyBtn(id):''}
     ${c.offer&&!c.pkg&&!S.cview?offerCard(id,c.offer):''}
     ${c.pkg||S.cview?'':sylCard(id)}
-    ${c.offer&&!c.pkg&&!S.cview?'':`<div class="list" role="list">
-      ${c.chapters.map((ch,i)=>{const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
-        <span class="num">${bn(i+1)}</span>
+    ${c.offer&&!c.pkg&&!S.cview?'':(c.parts?c.parts:[{from:0,n:c.chapters.length}]).map(pt=>`${pt.t?`<div class="adm-part"><h2>${esc(pt.t)}</h2><span class="muted">${esc(pt.s||'')}</span></div>`:''}<div class="list" role="list">
+      ${c.chapters.slice(pt.from,pt.from+pt.n).map((ch,j)=>{const i=pt.from+j, no=j;const done=!!S.done[id+':'+i];return c.content?`<button class="item" role="listitem" data-opench="${i}">
+        <span class="num">${bn(no+1)}</span>
         <span class="t">${esc(chTitle(id,i))}<br><span class="s">${chDoc(id,i)?'নোট আছে · চাপ দিয়ে পড়ুন':'নোট শিগগিরই আসবে'}</span></span>`:`<button class="item" role="listitem" data-chapter="${i}" aria-pressed="${done}">
-        <span class="num">${bn(i+1)}</span>
+        <span class="num">${bn(no+1)}</span>
         <span class="t">${ch}<br><span class="s">${done?'পড়া শেষ · আবার চাপলে বাতিল':'চাপ দিয়ে পড়া শেষ চিহ্নিত করুন'}</span></span>
         <span class="pill ${done?'done':'todo'}">${done?'সম্পন্ন':'বাকি'}</span></button>`}).join('')}
-    </div>
+    </div>`).join('')}${c.offer&&!c.pkg&&!S.cview?'':`
     ${c.exs||c.content?'':'<p class="muted" style="margin:0;font-size:13px">অধ্যায়ের তালিকা নমুনা হিসেবে দেওয়া; আপনার সিলেবাস অনুযায়ী বদলে নিতে পারবেন।</p>'}`}
   </div>`;
 }
