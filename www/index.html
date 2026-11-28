@@ -3194,7 +3194,7 @@ function qmAutoGen(){
 }
 /* ---------- বাছাই পাতা ---------- */
 /* লেকচার শীট (অংকবাড়ি+ PDF): www/pdf/study/ এ থাকে, studyOpen দিয়ে খোলে/ডাউনলোড হয়। c9/c9h নবম শ্রেণি দশমের সাথে একই */
-const LECTURES={c10:{3:[{f:'lecture-c10-3.1.pdf',t:'বীজগাণিতিক রাশি — অনুশীলনী ৩.১ (বর্গ ও ঘনের সূত্র)',p:14,kb:408}]}};
+const LECTURES={c10:{3:[{f:'lecture-c10-3.1.pdf',t:'বীজগাণিতিক রাশি — অনুশীলনী ৩.১ (বর্গ সংবলিত সূত্রাবলি)',p:15,kb:432}]}};
 function qmLecture(m,chs){
   const L=LECTURES[m.cid]||LECTURES[{c9:'c10',c9h:'c10h'}[m.cid]]||{}, cur=L[m.ch]||[];
   const others=Object.keys(L).filter(k=>String(k)!==String(m.ch)).sort((a,b)=>a-b);
