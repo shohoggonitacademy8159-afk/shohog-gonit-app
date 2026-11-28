@@ -201,8 +201,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .omr-lab{font-weight:700;color:var(--omr);text-align:center;font-size:13px;margin-bottom:4px}.omr-rg{display:flex;gap:4px}.omr-rc{display:flex;flex-direction:column;gap:2px;align-items:center}.omr-wr{width:20px;height:22px;border:1.5px solid var(--omr);border-radius:3px;margin-bottom:3px}
 .omr-setc{display:flex;flex-direction:column;align-items:center;gap:4px}
 .omr-b{display:inline-grid;place-items:center;width:19px;height:19px;border:1.4px solid var(--omr);border-radius:50%;font-size:10.5px;line-height:1;color:var(--omr);box-sizing:border-box}.omr-b.on{background:#111;border-color:#111}
-.omr-ans{display:grid;grid-template-columns:repeat(4,1fr);gap:0 10px;border:1.5px solid var(--omr);border-radius:10px;padding:8px 10px}.omr-col{display:flex;flex-direction:column}.omr-col+.omr-col{border-left:1px dashed #e7a5bd;padding-left:10px}.omr-row{display:flex;align-items:center;gap:6px;height:23px}.omr-no{width:28px;text-align:right;font-weight:700;font-size:13px}
-.omr-sign{display:flex;justify-content:space-between;margin-top:auto;padding:26px 20px 4px;font-size:13px}.omr-sign span{border-top:1px solid #111;padding-top:3px;min-width:200px;text-align:center}
+.omr-ans{flex:1;min-height:0;display:grid;gap:0 10px;border:1.5px solid var(--omr);border-radius:10px;padding:8px 10px;justify-items:center;align-content:center}.omr-col{display:flex;flex-direction:column;width:100%;align-items:center}.omr-col+.omr-col{border-left:1px dashed #e7a5bd;padding-left:10px}.omr-row{display:flex;align-items:center;gap:calc(var(--bs,19px)*.35);height:var(--rh,23px)}.omr-no{width:calc(var(--bs,19px)*1.6);text-align:right;font-weight:700;font-size:calc(var(--bs,19px)*.68)}.omr-ans .omr-b{width:var(--bs,19px);height:var(--bs,19px);font-size:calc(var(--bs,19px)*.55)}
+.omr-sign{display:flex;justify-content:space-between;padding:22px 20px 2px;font-size:13px}.omr-sign span{border-top:1px solid #111;padding-top:3px;min-width:200px;text-align:center}
 .adm-part{display:flex;flex-direction:column;gap:2px;margin:10px 2px 0;padding-left:10px;border-left:4px solid #16A34A}.adm-part h2{margin:0;font-size:19px}.adm-part .muted{font-size:13px}
 .qm .input{height:44px;padding:0 13px;font-size:15px;border-radius:12px}.qm .nb-row{gap:10px}.qm .nb-row .input{flex:1 1 0;min-width:0}.qm .field{gap:5px}.qp-prev{background:#e2e8f0}
 .qm-dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:6px}.qm-dl{display:flex;flex-direction:column;gap:4px;min-width:0}.qm-dl .qm-lab{margin:0}.qm-sel{width:100%;padding:8px 10px;font-size:14px}.qm-step{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line,#cbd5e1);border-radius:10px;padding:3px}.qm-step button{width:40px;height:34px;border-radius:8px;border:0;background:var(--brand,#1E5BD8);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer}.qm-step button:disabled{opacity:.35;cursor:default}.qm-step b{font-size:16px}
@@ -3009,7 +3009,7 @@ function qmOmrPages(host,o,d){
   for(let st=0;st<Math.max(1,Math.ceil(N/PER));st++){
     const p=document.createElement('div'); p.className='qp-page omr-page';
     p.style.setProperty('--qff',QM_FONTS[d.font][1]);
-    const from=st*PER, cnt=Math.min(PER,N-from), colsN=4, per=Math.min(25,Math.max(10,Math.ceil(cnt/colsN)));   /* প্রশ্নগুলো চার কলামে ছড়িয়ে */
+    const from=st*PER, cnt=Math.min(PER,N-from), colsN=cnt<=12?1:cnt<=30?2:cnt<=60?3:4, per=Math.ceil(cnt/colsN);   /* প্রশ্নের সংখ্যা অনুযায়ী কলাম */
     const cols=Array.from({length:colsN},(_,c)=>{ const rows=[]; for(let r=0;r<per;r++){ const q=from+c*per+r; if(q>=from+cnt) break;
       rows.push(`<div class="omr-row"><span class="omr-no">${bn(q+1)}</span>${[...'কখগঘ'].map(x=>bub(x)).join('')}</div>`); } return `<div class="omr-col">${rows.join('')}</div>`; }).join('');
     const top=st===0?`<div class="omr-head">${lg?`<img class="qp-logo" src="${lg}" alt="">`:''}<div class="omr-inst">${esc(d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি')}</div>${d.inst2?`<div class="omr-inst2">${esc(d.inst2)}</div>`:''}
@@ -3021,10 +3021,13 @@ function qmOmrPages(host,o,d){
         <div class="omr-box omr-roll"><div class="omr-lab">রোল নম্বর</div><div class="omr-rg">${Array.from({length:6},()=>`<div class="omr-rc"><span class="omr-wr"></span>${[...'০১২৩৪৫৬৭৮৯'].map(x=>bub(x)).join('')}</div>`).join('')}</div></div>
         ${(d.sets||1)>1?`<div class="omr-box omr-setc"><div class="omr-lab">সেট কোড</div>${[...'কখগঘ'].slice(0,d.sets).map(x=>bub(x)).join('')}</div>`:''}
       </div>`:`<div class="omr-head"><div class="omr-title">${esc(o.title)} — OMR (চলমান)</div></div>`;
-    p.innerHTML=`<div class="omr">${top}<div class="omr-ans">${cols}</div>
+    p.innerHTML=`<div class="omr">${top}<div class="omr-ans" style="grid-template-columns:repeat(${colsN},1fr)">${cols}</div>
       <div class="omr-sign"><span>পরীক্ষার্থীর স্বাক্ষর</span><span>কক্ষ পরিদর্শকের স্বাক্ষর</span></div></div>
       <div class="qp-foot">${esc(d.inst||'সহগ গণিত একাডেমি · অংকবাড়ি')} — OMR${N>PER?` · পৃষ্ঠা ${bn(st+1)}`:''}${d.inst?'<span class="qp-mark">অংকবাড়ি</span>':''}</div>`;
     host.appendChild(p); pages.push(p);
+    /* বাকি জায়গা মেপে সারির উচ্চতা ও বৃত্তের মাপ ঠিক করা: প্রশ্ন কম হলে বড়, বেশি হলে ছোট — সবসময় পাতা ভরে */
+    const A=p.querySelector('.omr-ans'), avail=A.clientHeight-18, rh=Math.max(22,Math.min(58,avail/per));
+    A.style.setProperty('--rh',rh.toFixed(1)+'px'); A.style.setProperty('--bs',Math.min(34,Math.max(19,rh*.66)).toFixed(1)+'px');
   }
   return pages;
 }
