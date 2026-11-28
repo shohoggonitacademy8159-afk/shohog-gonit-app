@@ -115,6 +115,8 @@ def drop_repeats(qs, keep=2):
     return gone
 
 print('ch9 repeats hidden:', drop_repeats(bank['c10']['9']))   # নবম ও দশম (c9 একই ব্যাংক ব্যবহার করে)
+import sys as _sys; _sys.path.insert(0, str(root / 'src/sq')); from syllabus_hide import hide_mcq
+print('syllabus hidden (base):', hide_mcq(bank))
 (root / 'src/mcq/mcq.json').write_text(json.dumps(bank, ensure_ascii=False, indent=1), encoding='utf-8')   # মূল ব্যাংক (PDF এটি থেকে)
 # বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
 import re as _re
@@ -147,6 +149,7 @@ for f, (c, ch) in _late:
         x = dict(x); x['n'] = n0 + 1 + i
         if not x.get('ex'): x.pop('ex', None)
         cur.append(x)
+print('syllabus hidden (ext):', hide_mcq(bank))
 bn_arith(bank)
 (root / 'www/mcq.js').write_text('// সহগ গণিত একাডেমি — MCQ প্রশ্নব্যাংক (src/mcq/build_bank.py থেকে তৈরি)\nwindow.SOHOG_MCQ = ' + json.dumps(bank, ensure_ascii=False) + ';\n', encoding='utf-8')
 print({k: len(v) for k, v in bank['c10'].items()}); print('c10h', {k: len(v) for k, v in bank['c10h'].items()}); print('h11', {k: len(v) for k, v in bank['h11'].items()}); print('h12', {k: len(v) for k, v in bank['h12'].items()})
