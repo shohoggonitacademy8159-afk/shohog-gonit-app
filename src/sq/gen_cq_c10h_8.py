@@ -1,4 +1,4 @@
-# এসএসসি উচ্চতর গণিত অধ্যায় ৮ (ত্রিকোণমিতি) অনুশীলনী 8.1: ৬টি সৃজনশীল প্রশ্ন — সহজ ২, মধ্যম ২, কঠিন ২ (শুধু উত্তর)
+# এসএসসি উচ্চতর গণিত অধ্যায় ৮ (ত্রিকোণমিতি): 8.1 এ ৬টি + 8.2 এ ১২টি (মিশ্র) সৃজনশীল প্রশ্ন — সহজ ২, মধ্যম ২, কঠিন ২ (শুধু উত্তর)
 # রেডিয়ান-ডিগ্রি রূপান্তর, s = rθ, ঘড়ি, চাকা, পৃথিবীর ব্যাসার্ধ। সব উত্তর কোডে যাচাই করা
 import json, os, math
 from sympy import Rational as R, pi, simplify, nsimplify, symbols, solve
@@ -43,9 +43,115 @@ CQ=[
  ['দেখাও যে, ত্রিভুজটির মধ্যম কোণটি π/3 রেডিয়ান।','ত্রিভুজটির কোণগুলো ডিগ্রি ও রেডিয়ানে নির্ণয় কর।','ত্রিভুজটির বৃহত্তম বাহু 10 সেমি হলে ক্ষুদ্রতম বাহুর প্রান্তবিন্দু দুটি দ্বারা ত্রিভুজটির পরিবৃত্তে ছিন্ন ক্ষুদ্রতর চাপের দৈর্ঘ্য নির্ণয় কর।'],
  'ক) প্রমাণিত (কোণগুলো a − d, a, a + d ⇒ 3a = 180° ⇒ a = 60° = π/3)\nখ) 30°, 60°, 90° অর্থাৎ π/6, π/3, π/2 রেডিয়ান\nগ) 5π/3 সেমি ≈ 5.24 সেমি'),
 ]
+
+# ---- অনুশীলনী 8.2 (পাঠ্যবইয়ের অংকগুলো মিশিয়ে): ১২টি — সহজ ৩, মধ্যম ৫, কঠিন ৪
+from sympy import sin, cos, tan, cot, sec, csc, symbols as S_, solveset, Interval, S as SS, Eq, sqrt
+t=S_('t'); xx,yy,aa,bb,cc=S_('xx yy aa bb cc',positive=True)
+Z=lambda e: simplify(e)==0
+def sol(eq,lo,hi,lo_open=True,hi_open=True):
+    # সংখ্যাগত মূল খোঁজা (|f| এর স্থানীয় ন্যূনতম ≈ 0), তারপর π এর গুণিতকে মেলানো
+    import numpy as np; from scipy.optimize import minimize_scalar
+    from sympy import lambdify
+    g=lambdify(t,eq,'numpy'); a_,b_=float(lo),float(hi); xs=np.linspace(a_,b_,40001)
+    with np.errstate(all='ignore'): ys=np.abs(g(xs)).astype(float)
+    ys=np.nan_to_num(ys,nan=1e9,posinf=1e9)
+    out=[]
+    for i in range(1,len(xs)-1):
+        if ys[i]<=ys[i-1] and ys[i]<=ys[i+1] and ys[i]<1e-2:
+            from scipy.optimize import brentq
+            p_,q_=xs[i-1],xs[i+1]
+            if np.sign(g(p_))!=np.sign(g(q_)): rx=brentq(g,p_,q_,xtol=1e-14)
+            else: rx=minimize_scalar(lambda u:abs(g(u)),bounds=(p_,q_),method='bounded',options={'xatol':1e-12}).x
+            class _r: pass
+            r=_r(); r.x=rx
+            if abs(g(r.x))<1e-6:
+                v=nsimplify(r.x/np.pi,tolerance=1e-6,rational=True)*pi
+                if (lo_open and abs(r.x-a_)<1e-6) or (hi_open and abs(r.x-b_)<1e-6): continue
+                if not out or abs(float(out[-1])-r.x)>1e-5: out.append(v)
+    return out
+# ১
+c_,s_=R(-4,5),R(-3,5); assert c_**2+s_**2==1 and s_/c_==R(3,4) and (s_+c_)/(s_/c_-1/c_)==R(-7,10)
+# ২
+sA,cA=R(-5,13),R(12,13); assert sA/cA==R(-5,12) and (1/sA+cA/sA)/(1/cA-sA/cA)==R(-10,3)
+# ৩
+assert Z((tan(t)+sec(t))*(sec(t)-tan(t))-1)
+X_=tan(t)+sec(t); assert Z(((X_**2-1)/(X_**2+1)-sin(t)).rewrite(sin))
+assert Z(tan(pi/6)+sec(pi/6)-sqrt(3)) and sin(pi/6)==R(1,2) and (3-1)/R(3+1)==R(1,2)
+# ৪
+th=symbols('th'); sn=xx/sqrt(xx**2+yy**2); cs=yy/sqrt(xx**2+yy**2)
+assert Z((xx*sn+yy*cs)/(xx*sn-yy*cs)-(xx**2+yy**2)/(xx**2-yy**2))
+assert sol(tan(t)-sqrt(3),0,2*pi)==[pi/3,4*pi/3] and (3+1)/R(3-1)==2
+# ৫
+assert sol(cos(t)-sin(t),0,pi/2)==[pi/4]
+for tv in (pi/6,3*pi/2): assert Z(sqrt(3)*cos(tv)-sin(tv)-1)
+assert sol(sqrt(3)*cos(t)-sin(t)-1,0,2*pi)==[pi/6,3*pi/2]
+# ৬
+P_=sum(sin(k*pi/4)**2 for k in (1,3,5,7)); Q_=sum(cos(k*pi/8)**2 for k in (1,3,5,7))
+assert sin(5*pi/4)==-sqrt(2)/2 and Z(P_-2) and Z(Q_-2)
+import math as M
+assert abs(M.prod(1/M.tan(k*M.pi/20) for k in (1,3,5,7,9))-1)<1e-12
+# ৭
+v=pi/3; assert Z(sin(2*v)-2*tan(v)/(1+tan(v)**2)) and Z(sin(3*v)-(3*sin(v)-4*sin(v)**3)) and Z(cos(3*v)-(4*cos(v)**3-3*cos(v)))
+assert Z(tan(2*v)-2*tan(v)/(1-tan(v)**2)) and Z(2*sin(v)**2+3*cos(v)-3)
+# ৮
+f=2*sin(t)**2+3*cos(t)
+assert Z(f.subs(t,pi/3)-3) and sol(f-3,0,pi/2)==[pi/3] and sol(f,0,2*pi)==[2*pi/3,4*pi/3]
+# ৯
+assert Z((4*(cos(t)**2+sin(t))-5)+(4*sin(t)**2-4*sin(t)+1))
+assert sol(4*(cos(t)**2+sin(t))-5,0,2*pi)==[pi/6,5*pi/6]
+assert Z(cot(pi/6)**2+csc(pi/6)**2-7) and sol(cot(t)**2+csc(t)**2-3,0,2*pi)==[pi/4,3*pi/4,5*pi/4,7*pi/4]
+# ১০
+assert Z(cot(11*pi/6)+sqrt(3)) and sin(11*pi/6)==-R(1,2) and cos(11*pi/6)==sqrt(3)/2
+assert Z((1-tan(11*pi/6)**2)/(1+tan(11*pi/6)**2)-R(1,2))
+assert cos(4*pi/3)==-R(1,2) and sin(4*pi/3)<0 and sin(11*pi/6)+cos(4*pi/3)==-1
+# ১১
+assert Z(cot(pi/12)*cot(5*pi/12)-1)
+assert Z(cos(7*pi/4)+cos(3*pi/4)+sin(29*pi/36)-sin(7*pi/36))
+assert abs(M.sin(19*M.pi/18)**2+M.sin(7*M.pi/12)**2+M.cos(35*M.pi/18)**2+M.sin(M.pi/12)**2-2)<1e-12
+# ১২
+A_=5*pi/6; assert csc(A_)==2 and Z(sqrt((1-sin(A_))/(1+sin(A_)))-1/sqrt(3)) and Z(sec(A_)-tan(A_)+1/sqrt(3))
+assert Z(tan(A_)+1/sqrt(3)) and Z(-R(1)/sqrt(4-1)+1/sqrt(3))
+CQ+=[
+('সহজ','cosθ = −4/5 এবং π < θ < 3π/2',
+ ['θ কোন চতুর্ভাগে অবস্থিত এবং sinθ এর চিহ্ন কী হবে?','sinθ ও tanθ এর মান নির্ণয় কর।','(sinθ + cosθ)/(tanθ − secθ) এর মান নির্ণয় কর।'],
+ 'ক) তৃতীয় চতুর্ভাগে ; sinθ ঋণাত্মক\nখ) sinθ = −3/5, tanθ = 3/4\nগ) −7/10'),
+('সহজ','দেওয়া আছে, tanA = −5/12 এবং tanA ও cosA বিপরীত চিহ্নবিশিষ্ট।',
+ ['A কোন চতুর্ভাগে অবস্থিত তা যুক্তিসহ লিখ।','sinA ও cosA এর মান নির্ণয় কর।','(cosecA + cotA)/(secA − tanA) এর মান নির্ণয় কর।'],
+ 'ক) চতুর্থ চতুর্ভাগে (tanA < 0, cosA > 0)\nখ) sinA = −5/13, cosA = 12/13\nগ) −10/3'),
+('সহজ','θ = π/3',
+ ['যাচাই কর: sin2θ = 2tanθ/(1 + tan²θ)','যাচাই কর: sin3θ = 3sinθ − 4sin³θ এবং cos3θ = 4cos³θ − 3cosθ','যাচাই কর: tan2θ = 2tanθ/(1 − tan²θ) এবং দেখাও যে, θ এর এই মান 2sin²θ + 3cosθ = 3 সমীকরণকে সিদ্ধ করে।'],
+ 'ক) উভয় পক্ষ = √3/2\nখ) প্রথমটির উভয় পক্ষ = 0, দ্বিতীয়টির উভয় পক্ষ = −1\nগ) উভয় পক্ষ = −√3 ; 2 × 3/4 + 3 × 1/2 = 3'),
+('মধ্যম','tanθ + secθ = x',
+ ['দেখাও যে, secθ − tanθ = 1/x','প্রমাণ কর যে, sinθ = (x² − 1)/(x² + 1)','x = √3 এবং 0 < θ < π/2 হলে θ এর মান নির্ণয় কর এবং উদ্দীপকের সম্পর্কটি যাচাই কর।'],
+ 'ক) প্রমাণিত (sec²θ − tan²θ = 1)\nখ) প্রমাণিত\nগ) sinθ = 1/2 ⇒ θ = π/6 ; tan(π/6) + sec(π/6) = 1/√3 + 2/√3 = √3'),
+('মধ্যম','tanθ = x/y, যেখানে x ≠ y এবং θ সূক্ষ্মকোণ।',
+ ['sinθ ও cosθ কে x ও y এর মাধ্যমে প্রকাশ কর।','দেখাও যে, (x sinθ + y cosθ)/(x sinθ − y cosθ) = (x² + y²)/(x² − y²)','x = √3, y = 1 হলে 0 < θ < 2π ব্যবধিতে tanθ = x/y এর সমাধান কর এবং খ এর রাশিটির মান নির্ণয় কর।'],
+ 'ক) sinθ = x/(√(x² + y²)), cosθ = y/(√(x² + y²))\nখ) প্রমাণিত\nগ) θ = π/3, 4π/3 ; রাশিটির মান 2'),
+('মধ্যম','P = sin²(π/4) + sin²(3π/4) + sin²(5π/4) + sin²(7π/4) এবং Q = cos²(π/8) + cos²(3π/8) + cos²(5π/8) + cos²(7π/8)',
+ ['sin(5π/4) এর মান নির্ণয় কর।','দেখাও যে, P = Q = 2','প্রমাণ কর যে, cot(π/20)·cot(3π/20)·cot(5π/20)·cot(7π/20)·cot(9π/20) = P − 1'],
+ 'ক) −1/√2\nখ) প্রমাণিত\nগ) প্রমাণিত (cot(9π/20) = tan(π/20), cot(7π/20) = tan(3π/20), cot(5π/20) = 1 ⇒ গুণফল = 1)'),
+('মধ্যম','f(θ) = 2sin²θ + 3cosθ',
+ ['f(π/3) এর মান নির্ণয় কর।','সমাধান কর: f(θ) = 3, যখন 0 < θ < π/2','সমাধান কর: f(θ) = 0, যখন 0 < θ < 2π'],
+ 'ক) 3\nখ) θ = π/3\nগ) θ = 2π/3, 4π/3'),
+('মধ্যম','cotα = −√3, যেখানে 3π/2 < α < 2π',
+ ['α এর মান নির্ণয় কর।','sinα ও cosα এর মান নির্ণয় কর এবং (1 − tan²α)/(1 + tan²α) এর মান বের কর।','cosβ = −1/2 এবং sinβ < 0 হলে β (0 < β < 2π) নির্ণয় কর এবং দেখাও যে, sinα + cosβ = −1'],
+ 'ক) α = 11π/6\nখ) sinα = −1/2, cosα = √3/2 ; মান = 1/2\nগ) β = 4π/3 ; −1/2 + (−1/2) = −1'),
+('কঠিন','a cosθ − b sinθ = c',
+ ['a = b = 1 এবং c = 0 হলে θ এর মান নির্ণয় কর, যখন 0 < θ < π/2','প্রমাণ কর যে, a sinθ + b cosθ = ±√(a² + b² − c²)','a = √3, b = 1, c = 1 হলে খ এর ফলাফল ব্যবহার করে সমীকরণটি সমাধান কর, যখন 0 < θ < 2π'],
+ 'ক) θ = π/4\nখ) প্রমাণিত\nগ) θ = π/6, 3π/2'),
+('কঠিন','4(cos²θ + sinθ) = 5',
+ ['সমীকরণটিকে sinθ এর দ্বিঘাত সমীকরণে প্রকাশ কর।','সমীকরণটি সমাধান কর, যখন 0 < θ < 2π','দেখাও যে, খ এ প্রাপ্ত ক্ষুদ্রতর মানের জন্য cot²θ + cosec²θ = 7 এবং সমাধান কর: cot²θ + cosec²θ = 3, যখন 0 < θ < 2π'],
+ 'ক) 4sin²θ − 4sinθ + 1 = 0\nখ) θ = π/6, 5π/6\nগ) cot²(π/6) + cosec²(π/6) = 3 + 4 = 7 ; θ = π/4, 3π/4, 5π/4, 7π/4'),
+('কঠিন','A = cos(7π/4) + cos(3π/4) + sin(29π/36) − sin(7π/36) এবং B = sin²(19π/18) + sin²(7π/12) + cos²(35π/18) + sin²(π/12)',
+ ['cot(π/12)·cot(5π/12) এর মান নির্ণয় কর।','দেখাও যে, A = 0','দেখাও যে, B = 2'],
+ 'ক) 1\nখ) প্রমাণিত (cos(7π/4) = 1/√2, cos(3π/4) = −1/√2, sin(29π/36) = sin(7π/36))\nগ) প্রমাণিত (sin²(19π/18) + cos²(35π/18) = 1, sin²(7π/12) + sin²(π/12) = 1)'),
+('কঠিন','cosecA = a/b, যেখানে a > b > 0',
+ ['sinA ও cosA এর মান a ও b এর মাধ্যমে লিখ।','প্রমাণ কর যে, tanA = ±b/(√(a² − b²))','a = 2, b = 1 এবং A স্থূলকোণ হলে A নির্ণয় কর এবং দেখাও যে, A এর এই মানের জন্য √((1 − sinA)/(1 + sinA)) = −(secA − tanA)'],
+ 'ক) sinA = b/a, cosA = ±(√(a² − b²))/a\nখ) প্রমাণিত\nগ) A = 5π/6 ; বামপক্ষ = 1/√3, secA − tanA = −1/√3'),
+]
 items=[]
 for i,(lv,st,p_,a_) in enumerate(CQ):
     assert len(p_)==3 and a_.count('ক)')==1 and a_.count('খ)')==1 and a_.count('গ)')==1, i
-    items.append({'n':f'b{i+1}','ex':'8.1','stem':st,'p':p_,'a':a_,'lv':lv})
-assert len(items)==6
+    items.append({'n':f'b{i+1}','ex':'8.1' if i<6 else '8.2','stem':st,'p':p_,'a':a_,'lv':lv})
+assert len(items)==18
 json.dump(items,open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'cq_c10h_8.json'),'w'),ensure_ascii=False,indent=1); print('cq_c10h_8',len(items))

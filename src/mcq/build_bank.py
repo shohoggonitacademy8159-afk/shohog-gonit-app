@@ -119,20 +119,30 @@ print('ch9 repeats hidden:', drop_repeats(bank['c10']['9']))   # নবম ও �
 # বর্ধিত প্রশ্ন (ext/*.json): প্রতি অংশে আরও 100টি (সহজ 40, মধ্যম 50, কঠিন 10); আগের প্রশ্ন ও নম্বর অপরিবর্তিত
 import re as _re
 def _cc(lbl):
-    m = _re.match(r'S\d*_(\w+?)_(\d+)$', lbl)
+    m = _re.match(r'[SL]\d*_(\w+?)_(\d+)$', lbl)
     if m: return m.group(1), m.group(2)
     if lbl == '8x': return 'c10', '8'
     if lbl[0] in 'hij': return {'h': 'c10h', 'i': 'h11', 'j': 'h12'}[lbl[0]], lbl[1:]
     return 'c10', lbl
 _add = {}
 for f in sorted((root / 'src/mcq/ext').glob('*.json')):
-    if f.stem.startswith('need'): continue
+    if f.stem.startswith('need') or f.stem.startswith('L'): continue
     c, ch = _cc(f.stem)
     _add.setdefault((c, ch), []).extend(json.loads(f.read_text(encoding='utf-8')))
+# L*_<cid>_<ch>.json: পরে যোগ হওয়া প্রশ্ন — আগের সব প্রশ্নের নম্বর না বদলে একেবারে শেষে বসে (ফাইলের ক্রমে)
+_late = [(f, _cc(f.stem)) for f in sorted((root / 'src/mcq/ext').glob('L*.json'), key=lambda f: int(_re.match(r'L(\d+)', f.stem).group(1)))]
 for (c, ch), items in sorted(_add.items()):
     cur = bank[c][ch]; n0 = max(x['n'] for x in cur)
     order = {lv: i for i, lv in enumerate(('সহজ', 'মধ্যম', 'কঠিন'))}
     items = sorted(items, key=lambda x: (str(x.get('ex') or ''), order[x['lv']]))
+    for i, x in enumerate(items):
+        x = dict(x); x['n'] = n0 + 1 + i
+        if not x.get('ex'): x.pop('ex', None)
+        cur.append(x)
+for f, (c, ch) in _late:
+    cur = bank[c][ch]; n0 = max(x['n'] for x in cur)
+    order = {lv: i for i, lv in enumerate(('সহজ', 'মধ্যম', 'কঠিন'))}
+    items = sorted(json.loads(f.read_text(encoding='utf-8')), key=lambda x: (str(x.get('ex') or ''), order[x['lv']]))
     for i, x in enumerate(items):
         x = dict(x); x['n'] = n0 + 1 + i
         if not x.get('ex'): x.pop('ex', None)
