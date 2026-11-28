@@ -51,6 +51,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .topbar h1{font-family:var(--font-display);font-size:22px;font-weight:400}
 .iconbtn{width:44px;height:44px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;cursor:pointer;color:var(--fg)}
 .iconbtn:hover{background:var(--accent-soft)}
+.logo-big{width:112px;height:112px;border-radius:28px;box-shadow:0 8px 22px rgba(31,111,229,.18);background:#FDFBF5}
 .logo{width:84px;height:84px;border-radius:24px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--accent)}
 .field{display:flex;flex-direction:column;gap:8px}
 .field label{font-weight:600;font-size:15px}
@@ -301,10 +302,10 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .hero{margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
   padding:18px 16px 20px;background:linear-gradient(180deg,var(--hero-2),var(--hero));color:var(--hero-ink);border-radius:0 0 26px 26px;
   display:flex;align-items:center;gap:10px}
-.hero .logo-art{width:62px;height:62px;flex-shrink:0}
+.hero .logo-img{width:60px;height:60px;flex-shrink:0;border-radius:15px;box-shadow:0 4px 12px rgba(0,0,0,.22);background:#FDFBF5}
 .hero .ttl{flex:1;min-width:0;text-align:center}
-.hero h1{font-family:var(--font-display);font-weight:400;font-size:clamp(24px,7vw,32px);line-height:1.15}
-.hero p{margin:4px 0 0;font-size:14px;opacity:.95}
+.hero h1{font-family:'Hind Siliguri',sans-serif;font-weight:700;font-size:clamp(26px,7.6vw,34px);line-height:1.1;letter-spacing:.2px;text-shadow:0 2px 6px rgba(0,0,0,.18)}
+.hero p{margin:6px auto 0;font-size:13.5px;font-weight:600;display:inline-block;padding:3px 12px;border-radius:999px;background:rgba(255,255,255,.16);opacity:1}
 .hero .iconbtn{color:var(--hero-ink)}
 .hero .iconbtn:hover{background:rgba(255,255,255,.15)}
 .panel{background:var(--panel);border:1px solid var(--panel-line);border-radius:22px;overflow:hidden}
@@ -1336,7 +1337,7 @@ function go(view, extra){ Object.assign(S, extra||{}); S.view=view; render(); wi
 function vLogin(){
   return `<div class="screen auth">
     <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
-      <div class="logo"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS.compass}</svg></div>
+      <img class="logo-big" src="logo.png" alt="অংকবাড়ি লোগো" width="112" height="112">
       <h1 class="display" style="font-size:36px">অংকবাড়ি</h1><p style="margin:-6px 0 0;font-weight:600;color:var(--accent);font-size:15px">সহগ গণিত একাডেমি</p>
       <p class="muted" style="margin:0;font-size:17px">আপনার গণিত যাত্রায় স্বাগতম</p>
     </div>
@@ -1420,8 +1421,8 @@ function vHome(){
   const anim=!HOME_ANIM_DONE; if(anim) setTimeout(()=>{ HOME_ANIM_DONE=true; },1500);
   return `<div class="screen home ${anim?'enter':''}">
     <header class="hero">
-      <span class="logo-art">${art('logo')}</span>
-      <div class="ttl"><h1>অংকবাড়ি</h1><p>গণিত শেখার নিজের ঘর</p></div>
+      <img class="logo-img" src="logo-mark.png" alt="অংকবাড়ি লোগো" width="60" height="60">
+      <div class="ttl"><h1>অংকবাড়ি</h1><p>গণিত শেখার নতুন ঠিকানা</p></div>
       <button class="iconbtn" data-go="report" aria-label="লার্নিং রিপোর্ট">${svg('growth','width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4"')}</button>
     </header>
     ${CAN_EDIT?`<button class="adminbar" data-go="admin">${svg('pencil')}<span>অ্যাডমিন প্যানেল: রুটিন ও সিলেবাস প্রকাশ</span></button>`:''}
@@ -3812,7 +3813,7 @@ function vAuth(){
   const phoneId=normPhone(au.id);
   return `<div class="screen auth">
     <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
-      <div class="logo"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS.compass}</svg></div>
+      <img class="logo-big" src="logo.png" alt="অংকবাড়ি লোগো" width="112" height="112">
       <h1 class="display" style="font-size:34px">অংকবাড়ি</h1><p style="margin:-6px 0 0;font-weight:600;color:var(--accent);font-size:14px">সহগ গণিত একাডেমি</p>
       <p class="muted" style="margin:0;font-size:16px">${fg?'পাসওয়ার্ড ভুলে গেছ?':reg?'প্রথমবার? অ্যাকাউন্ট খুলে শুরু করো':'তোমার অ্যাকাউন্টে লগইন করো'}</p>
     </div>

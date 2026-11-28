@@ -48,3 +48,26 @@ prev.paste(v,(0,0),cm2)
 sm=Image.new('L',(P,P),0); ImageDraw.Draw(sm).rounded_rectangle((0,0,P-1,P-1),radius=P//4,fill=255); prev.paste(v,(P+20,0),sm)
 prev.paste(full.resize((P,P)),(2*P+40,0),full.resize((P,P)))
 prev.save('/tmp/icon_prev.png'); print('icons done')
+# অ্যাপের ভেতরের লোগো (হোম হেডার ও লগইন পাতা)
+full.resize((256,256),Image.LANCZOS).save(os.path.join(ROOT,'www/logo.png'),optimize=True)
+# স্প্ল্যাশ: নীল পটভূমিতে মাঝখানে লোগো
+def splash(w,h):
+    top,bot=(63,139,240),(31,111,229); g=Image.new('RGB',(1,h))
+    for y in range(h): t=y/max(1,h-1); g.putpixel((0,y),tuple(int(top[i]+(bot[i]-top[i])*t) for i in range(3)))
+    c=g.resize((w,h)).convert('RGBA'); s=int(min(w,h)*0.46); lg=full.resize((s,s),Image.LANCZOS)
+    sh=Image.new('RGBA',(s+60,s+60),(0,0,0,0)); sh.paste((0,0,0,90),(30,38),lg.split()[3]); sh=sh.filter(ImageFilter.GaussianBlur(14))
+    c.alpha_composite(sh,((w-s)//2-30,(h-s)//2-30)); c.alpha_composite(lg,((w-s)//2,(h-s)//2)); return c.convert('RGB')
+splash(480,800).save(os.path.join(RES,'drawable/splash.png'))
+for d,(w,h) in {'mdpi':(320,480),'hdpi':(480,800),'xhdpi':(720,1280),'xxhdpi':(960,1600),'xxxhdpi':(1280,1920)}.items():
+    for o,(ww,hh) in (('port',(w,h)),('land',(h,w))):
+        p=os.path.join(RES,f'drawable-{o}-{d}')
+        if os.path.isdir(p): splash(ww,hh).save(os.path.join(p,'splash.png'))
+print('logo & splash done')
+# হেডারের ছোট লোগো: শুধু বাড়ি ও চিহ্নগুলো (লেখা ছাড়া), ক্রিম গোলাকার টাইলে
+sc=W/1254; box=[int(v*sc) for v in (95,55,1175,700)]
+mk=src.crop(box).convert('RGBA'); T=512; tile=Image.new('RGBA',(T,T),BG+(255,))
+k=min((T*0.88)/mk.width,(T*0.88)/mk.height); mk=mk.resize((int(mk.width*k),int(mk.height*k)),Image.LANCZOS)
+tile.paste(mk,((T-mk.width)//2,(T-mk.height)//2+8))
+rm=Image.new('L',(T,T),0); ImageDraw.Draw(rm).rounded_rectangle((0,0,T-1,T-1),radius=T//4,fill=255)
+out=Image.new('RGBA',(T,T),(0,0,0,0)); out.paste(tile,(0,0),rm); out.resize((192,192),Image.LANCZOS).save(os.path.join(ROOT,'www/logo-mark.png'),optimize=True)
+print('mark done')
